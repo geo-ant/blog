@@ -378,12 +378,14 @@ from a type, your users will have to go through a bit of pain to migrate.
 
 I'm not sure if this concept is common in other language, but both 
 C++ and Rust have move semantics. However, the way the languages think about
-move semantics is _very_ different. We'll explore the differences a bit in this
-section, before coming to our surprisingly short conclusion of how move constructors
-work in Rust.
+move semantics is _very_ different. That makes this section pretty straightforward.
 
-TODO: rust has destructive move semantics, so there's no equivalent for move constructors
-and they would not serve any purpose in Rust. 
+We've already mentioned that Rust has destructive move 
+semantics and ownership is is passed with a move. That means that there is 
+no need for a move constructor and Rust simply does not have an equivalent. That 
+also frees us from the burden of leaving moved-from values in a defined state.
+In Rust, there is no such thing as a moved-from value, since the compiler will
+not let you access it.
 
 # Conversions
 
