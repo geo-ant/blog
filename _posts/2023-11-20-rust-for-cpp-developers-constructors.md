@@ -376,7 +376,7 @@ from a type, your users will have to go through a bit of pain to migrate.
 
 # Move Constructors
 
-I'm not sure if this concept is common in other language, but both 
+I'm not sure if this concept is common in other languages, but both 
 C++ and Rust have move semantics. However, the way the languages think about
 move semantics is _very_ different. That makes this section pretty straightforward.
 
