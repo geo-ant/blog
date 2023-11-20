@@ -336,8 +336,9 @@ impl Copy for Rectangle {}
 
 You could also --you guessed it-- stick a `#derive(Copy)` above the struct definition.
 There's a couple important things to note about types that implement `Copy`. Firstly,
-for a type to implement `Copy`, it must also implement `Clone`. The compiler 
-enforces that. Further, the Rust documentation 
+for a type to implement `Copy`, it must also implement `Clone`. Also every field of a 
+type that is declared `Copy` must itself be `Copy`. The compiler 
+enforces both these things. Further, the Rust documentation 
 [states](https://doc.rust-lang.org/std/clone/trait.Clone.html#how-can-i-implement-clone):
 
 > Types that are Copy should have a trivial implementation of Clone. 
@@ -346,14 +347,32 @@ enforces that. Further, the Rust documentation
 > this invariant; however, unsafe code must not rely on it to ensure memory safety.
 
 The compiler cannot enforce that, but it can help us do the right thing if we just
-`#[derive(Clone,Copy)]`. However, the aforementioned caveats on generic types apply.
+`#[derive(Clone,Copy)]`. However, the aforementioned caveats on implementing 
+`Clone` on generic types apply.
 
-TODO copy trait example. TODO mention that copy implies clone and that I don't 
-know a clone of a copy type is always optimized away. NOTE ALSO about
-https://doc.rust-lang.org/std/clone/trait.Clone.html#how-can-i-implement-clone
-!!MAYBE IN FOOTNOTE
+### Copy vs Clone 
 
-!!! TODO DERIVING CLONE for generics is a bit surprising: https://stegosaurusdormant.com/understanding-derive-clone/
+We already saw how `Clone` comes in useful when we want to pass a copy of an 
+instance by value. Now `Copy` does something with our types that is much closer 
+to the C++ semantics. Now every assignment or pass-by-value becomes an implicit
+bitwise copy instead of a destructive move. `Copy` is the reason we can use
+primitive types like `f32`, `u64` like this:
+
+```rust
+fn add(lhs: i32, right: i32) -> i32 {
+    lhs + rhs
+}
+
+let x = 5;
+let y = x; // (1)
+let z = add(x,y); // (2)
+print("{x}+{y}={z}");
+```
+
+If `i32` wasn't `Copy`, then `x` would have been moved in &#9312; and `x` and `y` would
+have been moved in &#9313;. It's a useful semantic to have but if you're a library
+maintainer it's also a hell of a commitment to make, because if you remove `Copy`
+from a type, your users will have to go through a bit of pain to migrate.
 
 # Move Constructors
 
