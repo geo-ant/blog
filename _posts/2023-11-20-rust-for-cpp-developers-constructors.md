@@ -66,7 +66,8 @@ The ISO C++ website calls it a "technique that provides more intuitive and/or
 safer construction operations for users of your class" ([link](https://isocpp.org/wiki/faq/ctors#named-ctor-idiom)).
 
 Interestingly, that's exactly how we would do it in Rust. We just write an associated
-function (the equivalent of a static member function) and pass arguments to it.
+function (the equivalent of a static member function) that returns `Self` and takes 
+some arguments.
 
 ```rust
 struct Rectangle {
@@ -130,7 +131,7 @@ can fail, we just make it explicit in the signature and have it return `Result<S
 where `Error` is an appropriate error type. An example in the standard
 library is [`CString::new`](https://doc.rust-lang.org/std/ffi/struct.CString.html#method.new)
 that takes a string of bytes and transforms it into a 
-C-style (null-terminated) string. It will return an error if there 
+C-style (null-terminated) string. It will return an error if there are
 internal null-bytes in the given input. 
 
 # Default Constructors
@@ -141,8 +142,8 @@ constructor and is required e.g. for many operations in standard library contain
 It's so essential in C++ that writing `T t;` for a user defined `T` will not give us 
 an uninitialized instance of `T` but a default constructed one.
 
-The extand of what _default constructed_ means semantically will vary from type to type but
-at least it implies that the instance will not contain random nonsense. A default 
+The extent of what _default constructed_ means semantically will vary from type to type but
+at least it implies that the instance will not consist of utter random nonsense. A default 
 constructed `std::shared_ptr` will not be safe to dereference but at least it contains 
 a null pointer, which is much better than a random address. If you are writing a 
 numerical optimization library, the default constructed instance of your `Optimizer` type 
@@ -332,15 +333,14 @@ called [Copy](https://doc.rust-lang.org/std/marker/trait.Copy.html) for it. Mark
 traits are traits that have no associated methods and instead tell the compiler 
 some semantic properties about our type. Although it has no methods, the compiler will 
 not automatically implement the `Copy` trait on your types, since Rust wants you to be 
-explicit about the semantics of your types[^auto-traits].
-
-Implementing the `Copy` trait for our type is easy since it has no methods:
+explicit about the semantics of your types[^auto-traits]. Implementing the `Copy`
+trait for our type is easy since it has no methods:
 
 ```rust 
 impl Copy for Rectangle {}
 ```
 
-You could also --you guessed it-- stick a `#derive(Copy)` above the struct definition.
+You could also --you guessed it-- stick a `#[derive(Copy)]` above the struct definition.
 There's a couple important things to note about types that implement `Copy`. Firstly,
 for a type to implement `Copy`, it must also implement `Clone`. Also every field of a 
 type that is declared `Copy` must itself be `Copy`. The compiler 
@@ -375,7 +375,7 @@ let z = add(x,y); // (2)
 print("{x}+{y}={z}");
 ```
 
-If `i32` wasn't `Copy`, then `x` would have been moved in &#9312; and `x` and `y` would
+If `i32` wasn't `Copy`, then `x` would have been moved in &#9312; and `y` would
 have been moved in &#9313;. It's a useful semantic to have but if you're a library
 maintainer it's also a hell of a commitment to make, because if you remove `Copy`
 from a type, your users will have to go through quite a bit of pain to migrate.
@@ -420,9 +420,9 @@ but explicit[^deref]. As with a lot of the previous sections, the solution comes
 of traits. In this case, the two generic traits [`From<T>`](https://doc.rust-lang.org/std/convert/trait.From.html)
 and [`Into<T>`](https://doc.rust-lang.org/std/convert/trait.Into.html).
 To implement `From<T>` for our type `U` we must implement the function `from(value:T) -> U`
-which transforms a type `U` to type `T`. To implement `Into<T>` for a type `U`,
-we must implement the function `into(self) -> U`, which transforms a type `T` into
-a type `U`.
+which transforms a type `T` to type `U`. To implement `Into<T>` for a type `U`,
+we must implement the function `into(self) -> T`, which also transforms `U` into
+`T`.
 
 If we don't want to take ownership of the value, we can also implement the traits 
 on references, e.g. implement `Into<T> for &U` and so on.
@@ -456,7 +456,7 @@ let first = BigInteger::from(-1i32);
 let second = BigInteger::from(10u64);
 ```
 
-Moreover Rust will, behind the scenes implement `Into<BigInteger>` for 
+Additionally Rust will behind the scenes implement `Into<BigInteger>` for 
 both `i32` and `u64`, so that we can convert both those types to `BigInteger`
 by calling `into`.
 
@@ -467,7 +467,6 @@ fn add(first :BigInteger, second:BigInteger) -> BigInteger {
 
 let x = 10i32;
 let y = 20u64;
-
 let z = add(x.into(),y.into());
 ```
 
@@ -482,11 +481,13 @@ round.
 Conversely, if we want to accept a type `T` that can be made into a `BigInteger`, 
 we should constrain the type on `T: Into<BigInteger>` rather than `BigInteger: From<T>`, 
 because there are possibly more types implementing the first trait bound than the latter.
-So if we want to make out `add` function generic and have it perform the addition
+So if we want to make our `add` function generic and have it perform the addition
 without us having to manually call `into`, we would write it like so:
 
 ```rust
-fn add<T,U> (first : T, second : U) -> BigInteger {
+fn add<T,U> (first : T, second : U) -> BigInteger
+    where T: Into<BigInteger>, 
+          U: Into<BigInteger> {
     first.into() + second.into()
 }
 ```
@@ -501,15 +502,15 @@ This article is already pretty long, so I'll keep this section brief. Looking at
 the metod signatures for `From` and `Into`, we can see that they cannot return 
 an error. To implement a conversion that can return an error, we can use the 
 [`TryFrom`](https://doc.rust-lang.org/std/convert/trait.TryFrom.html) and 
-[`TryInto`](https://doc.rust-lang.org/std/convert/trait.TryInto.html). They work 
+[`TryInto`](https://doc.rust-lang.org/std/convert/trait.TryInto.html) traits. They work 
 analogous to their `From` and `Into` counterparts, but allow us to specify an error type `Error`
 and return a `Result<Self,Error>` to indicate conversions that can fail.
 
-# Conclusion 
+# Summary 
 
 I hope I have covered all the important use cases of constructors in C++ and shown 
 if and how we can map them to Rust. If not, please let me know and I'll add more 
-use cases here. The one key take that I tried to hammer home is that Rust values 
+use cases here. The one point that I tried to hammer home is that Rust values 
 explicitness. Explicit copies, clones, conversions and even being explicit in 
 what we want implemented even if the compiler could trivially do so. When I go 
 back to C++ now, I often find myself using ideoms like errors 
