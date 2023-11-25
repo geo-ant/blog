@@ -11,11 +11,11 @@ title: 'Idiomatic Rust (for C++ Devs): Constructors & Conversions'
 #
 #
 # Make sure this image is correct !!!
-og_image: 
+og_image: rust-4-cpp-constructors.png
 #
 #
 # Make sure comments are enabled !!!	
-comments_id: 
+comments_id: 54
 ---
 
 Starting out in Rust as a C++ developer, one of the features I missed most
@@ -33,7 +33,7 @@ if and how we can map them to Rust.
 
 One of the most obvious (and most important) purposes of constructors is to 
 provide a way to initialize an instance of a type[^initialization-cpp]. Say 
-we have a simple class definition like so:
+we have a simple class declaration like so:
 
 ```c++
 class Rectangle {
@@ -55,8 +55,8 @@ int main() {
 Here, the constructor allows us to initialize the private fields of the 
 `Rectangle` class, which is pretty useful if we appreciate encapsulation. 
 
-Before we jump into how map this usecase to Rust,
-let's note that in C++ constructors are so called _special member functions_.
+Before we jump into how to map this usecase to Rust,
+let's note that constructors are so called _special member functions_ in C++.
 They have special syntax for both how they are defined and how they are used,
 but really constructors are just functions that take some arguments and return an instance 
 of the type. There's nothing stopping us from just creating a static member 
@@ -66,7 +66,7 @@ The ISO C++ website calls it a "technique that provides more intuitive and/or
 safer construction operations for users of your class" ([link](https://isocpp.org/wiki/faq/ctors#named-ctor-idiom)).
 
 Interestingly, that's exactly how we would do it in Rust. We just write an associated
-function (the equivalent of a static member function) that returns `Self` and takes 
+function (the equivalent of a static member function) that returns `Self`[^Self] and takes 
 some arguments.
 
 ```rust
@@ -92,10 +92,10 @@ impl Rectangle {
 }
 ```
 
-Rust has no special syntax or semantics for constructors. If we want to provide them,
+Rust has no special syntax or semantics for these types of constructors. If we want to provide them,
 we just write associated functions that return an instance of our type. Since 
 `new` is not a keyword in Rust, it is customary (but by no means mandatory) to call 
-one constructor of your type, preferrebly one that a lot of users will interact with,
+one constructor of our type, preferrebly one that a lot of users will interact with,
 `new`. That `new`-function can take the number of arguments that make sense (including no arguments).
 For our rectangle that would be the width and height.
 
@@ -137,7 +137,7 @@ internal null-bytes in the given input.
 # Default Constructors
 
 Another supremely important use case of constructors is _default construction_.
-A constructor that can be called with no arguments[^no-arg-constructor] is a default
+In C++, a constructor that can be called with no arguments[^no-arg-constructor] is a default
 constructor and is required e.g. for many operations in standard library containers.
 It's so essential in C++ that writing `T t;` for a user defined `T` will not give us 
 an uninitialized instance of `T` but a default constructed one.
@@ -145,8 +145,9 @@ an uninitialized instance of `T` but a default constructed one.
 The extent of what _default constructed_ means semantically will vary from type to type but
 at least it implies that the instance will not consist of utter random nonsense. A default 
 constructed `std::shared_ptr` will not be safe to dereference but at least it contains 
-a null pointer, which is much better than a random address. If you are writing a 
-numerical optimization library, the default constructed instance of your `Optimizer` type 
+a null pointer, which is much better than a random address. A default constructed 
+`std::string` will be empty and can be safely printed. If we are designing 
+numerical optimization library, the default constructed instance of our `Optimizer` type 
 could contain sensible default values for stopping criteria and tolerances and 
 thus might be ready for use as-is.
 
@@ -163,7 +164,7 @@ for exactly that. Don't worry if you don't know enough about traits yet
 to understand how to actually use the `Default` trait in practice. I'll go 
 over an example of using trait bounds further below in the section on conversions.
 
-Now we can implement the `Default` trait for our struct manually like so:
+Now, we can implement the `Default` trait for our struct manually like so:
 
 ```rust
 impl Default for Rectangle {
@@ -230,9 +231,8 @@ invoking the copy constructors of the member fields. I just did that to make it 
 that, just as with the default constructor above, we can let the compiler implement 
 the boilerplate for us. We do that by sticking the `#[derive(Clone)]` annotation
 before the struct definition. This is the semantic equivalent of `default`ing the 
-copy constructor in C++, only that the Rust compiler will never implement a default constructor 
-for us automatically. We have to explicitly tell it to implement one. Since we already 
-derived `Default`, this now looks like so:
+copy constructor in C++, only that the Rust compiler will never implement a copy constructor 
+for us without being explicitly told to. Since we already derived `Default`, this now looks like so:
 
 ```rust
 #[derive(Default, Clone)]
@@ -266,7 +266,8 @@ In this case `original` is not accessible any more after it has been passed to
 the `flip` function. That can be pretty helpful because it allows the `flip`
 function to reuse the already allocated image buffers to perform its magic. But
 what if we wanted to display both the original and the flipped image next to each
-other? Well, that's where `Clone` comes in handy, assuming our `Image` implements it:
+other? Well, that's where `Clone` can come in handy, assuming our `Image` implements 
+it[^clone-image]:
 
 ```rust 
 let flipped = flip(original.clone());
@@ -278,7 +279,7 @@ is not unlike pass-by-value semantics in C++. However, in Rust
 we have to explicitly call the copy constructor via a call to `clone`, while in 
 C++ the copy constructor is invoked implicitly. I found the explicit cloning 
 pretty irritating at first, but I realized soon that it's a great way to 
-spot optimization opportunities and it encourages me to think carefully about
+spot optimization opportunities and it encourages me to think more carefully about
 the ownership semantics of my APIs.
 
 ### Deriving Clone on Generic Types 
@@ -332,8 +333,8 @@ Rust also has the concept of trivially copyable types and has a marker trait
 called [Copy](https://doc.rust-lang.org/std/marker/trait.Copy.html) for it. Marker 
 traits are traits that have no associated methods and instead tell the compiler 
 some semantic properties about our type. Although it has no methods, the compiler will 
-not automatically implement the `Copy` trait on your types, since Rust wants you to be 
-explicit about the semantics of your types[^auto-traits]. Implementing the `Copy`
+not automatically implement the `Copy` trait on our types, since Rust wants you to be 
+explicit about the semantics of our types[^auto-traits]. Implementing the `Copy`
 trait for our type is easy since it has no methods:
 
 ```rust 
@@ -360,7 +361,7 @@ The compiler cannot enforce that, but it can help us do the right thing if we ju
 
 We already saw how `Clone` comes in handy for passing a copy of an 
 instance by value. Now `Copy` does something with our types that is much closer 
-to the C++ semantics. Now every assignment or pass-by-value becomes an implicit
+to the C++ semantics: every assignment or pass-by-value becomes an implicit
 bitwise copy instead of a destructive move. `Copy` is the reason we can use
 primitive types like `f32`, `u64` like this:
 
@@ -387,7 +388,7 @@ C++ and Rust have move semantics. However, the way the two languages think about
 move semantics is _very_ different. That makes this section pretty straightforward.
 
 We've already mentioned that Rust has destructive move 
-semantics and ownership is passed with a move. That means that there is 
+semantics and ownership is transferred with a move. That means that there is 
 no need for a move constructor and Rust simply does not have an equivalent. That 
 also frees us from the burden of leaving moved-from values in a defined state.
 In Rust, there is no such thing as a moved-from value, since the compiler will
@@ -396,7 +397,7 @@ not let us access it.
 # Conversions
 
 The last major usecase --hoping I did not forget one-- of constructors in C++ are
-conversions. In fact every constructor that can be called with one parameter is 
+conversions. In fact, every constructor that can be called with one parameter is 
 a [converting constructor](https://en.cppreference.com/w/cpp/language/converting_constructor).
 That is, unless it is declared with the keyword `explicit`, which is considered
 [a better default practice](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rc-explicit)
@@ -420,15 +421,16 @@ but explicit[^deref]. As with a lot of the previous sections, the solution comes
 of traits. In this case, the two generic traits [`From<T>`](https://doc.rust-lang.org/std/convert/trait.From.html)
 and [`Into<T>`](https://doc.rust-lang.org/std/convert/trait.Into.html).
 To implement `From<T>` for our type `U` we must implement the function `from(value:T) -> U`
-which transforms a type `T` to type `U`. To implement `Into<T>` for a type `U`,
-we must implement the function `into(self) -> T`, which also transforms `U` into
-`T`.
+which transforms a type `T` to type `U`. To implement `Into<U>` for a type `T`,
+we must implement the function `into(self) -> U`, which also transforms `T` to `U`.
+If this seems like both traits are just reduntant ways to define a transformation
+`T -> U`, bear with me. The distinction will become clearer soon.
 
-If we don't want to take ownership of the value, we can also implement the traits 
-on references, e.g. implement `Into<T> for &U` and so on.
+As an important aside, note that if we don't want to take ownership of the value,
+we can also implement the traits on references, e.g. implement `Into<T> for &U` and so on.
 
 For an example let's pretend we're working on a `BigInteger` type that can store 
-large integer numbers. Obviously we want to offer a converting constructor from
+large integer numbers. Naturally, we want to offer a converting constructor from
 types like `i32`, `u64` and so on.
 
 ```rust
@@ -456,7 +458,7 @@ let first = BigInteger::from(-1i32);
 let second = BigInteger::from(10u64);
 ```
 
-Additionally Rust will behind the scenes implement `Into<BigInteger>` for 
+Behind the scenes, Rust will also implement `Into<BigInteger>` for 
 both `i32` and `u64`, so that we can convert both those types to `BigInteger`
 by calling `into`.
 
@@ -470,17 +472,20 @@ let y = 20u64;
 let z = add(x.into(),y.into());
 ```
 
-As a matter of fact, it's true that if we implement `From<U> for T`, then 
-the type `U` will get a so called [blanket implementation](https://doc.rust-lang.org/std/convert/trait.Into.html)
-of `Into<T>`, courtesy of the standard library. That's why it is 
+As a matter of fact, it's true that if we implement `From<T> for U`, then 
+the type `T` will get a so called [blanket implementation](https://doc.rust-lang.org/std/convert/trait.Into.html)
+of `Into<U>`, courtesy of the standard library. That's why it is 
 [recommended](https://doc.rust-lang.org/std/convert/trait.Into.html)
-to implement `From<U> for T` rather than `Into<T> for U`, if possible, because we 
-get the `Into` implementation for free when implementing `From` but not the other way 
-round.
+to implement `From<T> for U` rather than `Into<U> for T`, if possible. The reason
+is that we get the `Into` implementation for free when implementing 
+`From` but not the other way round[^from-into-blanket]. If we cannot implement 
+`From<T> for U`, we are still free to implement `Into<U> for T`.
 
-Conversely, if we want to accept a type `T` that can be made into a `BigInteger`, 
-we should constrain the type on `T: Into<BigInteger>` rather than `BigInteger: From<T>`, 
-because there are possibly more types implementing the first trait bound than the latter.
+In contrast to the recommendation on _implementing_ conversion traits, if we 
+want to _constrait_ on them the advice is flipped around. That is, if we want to accept 
+a type `U` that can be made into a `T`, we should constrain the type on 
+`U: Into<T>` rather than `T: From<U>`, because there are 
+possibly more types implementing the first trait bound than the latter.
 So if we want to make our `add` function generic and have it perform the addition
 without us having to manually call `into`, we would write it like so:
 
@@ -493,13 +498,13 @@ fn add<T,U> (first : T, second : U) -> BigInteger
 ```
 
 That is, provided our `BigInteger` type supports addition, which we can implement 
-using the [`Add`](https://doc.rust-lang.org/std/ops/trait.Add.html) trait but I'll 
+using the [`Add`](https://doc.rust-lang.org/std/ops/trait.Add.html) trait. But I'll 
 leave that for another time.
 
 ## Coversions that Fail
 
-This article is already pretty long, so I'll keep this section brief. Looking at 
-the metod signatures for `From` and `Into`, we can see that they cannot return 
+This article is already pretty long, so I'll keep this brief. Looking at 
+the associated function signatures for `From` and `Into`, we can see that they cannot return 
 an error. To implement a conversion that can return an error, we can use the 
 [`TryFrom`](https://doc.rust-lang.org/std/convert/trait.TryFrom.html) and 
 [`TryInto`](https://doc.rust-lang.org/std/convert/trait.TryInto.html) traits. They work 
@@ -512,13 +517,12 @@ I hope I have covered all the important use cases of constructors in C++ and sho
 if and how we can map them to Rust. If not, please let me know and I'll add more 
 use cases here. The one point that I tried to hammer home is that Rust values 
 explicitness. Explicit copies, clones, conversions and even being explicit in 
-what we want implemented even if the compiler could trivially do so. When I go 
-back to C++ now, I often find myself using ideoms like errors 
-as values or named constructors.
+what is implemented, even if the compiler could trivially do so. When I go 
+back to C++ now, I often find myself adhering to these more Rusty idioms.
 
 # Endnotes
 [^initialization-cpp]: It would not be C++ if there weren't potentially many ways of initialization that interact in complex ways with each other. There's even [a book](https://leanpub.com/cppinitbook) dedicated solely to this very topic.
-[^concept-triv]: It's not a _concept_ in the C++20 meaning of the word. Strictly speaking it is a _named requirement_.
+[^concept-triv]: It's not a _concept_ in the C++20 meaning of the word. 
 [^auto-traits]: There are a handful of marker traits that the compiler will implicitly implement for you if appropriate. Those are called [Auto Traits](https://doc.rust-lang.org/beta/reference/special-types-and-traits.html#auto-traits) and are very carefully chosen. The most common auto traits that programmers interact with are the `Send` and `Sync` traits that are important for describing thread safety via the type system.
 [^named-constr]: One drawback I can think of with using static functions as named constructors in C++ is that they won't be useful in contexts like `emplace` or `std::make_shared` where we use perfect forwarding of constructor arguments for in place construction of objects.
 [^function-overloading]: You _can_ abuse the trait system to get something like overloading. Don't do that.
@@ -529,3 +533,6 @@ as values or named constructors.
 [^tc-ub]: It's important to note that it's undefined to rely on manual specializations of `std::is_trivially_copyable`.
 [^by-value]: The wording here is a bit C++ inspired, but if we want to be absolutely precise, everything in Rust is passed by value, including references. In Rust, references are pointers with a whole lot of compile time guardrails, but pointers nonetheless. That's why we have to dereference them. In that sense it's closer to C than C++. A pointer itself in C is also passed by value, but it's pointee may be modifyable, depending on constness.
 [^deref]: Although Rust forces most conversions to be explicit, it does not abandon all forms of implict conversions either. There is a mechanism called [`Deref` coercion](https://doc.rust-lang.org/std/ops/trait.Deref.html#more-on-deref-coercion).
+[^Self]: In an `impl` block, `Self` refers to the type itself. For our `Rectangle` we could just have written out `Rectangle`, but for more complex types involving generics it becomes tedious quickly.
+[^clone-image]: This is just to serve as an illustration of explicit cloning. I'm not saying this is the best API for that particular problem.
+[^from-into-blanket]: The standard library implementors could just as well have chosen to do the blanket implementation the other way round. It's just the way they chose to do it at the time.
