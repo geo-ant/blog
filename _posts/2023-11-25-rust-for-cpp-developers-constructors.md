@@ -2,7 +2,7 @@
 layout: post
 tags: rust c++ patterns 
 #categories: []
-date: 2023-11-20
+date: 2023-11-25
 last_updated: 
 #excerpt: ''
 #description:
