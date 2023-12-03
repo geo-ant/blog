@@ -56,7 +56,7 @@ The fundemental idea of VarPro is that we can eliminate all linear parameters $$
 
 $$ \boldsymbol{\hat{c}}(\boldsymbol\alpha) = \arg \min_{\boldsymbol{c} \in \mathbb{R}^n} \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{\eta}(\boldsymbol{\alpha},\boldsymbol{c}))}\rVert_2^2 \label{LSMinimization} \tag{3},$$
 
-for any fixed $$\boldsymbol{\alpha}$$. Then obviously the full problem $$\eqref{FullMinimization}$$ is equivalent to the following reduced problem:
+for any fixed $$\boldsymbol{\alpha}$$. Then[^rank-conditions] the full problem $$\eqref{FullMinimization}$$ is equivalent to the following reduced problem:
 
 $$ \min_{\boldsymbol{\alpha} \in \mathcal{S}_\alpha} \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{\eta}(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha})))}\rVert_2^2 \label{ReducedMinimization} \tag{4},$$
 
@@ -233,3 +233,4 @@ The expressions are grouped in such a way that only matrix vector products need 
 [^model_base_functions]: This name might not always be accurate because the functions don't necessarily have to be linearly independent. However, for a good model they should be. See also the discussions later on the rank of $$\boldsymbol{\Phi}$$.
 [^derivatives]: Under the condition that we have analytical expressions for the partial derivatives $$\partial/\partial\alpha_k \phi_j(\boldsymbol\alpha,t)$$ of the model base functions.
 [^L2Solution]: The solution $$\boldsymbol{\hat{c}}$$ is not unique. The solution given here (using the pseudoinverse) has the smallest 2-Norm $$\lVert\boldsymbol{\hat{c}}\rVert_2^2$$ among all solutions that minimize the problem, see [here](https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse#Linear_least-squares)
+[^rank-conditions]: I've glossed over an important precondition that must hold before we can really separate the linear and nonlinear optimization as shown above. The matrix $$\boldsymbol{\Phi}(\boldsymbol{\alpha})$$ must have locally constant rank in a neighborhood of $$\boldsymbol{\alpha}$$.
