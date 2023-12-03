@@ -45,8 +45,7 @@ part in which I would retcon LINK!!! the ending and also extend the
 article significantly beyond its initial scope.
 
 # Recap: The Variable Projection Algorithm
-
-
+I'll quicklyj
 
 # Endnotes
 [^mrhs-old]: 
