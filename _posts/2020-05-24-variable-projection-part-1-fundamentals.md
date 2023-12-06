@@ -7,7 +7,7 @@ date: 2020-05-24
 #image: 'BASEURL/assets/blog/img/.png'
 #description:
 #permalink:
-title: 'The Variable Projection Method - Fundamentals of Nonlinear Least Squares Fitting with VarPro'
+title: 'The Variable Projection Method - Nonlinear Least Squares Fitting with VarPro (Update 12/2023)'
 comments_id: 11
 ---
 
@@ -15,12 +15,13 @@ This is the first post in a series on the use of the Variable Projection method
 (VarPro) in digital image processing. The method is interesting because it makes
 clever use of linear algebra to potentially speed up and increase the robustness
 of nonlinear least squares fitting. It does so by separating linear from nonlinear
-parameters. I will recap the method based on the literature and put my own spin
-on it at the end.
+parameters. I'll recap the method based on a couple of pieces of literature in such
+a way that it will enable you to implement your own varpro in a programming language
+of your choice, given a fundamental (but not more exhaustive) understanding of 
+linear algebra. 
 
-**UPDATE 2023** I have overhauled the article and relegated some fringe ideas to
-the appendix and put more emphasis on the calculations of the Jacobian of the
-residuals.
+**UPDATE 12/2023:** I have overhauled the article and relegated some fringe ideas to
+the appendix and put more emphasis on the calculations of the Jacobian.
 
 # Before We Dive In
 Variable Projection was introduced by Gene Golub and Victor Pereyra[^golub_pereyra2002]. 
@@ -50,16 +51,17 @@ That means VarPro is *not* a nonlinear least squares minimization algorithm in
 and of itself, but a clever way of rewriting the problem before tackling it numerically.
 
 # The Math of VarPro
+
 Let's now translate the principle above into formulas. Many of the contents in 
 this section are taken from O'Leary and Rust (O'Leary 2007).
 
 ## The Fitting Function
 
-VarPro is concerned with fitting model functions $$\eta$$ that can be written 
+VarPro is concerned with fitting model functions $$f$$ that can be written 
 as a *linear combination* of $$n$$ functions that are *nonlinear*[^nonlinear_base] 
 in their parameters:
 
-$$\eta(\boldsymbol{\alpha},\boldsymbol{c},t) = \sum_{j=1}^{n} c_j\phi_j(\boldsymbol{\alpha},t).$$
+$$f(\boldsymbol{\alpha},\boldsymbol{c},t) = \sum_{j=1}^{n} c_j\phi_j(\boldsymbol{\alpha},t).$$
 
 I will refer to the $$\phi_j$$ as the *model base functions*[^model_base_functions]. 
 We group the linear parameters in the vector $$\boldsymbol{c}=(c_1,\dots,c_n)^T\in\mathbb{R}^n$$ 
@@ -67,46 +69,49 @@ and the nonlinear parameters in $$\boldsymbol{\alpha}=(\alpha_1,\dots,\alpha_q)^
 So we have $$n$$ linear parameters and $$q$$ nonlinear parameters. The independent 
 variable of the model function is $$t$$. It could, for example, represent physical 
 quantities such as time or space. It is important to note that when I use the 
-terms *linear* or *nonlinear* it refers to the behaviour of the function $$\eta$$ 
+terms *linear* or *nonlinear* it refers to the behaviour of the function $$f$$ 
 with respect to the parameter vectors $$\boldsymbol{\alpha}$$ and $$\boldsymbol{c}$$, 
 but not the independent variable $$t$$. It is completely irrelevant if the model 
 is linear or nonlinear in $$t$$.
 
 ## Weighted Least Squares
+
 We want to fit our model to a vector $$\boldsymbol{y}$$ of observations
 
 $$\boldsymbol{y}=(y_1,\dots,y_m)^T \in \mathbb{R}^m,$$
 
 where $$y_i$$ is the observation at a coordinate $$t_i$$, $$i=1,\dots,m$$. The 
-total number of observations is $$m$$. Let's write the function values for $$\eta$$ 
+total number of observations is $$m$$. Let's write the function values for $$f$$ 
 at those coordinates as a vector, too:
 
-$$\boldsymbol{\eta}(\boldsymbol{\alpha},\boldsymbol{c}) = (\eta(\boldsymbol{\alpha},\boldsymbol{c},t_1),\dots,\eta(\boldsymbol{\alpha},\boldsymbol{c},t_m))^T \in \mathbb{R}^m.$$
+$$\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c}) = (f(\boldsymbol{\alpha},\boldsymbol{c},t_1),\dots,f(\boldsymbol{\alpha},\boldsymbol{c},t_m))^T \in \mathbb{R}^m.$$
 
 We want to minimize the weighted sum of the squared residuals:
 
-$$R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) = \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{\eta}(\boldsymbol{\alpha},\boldsymbol{c}))}\rVert_2^2, \label{RWLS}\tag{1}$$
+$$R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) = \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c}))}\rVert_2^2, \label{RWLS}\tag{1}$$
 
 with the weight matrix $$\boldsymbol{W}$$. Our minimization problem is formally 
 written as
 
-$$\min_{\boldsymbol{c}\in \mathbb{R}^n, \boldsymbol{\alpha}\in\mathcal{S}_\alpha} R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) \Leftrightarrow \min_{\boldsymbol{c}\in \mathbb{R}^n, \boldsymbol{\alpha}\in\mathcal{S}_\alpha} \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{\eta}(\boldsymbol{\alpha},\boldsymbol{c}))}\rVert_2^2 \label{FullMinimization}\tag{2}.$$
+$$\min_{\boldsymbol{c}\in \mathbb{R}^n, \boldsymbol{\alpha}\in\mathcal{S}_\alpha} R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) \Leftrightarrow \min_{\boldsymbol{c}\in \mathbb{R}^n, \boldsymbol{\alpha}\in\mathcal{S}_\alpha} \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c}))}\rVert_2^2 \label{FullMinimization}\tag{2}.$$
 
 Note that the nonlinear parameters can be constrained on a subset $$\mathcal{S}_\alpha$$ of $$\mathbb{R}^q$$
 while the linear parameters are unconstrained[^unconstrained].
 
 ## Separating Linear from Nonlinear Parameters
-The fundemental idea of VarPro is that we can eliminate all linear parameters 
-$$\boldsymbol{c}$$ from the minimization problem. We do that by solving the linear 
+
+The fundemental idea of VarPro is to eliminate all linear parameters 
+$$\boldsymbol{c}$$ from the minimization problem, by solving the linear 
 subproblem separately. Assume that for a fixed $$\boldsymbol{\alpha}$$ we have 
 a coefficient vector $$\boldsymbol{\hat{c}}(\boldsymbol{\alpha})$$ which is
 
-$$ \boldsymbol{\hat{c}}(\boldsymbol\alpha) = \arg \min_{\boldsymbol{c} \in \mathbb{R}^n} \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{\eta}(\boldsymbol{\alpha},\boldsymbol{c}))}\rVert_2^2 \label{LSMinimization} \tag{3},$$
+$$ \boldsymbol{\hat{c}}(\boldsymbol\alpha) = \arg \min_{\boldsymbol{c} \in \mathbb{R}^n} \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c}))}\rVert_2^2 \label{LSMinimization} \tag{3},$$
 
-for any fixed $$\boldsymbol{\alpha}$$. Then[^rank-conditions] the full problem 
+for any fixed $$\boldsymbol{\alpha}$$, which just means that $$\boldsymbol{c}(\boldsymbol{\alpha})$$
+solves the linear subproblem. Then[^rank-conditions] the full problem 
 $$\eqref{FullMinimization}$$ is equivalent to the following reduced problem:
 
-$$ \min_{\boldsymbol{\alpha} \in \mathcal{S}_\alpha} \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{\eta}(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha})))}\rVert_2^2 \label{ReducedMinimization} \tag{4},$$
+$$ \min_{\boldsymbol{\alpha} \in \mathcal{S}_\alpha} \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha})))}\rVert_2^2 \label{ReducedMinimization} \tag{4},$$
 
 where, as stated above, $$\boldsymbol{\hat{c}}(\boldsymbol{\alpha})$$ solves 
 minimization problem $$\eqref{LSMinimization}$$. We have reduced a minimization 
@@ -126,6 +131,7 @@ a good thing. But we are getting ahead of ourselves. Let's dive into some linear
 algebra to solve the linear subproblem.
 
 ## Enter the Matrix
+
 To rewrite problem $$\eqref{LSMinimization}$$ using linear algebra we introduce 
 the of *model function matrix* $$\boldsymbol{\Phi}(\boldsymbol{\alpha}) \in \mathbb{R}^{m \times n}$$:
 
@@ -146,7 +152,7 @@ This fact will be important later, when giving an expression for its pseudoinver
 
 We can now write
 
-$$\boldsymbol{\eta}(\boldsymbol{\alpha},\boldsymbol{c})=\boldsymbol{\Phi}(\boldsymbol{\alpha})\boldsymbol{c},$$
+$$\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c})=\boldsymbol{\Phi}(\boldsymbol{\alpha})\boldsymbol{c},$$
 
 so the linear problem $$\eqref{LSMinimization}$$ becomes
 
@@ -165,52 +171,67 @@ using the pseudoinverse $$\boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha})$$
 of $$\boldsymbol{\Phi_w}(\boldsymbol{\alpha})$$. This allows us to rewrite the 
 nonlinear problem by plugging in $$\boldsymbol{\hat{c}}$$ from above
 
-$$ \min_{\boldsymbol{\alpha} \in \mathcal{S}_\alpha} \lVert \boldsymbol{P}(\boldsymbol{\alpha})\boldsymbol{y_w} \rVert_2^2 \label{NonlinProblemMatrix} \tag{7},$$
+$$ \min_{\boldsymbol{\alpha} \in \mathcal{S}_\alpha} \lVert \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w} \rVert_2^2 \label{NonlinProblemMatrix} \tag{7},$$
 
 using the matrix
 
-$$\boldsymbol{P}(\boldsymbol{\alpha}) := \boldsymbol{1}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha}) \in \mathbb{R}^{m \times m}$$
+$$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}:= \boldsymbol{1}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha}) \in \mathbb{R}^{m \times m}$$
 
 which is called the *projection onto the orthogonal complement of the range of* 
-$$\boldsymbol{\Phi_w}$$ and is often written $$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}$$ 
-in other publications (Kaufman 1975). Using this matrix we have written the squared 
+$$\boldsymbol{\Phi}_w$$. It's abbreviated to $$\boldsymbol{P}$$ in 
+(O'Leary 2007), but I'll keep using the more complex symbol which is commonly used in 
+other publications as well. Using this matrix  we have written the squared 
 sum of residuals as
 
-$$R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) = \lVert \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\hat{c}}\rVert_2^2 = \lVert{\boldsymbol{P}(\boldsymbol{\alpha})\boldsymbol{y_w}}\rVert_2^2.$$
+$$\begin{eqnarray}
+R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) &=& \lVert \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\hat{c}}\rVert_2^2 = \lVert{\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}(\boldsymbol{\alpha})\boldsymbol{y_w}}\rVert_2^2,\\
+\boldsymbol{r}_w (\boldsymbol{\alpha})&:=&  \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w}\\
+\end{eqnarray}$$
 
-This is called the *projection functional* and the reason why the method is called 
-*Variable Projection* (Mullen 2009).
+When written like this, $$R_{WLS}$$ is called the *projection functional*, which
+is the  the reason why the method is called  *Variable Projection* (Mullen 2009).
+We can see that it is just the squared 2-norm of the residual vector $$\boldsymbol{r}_w$$.
 
 At this point we are almost halfway there. Our aim is to minimize the projection 
-functional using a (possibly constrained) minimization algorithm. To achieve 
-this we need two things: First we need a way of calculating the projection functional. 
-We calculate it as $$\lVert \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\hat{c}}\rVert_2^2$$, 
-rather than using the equivalent matrix expression in equation $$\eqref{NonlinProblemMatrix}$$. 
-For that we need to calculate $$\boldsymbol{\hat{c}}$$ in a numerically feasible 
-way, which can be achieved by either [QR Decomposition](https://en.wikipedia.org/wiki/QR_decomposition#Rectangular_matrix) 
-or [Singular Value Decomposition (SVD)](http://www.omgwiki.org/hpec/files/hpec-challenge/svd.html). 
-Good linear algebra libraries, like [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page), 
-allow us to find the solution $$\boldsymbol{\hat{c}}$$ without the need to explicitly 
-use the decompositions. I will give algebraic expressions involving the decompositions 
-in the Appendix.
+functional using a (possibly constrained) minimization algorithm. If we want to 
+use high quality off the shelf least squared solvers, we need two things: first
+we need to calculate the residual vector $$\boldsymbol{r}_w$$, which requires us
+to solve the linear system in a numerically feasible manner to obtain $$\boldsymbol{\hat{c}}(\boldsymbol{\alpha})$$
+for a given $$\boldsymbol{\alpha}$$. Secondly, we need 
+to supply the [Jacobian](https://de.wikipedia.org/wiki/Jacobi-Matrix)
+of $$\boldsymbol{r}_w$$ with respect to $$\boldsymbol{\alpha}$$. Solving the linear
+system is typically achieved using either a [QR Decomposition](https://en.wikipedia.org/wiki/QR_decomposition#Rectangular_matrix) 
+or [Singular Value Decomposition (SVD)](http://www.omgwiki.org/hpec/files/hpec-challenge/svd.html)
+of $$\boldsymbol{\Phi}_w$$. We'll revisit those decompositions when giving analytical
+expressions for the Jacobian.
 
 ### Analytical Derivatives
 
-It is possible to use derivative-free algorithms to minimize the projection functional, 
-but we might want to use an algorithm which takes advantage of the derivatives. 
-Common implementations of the Levenberg-Marquardt algorithm need the Jacobian 
-matrix $$\boldsymbol{J}(\boldsymbol{\alpha})\in \mathbb{R}^{m \times q}$$ of 
-$$\boldsymbol{\eta}(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha}))$$:
+If we want to use a high quality nonlinear solver to minimize our projection functional,
+we have to supply the Jacobian $$\boldsymbol{J}(\boldsymbol{\alpha})$$
+of $$\boldsymbol{r}_w(\boldsymbol{\alpha})$$ with respect to $$\alpha$$. The Jacobian
+Matrix of $$\boldsymbol{r}_r$$ is defined as the matrix $$J$$ with entries
+$$J_{ik} = \frac{\partial (\boldsymbol{r}_w)_i}{\partial \alpha_k}$$. It's a bit
+more helpful for the following calculations to write it in a column format:
 
 $$\boldsymbol{J}(\boldsymbol{\alpha}) =  (J_{ik})
 = \left(\begin{matrix}
-\frac{\partial}{\partial \alpha_1}\eta(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha}),t_1) & \dots & \frac{\partial}{\partial \alpha_q}\eta(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha}),t_1) \\
-\vdots & \ddots & \vdots \\
-\vdots & \ddots & \vdots \\
-\frac{\partial}{\partial \alpha_1}\eta(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha}),t_m)) & \dots & \frac{\partial}{\partial \alpha_q}\eta(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha}),t_m) \\
-\end{matrix}\right),$$
+\vert & \dots & \vert \\
+\boldsymbol{j}_1 & \dots &  , \boldsymbol{j}_q \\
+\vert & \dots & \vert \\
+\end{matrix}\right)
+= \left(\begin{matrix}
+\vert & \dots & \vert \\
+\frac{\partial}{\partial \alpha_1}\boldsymbol{r}_w, & \dots &  ,\frac{\partial}{\partial \alpha_q}\boldsymbol{r}_w & \\
+\vert & \dots & \vert \\
+\end{matrix}\right) $$
 
-with matrix entries $$J_{ik} = \frac{\partial\eta}{\partial \alpha_k}(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha}),t_i)$$. The Jacobian can be expressed as a sum of two matrices
+
+The derivative $$\frac{\partial}{\partial \alpha_k} \boldsymbol{r}_w$$ is simply
+the element wise derivative of the residual vector with respect to the scalar
+$$\alpha_k$$.
+
+with matrix entries $$J_{ik} = \frac{\partial f}{\partial \alpha_k}(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha}),t_i)$$. The Jacobian can be expressed as a sum of two matrices
 
 $$\boldsymbol{J}(\boldsymbol{\alpha}) = -(\boldsymbol{A}(\boldsymbol{\alpha})+\boldsymbol{B}(\boldsymbol{\alpha})),$$
 
@@ -238,18 +259,61 @@ $$\boldsymbol{D_k}(\boldsymbol\alpha) := \frac{\partial \boldsymbol{\Phi_w}}{\pa
 where the derivative is performed element-wise for $$\boldsymbol{\Phi_w}$$. If 
 we want to use off-the-shelf least squares solvers, e.g. implementations of the
 Levenberg-Marquardt algorithm to find a solution, then it is necessary to 
-know the Jacobian of $$\eta$$. 
+know the Jacobian of $$f$$. 
 
-## Approximating the Jacobian and Gradient
+## The Kaufman Approximation
+
 Many authors use the approximation by Kaufman to reduce the computational burden 
 of calculating the Jacobian while still retaining good numerical accuracy (Kaufman
 1975). It is given as
 
-$$\boldsymbol{J}(\boldsymbol{\alpha}) \approx -\boldsymbol{A}(\boldsymbol{\alpha}) \Rightarrow \boldsymbol{j_k} \approx - \boldsymbol{a_k}$$
+$$\boldsymbol{J}(\boldsymbol{\alpha}) = -(\boldsymbol{A}(\boldsymbol{\alpha}) + \boldsymbol{B}(\boldsymbol{\alpha})) \approx -\boldsymbol{A}(\boldsymbol{\alpha}) \Rightarrow \boldsymbol{j_k} \approx - \boldsymbol{a_k}$$
 
 This approximation is widely used and seems to do very well for many applications 
-(O'Leary 2007, Mullen 2009, Warren 2013). We can use the approximation to calculate 
-the gradient of $$R_{WLS}$$. This simplifies the numerical calculations a bit:
+(O'Leary 2007, Mullen 2009, Warren 2013). O'Leary notes that using
+this approximation will likely increase the number of function evaluations. If
+the model function is expensive to calculate (e.g. if it is the result of 
+a complex simulation), then it might be advantageous to evaluate the full Jacobian.
+
+
+
+# VarPro with General Purpose Nonlinear Minimization
+
+**UPDATE 2023** The ideas from this section featured pretty prominently in the
+previous version of this article. While I don't think the ideas are wrong,
+I don't believe they are as useful as I once did. I thought they would
+give me an elegant way of extending my varpro implementation to multiple right
+hand sides. However, there are established methods to do that which still
+compose pretty well with off-the-shelf least squares solvers.
+
+If we want to minimize the weighted residual using a general purpose minimizer, 
+then it is preferrable to know its gradient with respect to $$\boldsymbol{\alpha}$$.
+The weighted residual is $$R_{WLS}=\lVert \boldsymbol{y_w}-\boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))\rVert_2^2$$ 
+and we want to calculate its gradient:
+
+$$\nabla R_{WLS}(\boldsymbol\alpha) = \left(\frac{\partial R_{WLS}}{\partial\alpha_1}(\boldsymbol\alpha),\dots,\frac{\partial R_{WLS}}{\partial\alpha_q}(\boldsymbol\alpha)\right)^T.$$
+
+The $$k$$-th component is calculated using [the product rule for the dot product](https://math.stackexchange.com/questions/159284/product-rule-for-the-derivative-of-a-dot-product):
+
+$$\begin{eqnarray}
+\frac{\partial}{\partial \alpha_k} R_{WLS} &=& \frac{\partial}{\partial \alpha_k} \lVert \boldsymbol{y_w}-\boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))\rVert_2^2 \\
+&=& 2 (\boldsymbol{y_w}-\boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot \frac{\partial}{\partial \alpha_k} (\boldsymbol{y_w}-\boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \\
+&=& 2 (\boldsymbol{y_w}-\boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot (-\frac{\partial}{\partial \alpha_k} \boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \\
+&=& -2 (\boldsymbol{y_w}-\boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot \boldsymbol{j_k} \\
+&=& -2 \boldsymbol{r_w}\cdot \boldsymbol{j_k} \\
+&=& +2 \boldsymbol{r_w}\cdot (\boldsymbol{a_k}+\boldsymbol{b_k})
+\end{eqnarray}$$
+
+where $$\boldsymbol{j_k}=-(\boldsymbol{a_k}+\boldsymbol{b_k})$$ is the $$k$$-th 
+column of the Jacobian $$\boldsymbol{J}(\boldsymbol\alpha)$$, and $$\boldsymbol{r_w}$$ 
+is the weighted residual vector as defined above.
+
+If we use the Kaufman approximation and the expressions for the Jacobian as defined
+above, then the expressions for the partial derivative of $$R_{WLS}$$ become much 
+simpler:
+
+
+ACATHUNG!! fehler bei calculations, das W muss auch zum eta!!
 
 $$\begin{eqnarray}
 \frac{\partial}{\partial \alpha_k} R_{WLS} &\approx& 2\, \boldsymbol{r_w}\cdot \boldsymbol{a_k} \\
@@ -265,59 +329,27 @@ $$\boldsymbol{x}\cdot \boldsymbol{A} \boldsymbol{y} = \boldsymbol{A}^T\boldsymbo
 for all vectors $$\boldsymbol{x},\boldsymbol{y} \in \mathbb{R^m}$$ and square 
 matrices $$\boldsymbol{A} \in \mathbb{R}^{m\times m}$$. The last expression for 
 the partial derivative is very easy to calculate because it does not require 
-the matrix $$\boldsymbol{P}$$ explicitly.
-
-Now I have all ingredients together to implement VarPro using a linear solver 
-and a general purpose minimizer, which can take advantage of the gradient.
-
-# VarPro with General Purpose Nonlinear Minimization
-
-**UPDATE 2023** The ideas from this section featured pretty prominently in the
-previous version of this article. While I don't think the ideas are wrong,
-I don't believe they are as useful as I thought they were. I thought they would
-give me an elegant way of extending my varpro implementation to multiple right
-hand sides. However, there are established methods to do that and they still
-compose pretty well with using specialized least squares solvers.
-
-If we want to minimize the weighted residual using a general purpose minimizer, 
-then it is preferrable to know its gradient with respect to $$\boldsymbol{\alpha}$$.
-The weighted residual is $$R_{WLS}=\lVert \boldsymbol{y_w}-\boldsymbol\eta(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))\rVert_2^2$$ 
-and we want to calculate its gradient:
-
-$$\nabla R_{WLS}(\boldsymbol\alpha) = \left(\frac{\partial R_{WLS}}{\partial\alpha_1}(\boldsymbol\alpha),\dots,\frac{\partial R_{WLS}}{\partial\alpha_q}(\boldsymbol\alpha)\right)^T.$$
-
-The $$k$$-th component is calculated using [the product rule for the dot product](https://math.stackexchange.com/questions/159284/product-rule-for-the-derivative-of-a-dot-product):
-
-$$\begin{eqnarray}
-\frac{\partial}{\partial \alpha_k} R_{WLS} &=& \frac{\partial}{\partial \alpha_k} \lVert \boldsymbol{y_w}-\boldsymbol\eta(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))\rVert_2^2 \\
-&=& 2 (\boldsymbol{y_w}-\boldsymbol\eta(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot \frac{\partial}{\partial \alpha_k} (\boldsymbol{y_w}-\boldsymbol\eta(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \\
-&=& 2 (\boldsymbol{y_w}-\boldsymbol\eta(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot (-\frac{\partial}{\partial \alpha_k} \boldsymbol\eta(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \\
-&=& -2 (\boldsymbol{y_w}-\boldsymbol\eta(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot \boldsymbol{j_k} \\
-&=& -2 \boldsymbol{r_w}\cdot \boldsymbol{j_k} \\
-&=& +2 \boldsymbol{r_w}\cdot (\boldsymbol{a_k}+\boldsymbol{b_k})
-\end{eqnarray}$$
-
-where $$\boldsymbol{j_k}=-(\boldsymbol{a_k}+\boldsymbol{b_k})$$ is the $$k$$-th 
-column of the Jacobian $$\boldsymbol{J}(\boldsymbol\alpha)$$, and $$\boldsymbol{r_w}$$ 
-is the weighted residual vector as defined above.$$.
+the projection matrix $$\boldsymbol{P}$$ explicitly.
 
 For a general purpose minimizer we just need to provide the function to minimize, 
-i.e. $$R_{WLS}$$ and its gradient as functions of $$\boldsymbol\alpha$$. Every 
-decent linear algebra solver will use some form of matrix decomposition to obtain 
-the result $$\boldsymbol{\hat{c}}(\boldsymbol\alpha)$$ for eq. $$\eqref{c_hat_solution}$$. 
-We can often obtain the solution to the linear problem without having to deal with
-the components of the matrix decomposition explicitly. That 
-means we can calculate $$R_{WLS}=\lVert\boldsymbol{r_w}\rVert_2^2$$, with $$\boldsymbol{r_w}$$ 
-according to eq. $$\eqref{weighted_residual_vector}$$. Then we can calculate the 
-the gradient using approximation $$\eqref{Kaufman_Approx_Gradient_RWLS}$$. We
-merely need three things for that: first, the matrix $$\boldsymbol{D_k}(\boldsymbol\alpha)$$, 
+i.e. $$R_{WLS}$$ and its gradient as functions of $$\boldsymbol\alpha$$. Obtaining
+a solution $$\boldsymbol{\hat{c}}(\boldsymbol\alpha)$$ for eq. $$\eqref{c_hat_solution}$$ 
+typically involves choosing an appropriate matrix decomposition (such as QR or SVD)
+to solve the linear system. However, we can often obtain the solution to 
+the linear problem without having to deal with the components of the matrix decomposition 
+explicitly. That  means we can calculate $$R_{WLS}=\lVert\boldsymbol{r_w}\rVert_2^2$$, 
+with $$\boldsymbol{r_w}$$  according to eq. $$\eqref{weighted_residual_vector}$$. 
+Then we can calculate the  the gradient using approximation $$\eqref{Kaufman_Approx_Gradient_RWLS}$$. 
+We merely need three things for that: first, the matrix $$\boldsymbol{D_k}(\boldsymbol\alpha)$$, 
 which we can calculate from the model function derivatives. Second, the solution 
 for the coefficient vector $$\boldsymbol{\hat{c}}(\boldsymbol\alpha)$$, which 
 we have already obtained using the solver. Third, we need the vector of weighted 
 residuals $$\boldsymbol{r_w}(\boldsymbol\alpha)$$, which we have already calculated 
-as part of $$R_{WLS}$$. At no point do we have to deal with the matrix decomposition 
-directly. This is very neat, because it allows for a lot of flexibility in the 
-implentation. We can change the linear solver without changing any of the calculations.
+as part of $$R_{WLS}$$. 
+
+As mentioned in the update, I don't believe these ideas are as useful as I once thought,
+especially for multiple right hand sides. But who knows, maybe I'll try and explore
+them at some point and see how they turn out numerically.
 
 # Outlook
 
@@ -379,6 +411,7 @@ The expressions are grouped in such a way that only matrix vector products need
 to be calculated (O'Leary 2007).
 
 # Endnotes
+
 [^golub_pereyra2002]: See [here](https://pdfs.semanticscholar.org/3f20/1634276f9c1c79e421355b4915b69b4aae24.pdf) for a review paper on Variable Projection by Golub and Pereyra in 2002. In there you can also find references to their original work as well as the contributions by Linda Kaufman. There is also [a follow-up by Pereyra](http://vpereyra.com/wp-content/uploads/2019/08/Surveypaper2019.pdf) covering the time from 2002 until 2019.
 [^errors_notation]: Errors are mine of course. I will also use their notation to make it easy to go back and forth from this article and their publication. This is why I am sparing you the references to their publication in the next sections. Assume everything is taken from O'Leary and Rust unless stated otherwise.
 [^nonlinear_base]: These functions could also be linear in their parameters but it makes little sense to have them be linear without good reason. One such reason could be that the parameter space is constrained, because the derivatives presented in here are only true for unconstrained linear parameters.
