@@ -210,7 +210,7 @@ expressions for the Jacobian.
 If we want to use a high quality nonlinear solver to minimize our projection functional,
 we have to supply the Jacobian $$\boldsymbol{J}(\boldsymbol{\alpha})$$
 of $$\boldsymbol{r}_w(\boldsymbol{\alpha})$$ with respect to $$\alpha$$. The Jacobian
-Matrix of $$\boldsymbol{r}_r$$ is defined as the matrix $$J$$ with entries
+Matrix of $$\boldsymbol{r}_w$$ is defined as the matrix $$J$$ with entries
 $$J_{ik} = \frac{\partial (\boldsymbol{r}_w)_i}{\partial \alpha_k}$$. It's a bit
 more helpful for the following calculations to write it in a column format:
 
@@ -226,13 +226,40 @@ $$\boldsymbol{J}(\boldsymbol{\alpha}) =  (J_{ik})
 \vert & \dots & \vert \\
 \end{matrix}\right) $$
 
-
 The derivative $$\frac{\partial}{\partial \alpha_k} \boldsymbol{r}_w$$ is simply
 the element wise derivative of the residual vector with respect to the scalar
-$$\alpha_k$$.
+$$\alpha_k$$. Since $$\boldsymbol{r}_w (\boldsymbol{\alpha})=\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w}\\$$,
+we know that we can write the $$k$$-th column of the Jacobian as:
 
-with matrix entries $$J_{ik} = \frac{\partial f}{\partial \alpha_k}(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha}),t_i)$$. The Jacobian can be expressed as a sum of two matrices
+$$
+\boldsymbol{j}_k = \frac{\boldsymbol{r}_w (\boldsymbol{\alpha})}{\alpha_k} = \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}\boldsymbol{y_w},
+$$
 
+where the derivative with respect to $$\alpha_k$$ for the matrix and vector are
+just applied element-wise. So the thing we need is an expression for 
+$$ \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}$$.
+It turns out that it is not hard to calculate (see the Appendix) an expression for the derivative and 
+it is given as:
+
+
+$$
+\frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}
+= -\left[
+\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi}^\dagger(\boldsymbol{\alpha})
++\left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi}^\dagger(\boldsymbol{\alpha})\right)^T
+\right],
+$$
+
+where $$D_k$$ is the derivative of the weighted model function matrix with respect to $$\alpha_k$$.
+
+$$
+\boldsymbol{D_k}(\boldsymbol\alpha) := \frac{\partial \boldsymbol{\Phi_w}}{\partial \alpha_k} (\boldsymbol\alpha) =\boldsymbol{W} \frac{\partial \boldsymbol{\Phi}}{\partial \alpha_k} (\boldsymbol\alpha) \in \mathbb{R}^{m\times n},
+$$
+
+where the derivative, again, is performed element-wise for $$\boldsymbol{\Phi_w}$$. 
+
+111111111111111111111111111111
+11111111111111!!!!!!!!!!!!!!!!!!!!!!!!!!11
 $$\boldsymbol{J}(\boldsymbol{\alpha}) = -(\boldsymbol{A}(\boldsymbol{\alpha})+\boldsymbol{B}(\boldsymbol{\alpha})),$$
 
 where the $$k$$-th column of $$\boldsymbol{A}(\boldsymbol{\alpha})$$ is given as
@@ -256,7 +283,7 @@ and the *matrix of model function derivatives*
 
 $$\boldsymbol{D_k}(\boldsymbol\alpha) := \frac{\partial \boldsymbol{\Phi_w}}{\partial \alpha_k} (\boldsymbol\alpha) =\boldsymbol{W} \frac{\partial \boldsymbol{\Phi}}{\partial \alpha_k} (\boldsymbol\alpha) \in \mathbb{R}^{m\times n},$$
 
-where the derivative is performed element-wise for $$\boldsymbol{\Phi_w}$$. If 
+where the derivative, again, is performed element-wise for $$\boldsymbol{\Phi_w}$$. If 
 we want to use off-the-shelf least squares solvers, e.g. implementations of the
 Levenberg-Marquardt algorithm to find a solution, then it is necessary to 
 know the Jacobian of $$f$$. 
@@ -288,7 +315,7 @@ compose pretty well with off-the-shelf least squares solvers.
 
 If we want to minimize the weighted residual using a general purpose minimizer, 
 then it is preferrable to know its gradient with respect to $$\boldsymbol{\alpha}$$.
-The weighted residual is $$R_{WLS}=\lVert \boldsymbol{y_w}-\boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))\rVert_2^2$$ 
+The weighted residual is $$R_{WLS}=\lVert \boldsymbol{y_w}-\boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))\rVert_2^2$$ 
 and we want to calculate its gradient:
 
 $$\nabla R_{WLS}(\boldsymbol\alpha) = \left(\frac{\partial R_{WLS}}{\partial\alpha_1}(\boldsymbol\alpha),\dots,\frac{\partial R_{WLS}}{\partial\alpha_q}(\boldsymbol\alpha)\right)^T.$$
@@ -296,10 +323,10 @@ $$\nabla R_{WLS}(\boldsymbol\alpha) = \left(\frac{\partial R_{WLS}}{\partial\alp
 The $$k$$-th component is calculated using [the product rule for the dot product](https://math.stackexchange.com/questions/159284/product-rule-for-the-derivative-of-a-dot-product):
 
 $$\begin{eqnarray}
-\frac{\partial}{\partial \alpha_k} R_{WLS} &=& \frac{\partial}{\partial \alpha_k} \lVert \boldsymbol{y_w}-\boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))\rVert_2^2 \\
-&=& 2 (\boldsymbol{y_w}-\boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot \frac{\partial}{\partial \alpha_k} (\boldsymbol{y_w}-\boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \\
-&=& 2 (\boldsymbol{y_w}-\boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot (-\frac{\partial}{\partial \alpha_k} \boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \\
-&=& -2 (\boldsymbol{y_w}-\boldsymbolf(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot \boldsymbol{j_k} \\
+\frac{\partial}{\partial \alpha_k} R_{WLS} &=& \frac{\partial}{\partial \alpha_k} \lVert \boldsymbol{y_w}-\boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))\rVert_2^2 \\
+&=& 2 (\boldsymbol{y_w}-\boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot \frac{\partial}{\partial \alpha_k} (\boldsymbol{y_w}-\boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \\
+&=& 2 (\boldsymbol{y_w}-\boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot (-\frac{\partial}{\partial \alpha_k} \boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \\
+&=& -2 (\boldsymbol{y_w}-\boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot \boldsymbol{j_k} \\
 &=& -2 \boldsymbol{r_w}\cdot \boldsymbol{j_k} \\
 &=& +2 \boldsymbol{r_w}\cdot (\boldsymbol{a_k}+\boldsymbol{b_k})
 \end{eqnarray}$$
@@ -368,6 +395,11 @@ in the time resolved microscopy literature (Mullen 2009).
 **(Mullen 2009)** Mullen, K.M., Stokkum, I.H.M.v.: The variable projection algorithm in time-resolved spectroscopy, microscopy and mass spectrometry applications. *Numer Algor* **51**, 319–340 (2009). [https://doi.org/10.1007/s11075-008-9235-2](https://doi.org/10.1007/s11075-008-9235-2).
 
 **(Warren 2013)** Warren, S.C *et al.* "Rapid global fitting of large fluorescence lifetime imaging microscopy datasets." *PloS one* **8,8 e70687**. 5 Aug. 2013, [doi:10.1371/journal.pone.0070687](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0070687).
+
+# Appendix A: Calculating the Derivative of the Projection Functional
+
+!!!!!!!!!!!!! achtung hier die calculations nach b'rligea und hochstaffl
+!!!!
 
 # Appendix: Matrix Expressions for the Jacobian
 To express the Jacobian matrix, we need a numerically efficient decomposition 
