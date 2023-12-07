@@ -184,8 +184,8 @@ other publications as well. Using this matrix  we have written the squared
 sum of residuals as
 
 $$\begin{eqnarray}
-R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) &=& \lVert \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\hat{c}}\rVert_2^2 = \lVert{\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}(\boldsymbol{\alpha})\boldsymbol{y_w}}\rVert_2^2,\\
-\boldsymbol{r}_w (\boldsymbol{\alpha})&:=&  \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w}\\
+R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) &=& \lVert \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\hat{c}}(\boldsymbol{\alpha})\rVert_2^2 = \lVert{\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w}}\rVert_2^2,\\
+\boldsymbol{r}_w (\boldsymbol{\alpha})&:=&  \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\hat{c}}(\boldsymbol{\alpha}) = \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w}\\
 \end{eqnarray}$$
 
 When written like this, $$R_{WLS}$$ is called the *projection functional*, which
