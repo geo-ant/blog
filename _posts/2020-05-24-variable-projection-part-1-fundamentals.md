@@ -16,14 +16,15 @@ This is the first post in a series on the use of the Variable Projection method
 clever use of linear algebra to potentially speed up and increase the robustness
 of nonlinear least squares fitting. It does so by separating linear from nonlinear
 parameters. I'll recap the method based on a couple of pieces of literature in such
-a way that it will enable you to implement your own varpro in a programming language
-of your choice, given a fundamental (but not more exhaustive) understanding of 
-linear algebra. 
+a way that it will enable you to implement your own varpro library in your favorite
+programming language, given a basic understanding of linear algebra. 
 
 **UPDATE 12/2023:** I have overhauled the article and relegated some fringe ideas to
-the appendix and put more emphasis on the calculations of the Jacobian.
+the appendix. I have put more emphasis on the calculations of the Jacobian and 
+how to compose varpro with off-the-shelf nonlinear solvers.
 
 # Before We Dive In
+
 Variable Projection was introduced by Gene Golub and Victor Pereyra[^golub_pereyra2002]. 
 I based much of the content of this article on the publication of Dianne O'Leary 
 and Bert Rust (O'Leary 2007). They do an excellent job of breaking the method 
@@ -34,6 +35,7 @@ the most part, use the notation of O'Leary and Rust so that it is easy to go
 back and forth. So let's dive in.
 
 # The Idea of VarPro
+
 [Nonlinear Least Squares Fitting](https://en.wikipedia.org/wiki/Non-linear_least_squares) 
 is the process of fitting a function to data by minimizing the sum of the squared 
 residuals. It's called *nonlinear* least squares as opposed to *linear* least 
@@ -49,6 +51,8 @@ reduced problem using a nonlinear minimization algorithm of our choice (e.g.
 
 That means VarPro is *not* a nonlinear least squares minimization algorithm in 
 and of itself, but a clever way of rewriting the problem before tackling it numerically.
+We will see how to compose Variable Projection with off-the-shelf nonlinear
+least squares solvers.
 
 # The Math of VarPro
 
@@ -85,7 +89,7 @@ total number of observations is $$m$$. Let's write the function values for $$f$$
 at those coordinates as a vector, too:
 
 $$\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c}) = (f(\boldsymbol{\alpha},\boldsymbol{c},t_1),\dots,f(\boldsymbol{\alpha},\boldsymbol{c},t_m))^T \in \mathbb{R}^m.$$
-
+into the
 We want to minimize the weighted sum of the squared residuals:
 
 $$R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) = \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c}))}\rVert_2^2, \label{RWLS}\tag{1}$$
@@ -194,7 +198,7 @@ We can see that it is just the squared 2-norm of the residual vector $$\boldsymb
 
 At this point we are almost halfway there. Our aim is to minimize the projection 
 functional using a (possibly constrained) minimization algorithm. If we want to 
-use high quality off the shelf least squared solvers, we need two things: first
+use high quality off-the-shelf least squared solvers, we need two things: first
 we need to calculate the residual vector $$\boldsymbol{r}_w$$, which requires us
 to solve the linear system in a numerically feasible manner to obtain $$\boldsymbol{\hat{c}}(\boldsymbol{\alpha})$$
 for a given $$\boldsymbol{\alpha}$$. Secondly, we need 
@@ -202,15 +206,15 @@ to supply the [Jacobian](https://de.wikipedia.org/wiki/Jacobi-Matrix)
 of $$\boldsymbol{r}_w$$ with respect to $$\boldsymbol{\alpha}$$. Solving the linear
 system is typically achieved using either a [QR Decomposition](https://en.wikipedia.org/wiki/QR_decomposition#Rectangular_matrix) 
 or [Singular Value Decomposition (SVD)](http://www.omgwiki.org/hpec/files/hpec-challenge/svd.html)
-of $$\boldsymbol{\Phi}_w$$. We'll revisit those decompositions when giving analytical
-expressions for the Jacobian.
+of $$\boldsymbol{\Phi}_w$$. We'll revisit those decompositions when calculating
+the Jacobian.
 
 ### Analytical Derivatives
 
 If we want to use a high quality nonlinear solver to minimize our projection functional,
 we have to supply the Jacobian $$\boldsymbol{J}(\boldsymbol{\alpha})$$
 of $$\boldsymbol{r}_w(\boldsymbol{\alpha})$$ with respect to $$\alpha$$. The Jacobian
-Matrix of $$\boldsymbol{r}_w$$ is defined as the matrix $$J$$ with entries
+Matrix of $$\boldsymbol{r}_w$$ is defined as the matrix $$\boldsymbol{J}$$ with entries
 $$J_{ik} = \frac{\partial (\boldsymbol{r}_w)_i}{\partial \alpha_k}$$. It's a bit
 more helpful for the following calculations to write it in a column format:
 
@@ -227,7 +231,7 @@ $$\boldsymbol{J}(\boldsymbol{\alpha}) =  (J_{ik})
 \end{matrix}\right) $$
 
 The derivative $$\frac{\partial}{\partial \alpha_k} \boldsymbol{r}_w$$ is simply
-the element wise derivative of the residual vector with respect to the scalar
+the element-wise derivative of the residual vector with respect to the scalar
 $$\alpha_k$$. Since $$\boldsymbol{r}_w (\boldsymbol{\alpha})=\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w}\\$$,
 we know that we can write the $$k$$-th column of the Jacobian as:
 
@@ -236,11 +240,9 @@ $$
 $$
 
 where the derivative with respect to $$\alpha_k$$ for the matrix and vector are
-just applied element-wise. So the thing we need is an expression for 
-$$ \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}$$.
-It turns out that it is not hard to calculate (see the Appendix) an expression for the derivative and 
-it is given as:
-
+just applied element-wise. So we need an expression for 
+$$ \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}$$ and
+it turns out it is not that hard to calculate (see Appendix):
 
 $$
 \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}
@@ -256,18 +258,20 @@ $$
 \boldsymbol{D_k}(\boldsymbol\alpha) := \frac{\partial \boldsymbol{\Phi_w}}{\partial \alpha_k} (\boldsymbol\alpha) =\boldsymbol{W} \frac{\partial \boldsymbol{\Phi}}{\partial \alpha_k} (\boldsymbol\alpha) \in \mathbb{R}^{m\times n},
 $$
 
-where the derivative, again, is performed element-wise for $$\boldsymbol{\Phi_w}$$. 
+where the derivative, again, is performed element-wise for $$\boldsymbol{\Phi_w}$$.
+Using these results, we find that we can calculate the $$k$$-th column of the Jacobian
+as
 
-111111111111111111111111111111
-11111111111111!!!!!!!!!!!!!!!!!!!!!!!!!!11
-$$\boldsymbol{J}(\boldsymbol{\alpha}) = -(\boldsymbol{A}(\boldsymbol{\alpha})+\boldsymbol{B}(\boldsymbol{\alpha})),$$
+$$
+\boldsymbol{j}_k (\boldsymbol{\alpha})= \boldsymbol{a}_k(\boldsymbol{\alpha}) + \boldsymbol{b}_k (\boldsymbol{\alpha}),
+$$
 
-where the $$k$$-th column of $$\boldsymbol{A}(\boldsymbol{\alpha})$$ is given as
+where
 
 $$\boldsymbol{a_k}(\boldsymbol\alpha) = \boldsymbol{P} \, \boldsymbol{D_k} \, \boldsymbol{\Phi_w}^\dagger \, \boldsymbol{y_w}
 = \boldsymbol{P} \, \boldsymbol{D_k} \, \boldsymbol{\hat{c}},$$
 
-and the $$k$$-th column of $$\boldsymbol{B}(\boldsymbol{\alpha})$$ is
+and 
 
 $$\begin{eqnarray}
 \boldsymbol{b_k}(\boldsymbol\alpha) &=& (\boldsymbol{P}\, \boldsymbol{D_k}\, \boldsymbol{\Phi_w}^\dagger)^T \boldsymbol{y_w} \\
@@ -275,18 +279,7 @@ $$\begin{eqnarray}
 &=& (\boldsymbol{\Phi_w}^\dagger)^T \boldsymbol{D_k}^T \,  \boldsymbol{r_w}.
 \end{eqnarray}$$
 
-In the last line we have used that $$\boldsymbol{P}^T=\boldsymbol{P}$$ [due to the properties of the pseudoinverse](https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse#Definition). We have also used the *weighted residual vector*
-
-$$\boldsymbol{r_w}(\boldsymbol\alpha) = \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol\alpha)\boldsymbol{\hat{c}}(\boldsymbol\alpha) = \boldsymbol{P}(\boldsymbol\alpha) \boldsymbol{y_w} \label{weighted_residual_vector} \tag{8}$$
-
-and the *matrix of model function derivatives*
-
-$$\boldsymbol{D_k}(\boldsymbol\alpha) := \frac{\partial \boldsymbol{\Phi_w}}{\partial \alpha_k} (\boldsymbol\alpha) =\boldsymbol{W} \frac{\partial \boldsymbol{\Phi}}{\partial \alpha_k} (\boldsymbol\alpha) \in \mathbb{R}^{m\times n},$$
-
-where the derivative, again, is performed element-wise for $$\boldsymbol{\Phi_w}$$. If 
-we want to use off-the-shelf least squares solvers, e.g. implementations of the
-Levenberg-Marquardt algorithm to find a solution, then it is necessary to 
-know the Jacobian of $$f$$. 
+Before we dive into an efficient way of calculating the !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
 
 ## The Kaufman Approximation
 
