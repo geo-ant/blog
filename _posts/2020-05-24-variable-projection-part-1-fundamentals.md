@@ -52,14 +52,10 @@ reduced problem using a nonlinear minimization algorithm of our choice (e.g.
 That means VarPro is *not* a nonlinear least squares minimization algorithm in 
 and of itself, but a clever way of rewriting the problem before tackling it numerically.
 We will see how to compose Variable Projection with off-the-shelf nonlinear
-least squares solvers.
+least squares solvers. Let's now translate the principle above into formulas.
+Many of the contents in this section are taken from O'Leary and Rust (O'Leary 2007).
 
-# The Math of VarPro
-
-Let's now translate the principle above into formulas. Many of the contents in 
-this section are taken from O'Leary and Rust (O'Leary 2007).
-
-## The Fitting Function
+# The Fitting Function
 
 VarPro is concerned with fitting model functions $$f$$ that can be written 
 as a *linear combination* of $$n$$ functions that are *nonlinear*[^nonlinear_base] 
@@ -78,7 +74,7 @@ with respect to the parameter vectors $$\boldsymbol{\alpha}$$ and $$\boldsymbol{
 but not the independent variable $$t$$. It is completely irrelevant if the model 
 is linear or nonlinear in $$t$$.
 
-## Weighted Least Squares
+# Weighted Least Squares
 
 We want to fit our model to a vector $$\boldsymbol{y}$$ of observations
 
@@ -102,7 +98,7 @@ $$\min_{\boldsymbol{c}\in \mathbb{R}^n, \boldsymbol{\alpha}\in\mathcal{S}_\alpha
 Note that the nonlinear parameters can be constrained on a subset $$\mathcal{S}_\alpha$$ of $$\mathbb{R}^q$$
 while the linear parameters are unconstrained[^unconstrained].
 
-## Separating Linear from Nonlinear Parameters
+# Separating Linear from Nonlinear Parameters
 
 The fundemental idea of VarPro is to eliminate all linear parameters 
 $$\boldsymbol{c}$$ from the minimization problem, by solving the linear 
@@ -134,7 +130,7 @@ is that we can feed the algorithm with derivatives and that is almost always
 a good thing. But we are getting ahead of ourselves. Let's dive into some linear 
 algebra to solve the linear subproblem.
 
-## Enter the Matrix
+# Enter the Matrix
 
 To rewrite problem $$\eqref{LSMinimization}$$ using linear algebra we introduce 
 the of *model function matrix* $$\boldsymbol{\Phi}(\boldsymbol{\alpha}) \in \mathbb{R}^{m \times n}$$:
@@ -209,7 +205,7 @@ or [Singular Value Decomposition (SVD)](http://www.omgwiki.org/hpec/files/hpec-c
 of $$\boldsymbol{\Phi}_w$$. We'll revisit those decompositions when calculating
 the Jacobian.
 
-### Analytical Derivatives
+# Analytical Derivatives
 
 If we want to use a high quality nonlinear solver to minimize our projection functional,
 we have to supply the Jacobian $$\boldsymbol{J}(\boldsymbol{\alpha})$$
@@ -268,36 +264,124 @@ $$
 
 where
 
-$$\boldsymbol{a_k}(\boldsymbol\alpha) = \boldsymbol{P} \, \boldsymbol{D_k} \, \boldsymbol{\Phi_w}^\dagger \, \boldsymbol{y_w}
-= \boldsymbol{P} \, \boldsymbol{D_k} \, \boldsymbol{\hat{c}},$$
+$$\boldsymbol{a_k}(\boldsymbol\alpha) = \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\, \boldsymbol{D_k} \, \boldsymbol{\Phi_w}^\dagger \, \boldsymbol{y_w}
+=  \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \, \boldsymbol{D_k} \, \boldsymbol{\hat{c}},$$
 
 and 
 
 $$\begin{eqnarray}
-\boldsymbol{b_k}(\boldsymbol\alpha) &=& (\boldsymbol{P}\, \boldsymbol{D_k}\, \boldsymbol{\Phi_w}^\dagger)^T \boldsymbol{y_w} \\
-&=& (\boldsymbol{\Phi_w}^\dagger)^T \boldsymbol{D_k}^T \, \boldsymbol{P}^T \boldsymbol{y_w} \\
-&=& (\boldsymbol{\Phi_w}^\dagger)^T \boldsymbol{D_k}^T \,  \boldsymbol{r_w}.
+\boldsymbol{b_k}(\boldsymbol\alpha) &=& \left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\, \boldsymbol{D_k}\, \boldsymbol{\Phi_w}^\dagger\right)^T \boldsymbol{y_w} \\
+&=& \left(\boldsymbol{\Phi_w}^\dagger\right)^T \boldsymbol{D_k}^T \, \left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\right)^T \boldsymbol{y_w} \\
+&=& \left(\boldsymbol{\Phi_w}^\dagger\right)^T \boldsymbol{D_k}^T \,  \boldsymbol{r_w}.
 \end{eqnarray}$$
 
-Before we dive into an efficient way of calculating the !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
+Here we used that $$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} = \left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\right)^T$$,
+cf. the Appendix.
 
 ## The Kaufman Approximation
 
-Many authors use the approximation by Kaufman to reduce the computational burden 
-of calculating the Jacobian while still retaining good numerical accuracy (Kaufman
-1975). It is given as
+A widely used approximation in the context of Variable Projection is the Kaufman
+approximation, which neglects the second summand in the derivative 
+$$\frac{\partial}{\partial\alpha_k}\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}$$:
 
-$$\boldsymbol{J}(\boldsymbol{\alpha}) = -(\boldsymbol{A}(\boldsymbol{\alpha}) + \boldsymbol{B}(\boldsymbol{\alpha})) \approx -\boldsymbol{A}(\boldsymbol{\alpha}) \Rightarrow \boldsymbol{j_k} \approx - \boldsymbol{a_k}$$
 
-This approximation is widely used and seems to do very well for many applications 
+$$
+\frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}
+\approx - \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi}^\dagger(\boldsymbol{\alpha})
+$$
+
+This approximation reduces the computational burden of calculating the Jacobian
+while still retaining good numerical accuracy (Kaufman 1975). It implies that
+we can calculate the columns of the jacobian as:
+
+$$
+\boldsymbol{j}_k \approx - \boldsymbol{a_k}
+= \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \, \boldsymbol{D_k} \, \boldsymbol{\hat{c}}.
+$$
+
+This approximation is ubiquitous and seems to do very well for many applications
 (O'Leary 2007, Mullen 2009, Warren 2013). O'Leary notes that using
-this approximation will likely increase the number of function evaluations. If
-the model function is expensive to calculate (e.g. if it is the result of 
-a complex simulation), then it might be advantageous to evaluate the full Jacobian.
+this approximation will likely increase the number of function iterations. If
+the model function is very expensive to calculate (e.g. if it is the result of 
+a complex simulation), then it might be advantageous to calculate the full Jacobian
+to benefit from less iterations.
+
+## Analytical Derivatives Using Singular Value Decomposition
+
+Further above I mentioned that we will typically use a matrix decomposition
+of $$\boldsymbol{\Phi}_w$$ to solve the linear system and that we would see
+those decompositions again when calculating the Jacobian. Now's the time. 
+
+!!!!!!!!!!!!!!!!!!!!!111
+
+To calculate the Jacobian matrix, we need a numerically efficient decomposition 
+of $$\boldsymbol{\Phi_w}$$ to calculate the pseudoinverse. This is done by either 
+QR Decomposition or SVD, as mentioned above. I will follow O'Leary and use the 
+SVD, although most other implementations use the QR Decomposition (O'Leary 2007 
+Sima 2007, Mullen 2009, Kaufman 1975, Warren 2013).
+
+For a rectangular matrix $$\boldsymbol{\Phi_w}$$ with *full rank*, we can write 
+$$\boldsymbol{\Phi_w}^\dagger=(\boldsymbol{\Phi}^T \boldsymbol{\Phi})^{-1} \boldsymbol{\Phi}^T$$, 
+which is [usually a bad idea](https://eigen.tuxfamily.org/dox/group__LeastSquares.html) 
+numerically. Furthermore, if $$\boldsymbol{\Phi_w}$$ does not have full rank, 
+then $$(\boldsymbol{\Phi}^T \boldsymbol{\Phi})^{-1}$$ does not exist and we need 
+a different expression for the pseudoinverse. This can be given in terms of the 
+[*reduced* Singular Value Decomposition](http://www.omgwiki.org/hpec/files/hpec-challenge/svd.html) 
+of $$\boldsymbol{\Phi_w}$$:
+
+$$\boldsymbol{\Phi_w} = \boldsymbol{U}\boldsymbol\Sigma\boldsymbol{V}^T,$$
+
+with $$\boldsymbol{U}\in \mathbb{R}^{m\times \text{rank}\boldsymbol{\Phi_w}}$$, 
+$$\boldsymbol{V}\in \mathbb{R}^{\text{rank}\boldsymbol{\Phi_w} \times \text{rank}\boldsymbol{\Phi_w}}$$ 
+and the diagonal matrix of nonzero eigenvalues $$\boldsymbol\Sigma$$. Note that 
+the matrix $$\boldsymbol{U}$$ is not the square matrix from the *full* Singular
+Value Decomposition. That means it is not unitary, i.e. $$\boldsymbol{U}\boldsymbol{U}^T$$ 
+is not the identity matrix. For the matrix $$\boldsymbol{V}$$, however, we have 
+$$\boldsymbol{I} = \boldsymbol{V}^T\boldsymbol{V}$$. The pseudoinverse of can 
+be expressed as
+
+$$\boldsymbol{\Phi_w}^\dagger = \boldsymbol{V}\boldsymbol\Sigma^{-1}\boldsymbol{U}^T.$$
+
+This implies $$\boldsymbol{P}=\boldsymbol{I}-\boldsymbol{U}\boldsymbol{U}^T$$ 
+and the expressions for the columns $$\boldsymbol{a_k}$$ and $$\boldsymbol{b_k}$$ 
+can be written as
+
+$$\begin{eqnarray}
+\boldsymbol{a_k} &=& \boldsymbol{D_k}\boldsymbol{\hat{c}} - \boldsymbol{U}(\boldsymbol{U}^T(\boldsymbol{D_k}\boldsymbol{\hat{c}})) \\
+\boldsymbol{b_k} &=& \boldsymbol{U}(\boldsymbol{\Sigma^{-1}}(\boldsymbol{V}^T(\boldsymbol{D_k}^T\boldsymbol{r_w})).
+\end{eqnarray}$$
+
+The expressions are grouped in such a way that only matrix vector products need 
+to be calculated (O'Leary 2007).
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
+
+
+# Outlook
+
+This concludes my first article on Variable Projection. In the next part of the 
+series I will go into more detail on how to implement this with the aim of fitting 
+large problems with multiple right hand sides. This is also termed *global analysis* 
+in the time resolved microscopy literature (Mullen 2009). 
+
+# Literature
+**(Kaufman 1975)** Kaufman, L. "A variable projection method for solving separable nonlinear least squares problems." *BIT* **15**, 49–57 (1975). [https://doi.org/10.1007/BF01932995](https://doi.org/10.1007/BF01932995)
+
+**(O'Leary 2007)** O’Leary, D.P., Rust, B.W. "Variable projection for nonlinear least squares problems." *Comput Optim Appl* **54**, 579–593 (2013). [https://doi.org/10.1007/s10589-012-9492-9](https://doi.org/10.1007/s10589-012-9492-9). The article is behind a paywall. You can find the manuscript by O'Leary and Rust [publicly available here](https://www.cs.umd.edu/users/oleary/software/varpro.pdf). *Caution*: There are typos / errors in some important formulas in the paper and manuscript. I have (hopefully) corrected these mistakes in my post.
+
+**(Sima 2007)** Sima, D.M., Van Huffel, S. "Separable nonlinear least squares fitting with linear bound constraints and its application in magnetic resonance spectroscopy data quantification," *J Comput Appl Math*.**203**, 264-278 (2007) [https://doi.org/10.1016/j.cam.2006.03.025](https://doi.org/10.1016/j.cam.2006.03.025).
+
+**(Mullen 2009)** Mullen, K.M., Stokkum, I.H.M.v.: The variable projection algorithm in time-resolved spectroscopy, microscopy and mass spectrometry applications. *Numer Algor* **51**, 319–340 (2009). [https://doi.org/10.1007/s11075-008-9235-2](https://doi.org/10.1007/s11075-008-9235-2).
+
+**(Warren 2013)** Warren, S.C *et al.* "Rapid global fitting of large fluorescence lifetime imaging microscopy datasets." *PloS one* **8,8 e70687**. 5 Aug. 2013, [doi:10.1371/journal.pone.0070687](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0070687).
+
+# Appendix A: Calculating the Derivative of the Projection Functional
+
+!!!!!!!!!!!!! achtung hier die calculations nach b'rligea und hochstaffl
+!!!!
 
 
 
-# VarPro with General Purpose Nonlinear Minimization
+# Appendix B: VarPro with General Purpose Nonlinear Minimization
 
 **UPDATE 2023** The ideas from this section featured pretty prominently in the
 previous version of this article. While I don't think the ideas are wrong,
@@ -370,70 +454,6 @@ as part of $$R_{WLS}$$.
 As mentioned in the update, I don't believe these ideas are as useful as I once thought,
 especially for multiple right hand sides. But who knows, maybe I'll try and explore
 them at some point and see how they turn out numerically.
-
-# Outlook
-
-This concludes my first article on Variable Projection. In the next part of the 
-series I will go into more detail on how to implement this with the aim of fitting 
-large problems with multiple right hand sides. This is also termed *global analysis* 
-in the time resolved microscopy literature (Mullen 2009). 
-
-# Literature
-**(Kaufman 1975)** Kaufman, L. "A variable projection method for solving separable nonlinear least squares problems." *BIT* **15**, 49–57 (1975). [https://doi.org/10.1007/BF01932995](https://doi.org/10.1007/BF01932995)
-
-**(O'Leary 2007)** O’Leary, D.P., Rust, B.W. "Variable projection for nonlinear least squares problems." *Comput Optim Appl* **54**, 579–593 (2013). [https://doi.org/10.1007/s10589-012-9492-9](https://doi.org/10.1007/s10589-012-9492-9). The article is behind a paywall. You can find the manuscript by O'Leary and Rust [publicly available here](https://www.cs.umd.edu/users/oleary/software/varpro.pdf). *Caution*: There are typos / errors in some important formulas in the paper and manuscript. I have (hopefully) corrected these mistakes in my post.
-
-**(Sima 2007)** Sima, D.M., Van Huffel, S. "Separable nonlinear least squares fitting with linear bound constraints and its application in magnetic resonance spectroscopy data quantification," *J Comput Appl Math*.**203**, 264-278 (2007) [https://doi.org/10.1016/j.cam.2006.03.025](https://doi.org/10.1016/j.cam.2006.03.025).
-
-**(Mullen 2009)** Mullen, K.M., Stokkum, I.H.M.v.: The variable projection algorithm in time-resolved spectroscopy, microscopy and mass spectrometry applications. *Numer Algor* **51**, 319–340 (2009). [https://doi.org/10.1007/s11075-008-9235-2](https://doi.org/10.1007/s11075-008-9235-2).
-
-**(Warren 2013)** Warren, S.C *et al.* "Rapid global fitting of large fluorescence lifetime imaging microscopy datasets." *PloS one* **8,8 e70687**. 5 Aug. 2013, [doi:10.1371/journal.pone.0070687](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0070687).
-
-# Appendix A: Calculating the Derivative of the Projection Functional
-
-!!!!!!!!!!!!! achtung hier die calculations nach b'rligea und hochstaffl
-!!!!
-
-# Appendix: Matrix Expressions for the Jacobian
-To express the Jacobian matrix, we need a numerically efficient decomposition 
-of $$\boldsymbol{\Phi_w}$$ to express the pseudoinverse. This is done by either 
-QR Decomposition or SVD, as mentioned above. I will follow O'Leary and use the 
-SVD, although most other implementations use the QR Decomposition (O'Leary 2007 
-Sima 2007, Mullen 2009, Kaufman 1975, Warren 2013).
-
-For a rectangular matrix $$\boldsymbol{\Phi_w}$$ with *full rank*, we can write 
-$$\boldsymbol{\Phi_w}=(\boldsymbol{\Phi}^T \boldsymbol{\Phi})^{-1} \boldsymbol{\Phi}^T$$, 
-which is [usually a bad idea](https://eigen.tuxfamily.org/dox/group__LeastSquares.html) 
-numerically. Furthermore, if $$\boldsymbol{\Phi_w}$$ does not have full rank, 
-then $$(\boldsymbol{\Phi}^T \boldsymbol{\Phi})^{-1}$$ does not exist and we need 
-a different expression for the pseudoinverse. This can be given in terms of the 
-[*reduced* Singular Value Decomposition](http://www.omgwiki.org/hpec/files/hpec-challenge/svd.html) 
-of $$\boldsymbol{\Phi_w}$$:
-
-$$\boldsymbol{\Phi_w} = \boldsymbol{U}\boldsymbol\Sigma\boldsymbol{V}^T,$$
-
-with $$\boldsymbol{U}\in \mathbb{R}^{m\times \text{rank}\boldsymbol{\Phi_w}}$$, 
-$$\boldsymbol{V}\in \mathbb{R}^{\text{rank}\boldsymbol{\Phi_w} \times \text{rank}\boldsymbol{\Phi_w}}$$ 
-and the diagonal matrix of nonzero eigenvalues $$\boldsymbol\Sigma$$. Note that 
-the matrix $$\boldsymbol{U}$$ is not the square matrix from the *full* Singular
-Value Decomposition. That means it is not unitary, i.e. $$\boldsymbol{U}\boldsymbol{U}^T$$ 
-is not the identity matrix. For the matrix $$\boldsymbol{V}$$, however, we have 
-$$\boldsymbol{I} = \boldsymbol{V}^T\boldsymbol{V}$$. The pseudoinverse of can 
-be expressed as
-
-$$\boldsymbol{\Phi_w}^\dagger = \boldsymbol{V}\boldsymbol\Sigma^{-1}\boldsymbol{U}^T.$$
-
-This implies $$\boldsymbol{P}=\boldsymbol{I}-\boldsymbol{U}\boldsymbol{U}^T$$ 
-and the expressions for the columns $$\boldsymbol{a_k}$$ and $$\boldsymbol{b_k}$$ 
-can be written as
-
-$$\begin{eqnarray}
-\boldsymbol{a_k} &=& \boldsymbol{D_k}\boldsymbol{\hat{c}} - \boldsymbol{U}(\boldsymbol{U}^T(\boldsymbol{D_k}\boldsymbol{\hat{c}})) \\
-\boldsymbol{b_k} &=& \boldsymbol{U}(\boldsymbol{\Sigma^{-1}}(\boldsymbol{V}^T(\boldsymbol{D_k}^T\boldsymbol{r_w})).
-\end{eqnarray}$$
-
-The expressions are grouped in such a way that only matrix vector products need 
-to be calculated (O'Leary 2007).
 
 # Endnotes
 
