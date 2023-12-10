@@ -17,7 +17,8 @@ clever use of linear algebra to potentially speed up and increase the robustness
 of nonlinear least squares fitting. It does so by separating linear from nonlinear
 parameters. I'll recap the method based on a couple of pieces of literature in such
 a way that it will enable you to implement your own varpro library in your favorite
-programming language, given a basic understanding of linear algebra. 
+programming language. A basic understanding of linear algebra and calculus is required,
+but not much more.
 
 **UPDATE 12/2023:** I have overhauled the article and relegated some fringe ideas to
 the appendix. I have put more emphasis on the calculations of the Jacobian and 
@@ -308,17 +309,15 @@ to benefit from less iterations.
 
 ## Analytical Derivatives Using Singular Value Decomposition
 
-Further above I mentioned that we will typically use a matrix decomposition
+Further above, I mentioned that we typially use a matrix decomposition
 of $$\boldsymbol{\Phi}_w$$ to solve the linear system and that we would see
-those decompositions again when calculating the Jacobian. Now's the time. 
-
-!!!!!!!!!!!!!!!!!!!!!111
+those decompositions again when calculating the Jacobian. Now's that time. 
 
 To calculate the Jacobian matrix, we need a numerically efficient decomposition 
-of $$\boldsymbol{\Phi_w}$$ to calculate the pseudoinverse. This is done by either 
-QR Decomposition or SVD, as mentioned above. I will follow O'Leary and use the 
-SVD, although most other implementations use the QR Decomposition (O'Leary 2007 
-Sima 2007, Mullen 2009, Kaufman 1975, Warren 2013).
+of $$\boldsymbol{\Phi_w}$$ to calculate the pseudoinverse and the projection
+matrix. This is done by either  QR Decomposition or SVD, as mentioned above. 
+I will follow O'Leary in using the  SVD, although most other implementations use 
+the QR Decomposition (O'Leary 2007, Sima 2007, Mullen 2009, Kaufman 1975, Warren 2013).
 
 For a rectangular matrix $$\boldsymbol{\Phi_w}$$ with *full rank*, we can write 
 $$\boldsymbol{\Phi_w}^\dagger=(\boldsymbol{\Phi}^T \boldsymbol{\Phi})^{-1} \boldsymbol{\Phi}^T$$, 
@@ -342,7 +341,7 @@ be expressed as
 
 $$\boldsymbol{\Phi_w}^\dagger = \boldsymbol{V}\boldsymbol\Sigma^{-1}\boldsymbol{U}^T.$$
 
-This implies $$\boldsymbol{P}=\boldsymbol{I}-\boldsymbol{U}\boldsymbol{U}^T$$ 
+This implies $$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} =\boldsymbol{I}-\boldsymbol{U}\boldsymbol{U}^T$$ 
 and the expressions for the columns $$\boldsymbol{a_k}$$ and $$\boldsymbol{b_k}$$ 
 can be written as
 
@@ -353,8 +352,6 @@ $$\begin{eqnarray}
 
 The expressions are grouped in such a way that only matrix vector products need 
 to be calculated (O'Leary 2007).
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
-
 
 # Outlook
 
