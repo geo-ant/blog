@@ -38,12 +38,14 @@ back and forth. So let's dive in.
 # The Idea of VarPro
 
 [Nonlinear Least Squares Fitting](https://en.wikipedia.org/wiki/Non-linear_least_squares) 
-is the process of fitting a function to data by minimizing the sum of the squared 
+is the process of fitting a model function to data by minimizing the sum of the squared 
 residuals. It's called *nonlinear* least squares as opposed to *linear* least 
 squares because the function in question can be nonlinear in the fitting parameters. 
 If the function was purely linear in the fitting parameters we could take advantage 
 of the fact that linear least squares problems can be [very efficiently solved](https://en.wikipedia.org/wiki/Linear_least_squares). 
-The fundamental idea of VarPro is to separate the linear parameters from the 
+
+VarPro shines when fitting a model function that is comprised of both linear
+and nonlinear parameters. The fundamental idea of VarPro is to separate the linear parameters from the 
 nonlinear parameters during the fitting process. In doing so we can take advantage 
 of efficient solutions for the linear parameters and reduce the fitting problem 
 to a purely nonlinear least squares minimization. We still have to solve this 
@@ -54,9 +56,9 @@ That means VarPro is *not* a nonlinear least squares minimization algorithm in
 and of itself, but a clever way of rewriting the problem before tackling it numerically.
 We will see how to compose Variable Projection with off-the-shelf nonlinear
 least squares solvers. Let's now translate the principle above into formulas.
-Many of the contents in this section are taken from O'Leary and Rust (O'Leary 2007).
+Much of the content in this section is taken from O'Leary and Rust (O'Leary 2007).
 
-# The Fitting Function
+# The Model Function
 
 VarPro is concerned with fitting model functions $$f$$ that can be written 
 as a *linear combination* of $$n$$ functions that are *nonlinear*[^nonlinear_base] 
@@ -84,17 +86,15 @@ $$\boldsymbol{y}=(y_1,\dots,y_m)^T \in \mathbb{R}^m,$$
 where $$y_i$$ is the observation at a coordinate $$t_i$$, $$i=1,\dots,m$$. The 
 total number of observations is $$m$$. Let's write the function values for $$f$$ 
 at those coordinates as a vector, too:
-
 $$\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c}) = (f(\boldsymbol{\alpha},\boldsymbol{c},t_1),\dots,f(\boldsymbol{\alpha},\boldsymbol{c},t_m))^T \in \mathbb{R}^m.$$
-into the
-We want to minimize the weighted sum of the squared residuals:
+Our objective is to minimize the weighted sum of the squared residuals:
 
 $$R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) = \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c}))}\rVert_2^2, \label{RWLS}\tag{1}$$
 
 with the weight matrix $$\boldsymbol{W}$$. Our minimization problem is formally 
 written as
 
-$$\min_{\boldsymbol{c}\in \mathbb{R}^n, \boldsymbol{\alpha}\in\mathcal{S}_\alpha} R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) \Leftrightarrow \min_{\boldsymbol{c}\in \mathbb{R}^n, \boldsymbol{\alpha}\in\mathcal{S}_\alpha} \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c}))}\rVert_2^2 \label{FullMinimization}\tag{2}.$$
+$$\min_{\boldsymbol{c}\in \mathbb{R}^n, \boldsymbol{\alpha}\in\mathcal{S}_\alpha} R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) \label{FullMinimization}\tag{2}.$$
 
 Note that the nonlinear parameters can be constrained on a subset $$\mathcal{S}_\alpha$$ of $$\mathbb{R}^q$$
 while the linear parameters are unconstrained[^unconstrained].
@@ -109,7 +109,7 @@ a coefficient vector $$\boldsymbol{\hat{c}}(\boldsymbol{\alpha})$$ which is
 $$ \boldsymbol{\hat{c}}(\boldsymbol\alpha) = \arg \min_{\boldsymbol{c} \in \mathbb{R}^n} \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c}))}\rVert_2^2 \label{LSMinimization} \tag{3},$$
 
 for any fixed $$\boldsymbol{\alpha}$$, which just means that $$\boldsymbol{c}(\boldsymbol{\alpha})$$
-solves the linear subproblem. Then[^rank-conditions] the full problem 
+solves the linear subproblem. Then, assuming certain conditions[^rank-conditions], the full problem 
 $$\eqref{FullMinimization}$$ is equivalent to the following reduced problem:
 
 $$ \min_{\boldsymbol{\alpha} \in \mathcal{S}_\alpha} \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha})))}\rVert_2^2 \label{ReducedMinimization} \tag{4},$$
@@ -126,22 +126,25 @@ The additional brilliance of VarPro is that it gives us expressions for the deri
 of the function $$R_{WLS}(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha}))$$, 
 too[^derivatives]. $$R_{WLS}(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha}))$$ 
 is the target we want to minimize for the nonlinear problem $$\eqref{ReducedMinimization}$$, 
-which we have to solve using our favorite numerical algorithm. The nice thing 
-is that we can feed the algorithm with derivatives and that is almost always 
-a good thing. But we are getting ahead of ourselves. Let's dive into some linear 
-algebra to solve the linear subproblem.
+which we have to solve using our favorite numerical algorithm. But we are getting ahead
+of ourselves.
 
 # Enter the Matrix
 
 To rewrite problem $$\eqref{LSMinimization}$$ using linear algebra we introduce 
 the of *model function matrix* $$\boldsymbol{\Phi}(\boldsymbol{\alpha}) \in \mathbb{R}^{m \times n}$$:
 
-$$\boldsymbol{\Phi}(\boldsymbol{\alpha}) =  (\Phi_{ik})
+$$\boldsymbol{\Phi}(\boldsymbol{\alpha}) 
 = \left(\begin{matrix}
 \phi_1(\boldsymbol{\alpha},t_1) & \dots & \phi_n(\boldsymbol{\alpha},t_1) \\
 \vdots & \ddots & \vdots \\
 \vdots & \ddots & \vdots \\
 \phi_1(\boldsymbol{\alpha},t_m) & \dots & \phi_n(\boldsymbol{\alpha},t_m) \\
+\end{matrix}\right)
+= \left(\begin{matrix}
+\vert & & \vert \\
+\boldsymbol\phi_1(\boldsymbol{\alpha}), & \dots & ,\boldsymbol\phi_n(\boldsymbol{\alpha}) \\
+\vert & & \vert  \\
 \end{matrix}\right),$$
 
 so for the matrix elements we have $$\Phi_{ik} = \phi_k(\boldsymbol{\alpha},t_i)$$. 
@@ -212,7 +215,7 @@ If we want to use a high quality nonlinear solver to minimize our projection fun
 we have to supply the Jacobian $$\boldsymbol{J}(\boldsymbol{\alpha})$$
 of $$\boldsymbol{r}_w(\boldsymbol{\alpha})$$ with respect to $$\alpha$$. The Jacobian
 Matrix of $$\boldsymbol{r}_w$$ is defined as the matrix $$\boldsymbol{J}$$ with entries
-$$J_{ik} = \frac{\partial (\boldsymbol{r}_w)_i}{\partial \alpha_k}$$. It's a bit
+$$J_{ik} = \left(\frac{\partial \boldsymbol{r}_w}{\partial \alpha_k}\right)_i$$. It's a bit
 more helpful for the following calculations to write it in a column format:
 
 $$\boldsymbol{J}(\boldsymbol{\alpha}) =  (J_{ik})
@@ -233,19 +236,19 @@ $$\alpha_k$$. Since $$\boldsymbol{r}_w (\boldsymbol{\alpha})=\boldsymbol{P}^\per
 we know that we can write the $$k$$-th column of the Jacobian as:
 
 $$
-\boldsymbol{j}_k = \frac{\boldsymbol{r}_w (\boldsymbol{\alpha})}{\alpha_k} = \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}\boldsymbol{y_w},
+\boldsymbol{j}_k(\boldsymbol\alpha) = \frac{\partial \boldsymbol{r}_w}{\partial \alpha_k} (\boldsymbol{\alpha})= \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}\boldsymbol{y_w},
 $$
 
-where the derivative with respect to $$\alpha_k$$ for the matrix and vector are
+where the derivative with respect to the scalar $$\alpha_k$$ for the matrix and vector are
 just applied element-wise. So we need an expression for 
 $$ \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}$$ and
-it turns out it is not that hard to calculate (see Appendix):
+it turns out it is not that hard to calculate (see Appendix A):
 
 $$
 \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}
 = -\left[
-\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi}^\dagger(\boldsymbol{\alpha})
-+\left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi}^\dagger(\boldsymbol{\alpha})\right)^T
+\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha})
++\left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha})\right)^T
 \right],
 $$
 
@@ -277,23 +280,24 @@ $$\begin{eqnarray}
 \end{eqnarray}$$
 
 Here we used that $$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} = \left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\right)^T$$,
-cf. the Appendix.
+cf. the Appendix A.
 
 ## The Kaufman Approximation
 
 A widely used approximation in the context of Variable Projection is the Kaufman
 approximation, which neglects the second summand in the derivative 
-$$\frac{\partial}{\partial\alpha_k}\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}$$:
+$$\frac{\partial}{\partial\alpha_k}\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}$$
+and approximates it as:
 
 
 $$
 \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}
-\approx - \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi}^\dagger(\boldsymbol{\alpha})
+\approx - \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha})
 $$
 
 This approximation reduces the computational burden of calculating the Jacobian
 while still retaining good numerical accuracy (Kaufman 1975). It implies that
-we can calculate the columns of the jacobian as:
+we can approximate the columns of the jacobian as:
 
 $$
 \boldsymbol{j}_k \approx - \boldsymbol{a_k}
@@ -302,10 +306,10 @@ $$
 
 This approximation is ubiquitous and seems to do very well for many applications
 (O'Leary 2007, Mullen 2009, Warren 2013). O'Leary notes that using
-this approximation will likely increase the number of function iterations. If
-the model function is very expensive to calculate (e.g. if it is the result of 
-a complex simulation), then it might be advantageous to calculate the full Jacobian
-to benefit from less iterations.
+this approximation will likely increase the number of iterations before a 
+solution is obtained. If the model function is very expensive to calculate
+(e.g. if it is the result of  a complex simulation), then it might be advantageous
+to calculate the full Jacobian to benefit from less iterations.
 
 ## Analytical Derivatives Using Singular Value Decomposition
 
@@ -317,7 +321,7 @@ To calculate the Jacobian matrix, we need a numerically efficient decomposition
 of $$\boldsymbol{\Phi_w}$$ to calculate the pseudoinverse and the projection
 matrix. This is done by either  QR Decomposition or SVD, as mentioned above. 
 I will follow O'Leary in using the  SVD, although most other implementations use 
-the QR Decomposition (O'Leary 2007, Sima 2007, Mullen 2009, Kaufman 1975, Warren 2013).
+some form of QR Decomposition (O'Leary 2007, Sima 2007, Mullen 2009, Kaufman 1975, Warren 2013).
 
 For a rectangular matrix $$\boldsymbol{\Phi_w}$$ with *full rank*, we can write 
 $$\boldsymbol{\Phi_w}^\dagger=(\boldsymbol{\Phi}^T \boldsymbol{\Phi})^{-1} \boldsymbol{\Phi}^T$$, 
@@ -353,7 +357,10 @@ $$\begin{eqnarray}
 The expressions are grouped in such a way that only matrix vector products need 
 to be calculated (O'Leary 2007).
 
-# Outlook
+# Putting It All Together
+
+
+!!!!!!!!!!!!
 
 This concludes my first article on Variable Projection. In the next part of the 
 series I will go into more detail on how to implement this with the aim of fitting 
@@ -465,4 +472,5 @@ them at some point and see how they turn out numerically.
 [^model_base_functions]: This name might not always be accurate because the functions don't necessarily have to be linearly independent. However, for a good model they should be. See also the discussions later on the rank of $$\boldsymbol{\Phi}$$.
 [^derivatives]: Under the condition that we have analytical expressions for the partial derivatives $$\partial/\partial\alpha_k \phi_j(\boldsymbol\alpha,t)$$ of the model base functions.
 [^L2Solution]: The solution $$\boldsymbol{\hat{c}}$$ is not unique. The solution given here (using the pseudoinverse) has the smallest 2-Norm $$\lVert\boldsymbol{\hat{c}}\rVert_2^2$$ among all solutions that minimize the problem, see [here](https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse#Linear_least-squares)
-[^rank-conditions]: I've glossed over an important precondition that must hold before we can really separate the linear and nonlinear optimization as shown above. The matrix $$\boldsymbol{\Phi}(\boldsymbol{\alpha})$$ must have locally constant rank in a neighborhood of $$\boldsymbol{\alpha}$$.
+[^rank-conditions]: I've glossed over an important precondition that must hold before we can really separate the linear and nonlinear optimization as shown above. The matrix $$\boldsymbol{\Phi}(\boldsymbol{\alpha})$$ of the model base functions must have locally constant rank in a neighborhood of $$\boldsymbol{\alpha}$$.
+
