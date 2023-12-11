@@ -11,18 +11,17 @@ title: 'The Variable Projection Method - Nonlinear Least Squares Fitting with Va
 comments_id: 11
 ---
 
-This is the first post in a series on the use of the Variable Projection method
-(VarPro) in digital image processing. The method is interesting because it makes
-clever use of linear algebra to potentially speed up and increase the robustness
-of nonlinear least squares fitting. It does so by separating linear from nonlinear
-parameters. I'll recap the method based on a couple of pieces of literature in such
-a way that it will enable you to implement your own varpro library in your favorite
-programming language. A basic understanding of linear algebra and calculus is required,
-but not much more.
+The Variable Projection method is a relatively unknown algorithm in the context of 
+nonlinear least squares fitting. It is interesting because it makes 
+clever use of linear algebra to potentially speed up and increase the 
+robustness of nonlinear least squares fitting. I'll introduce the method
+such a way that it will enable you to implement your own varpro library in your
+favorite programming language. Only a basic understanding of linear algebra and calculus is required.
 
-**UPDATE 12/2023:** I have overhauled the article and relegated some fringe ideas to
-the appendix. I have put more emphasis on the calculations of the Jacobian and 
-how to compose varpro with off-the-shelf nonlinear solvers.
+**UPDATE 12/2023:** This article has undergone a pretty major rework. I have
+restructured it to be a more self contained introduction into how to implement
+variable projection using off-the-shelf nonlinear least squares solvers. I have
+also relegated a few more non-standard ideas to the appendix.
 
 # Before We Dive In
 
@@ -33,7 +32,7 @@ down in terms of familiar linear algebra. Furthermore, they give helpful practic
 tips on the implementation. However, there are errors and typos in some crucial 
 formulas in their publication, which I have hopefully corrected. I will, for 
 the most part, use the notation of O'Leary and Rust so that it is easy to go 
-back and forth. So let's dive in.
+back and forth. Let's dive in.
 
 # The Idea of VarPro
 
@@ -45,14 +44,16 @@ If the function was purely linear in the fitting parameters we could take advant
 of the fact that linear least squares problems can be [very efficiently solved](https://en.wikipedia.org/wiki/Linear_least_squares). 
 
 VarPro shines when fitting a model function that is comprised of both linear
-and nonlinear parameters. The fundamental idea of VarPro is to separate the linear parameters from the 
+and nonlinear parameters or, to be more precise, if the model is _separable_.
+Separable models are linear combinations of nonlinear functions.
+The fundamental idea of VarPro is to separate the linear parameters from the 
 nonlinear parameters during the fitting process. In doing so we can take advantage 
 of efficient solutions for the linear parameters and reduce the fitting problem 
 to a purely nonlinear least squares minimization. We still have to solve this 
 reduced problem using a nonlinear minimization algorithm of our choice (e.g. 
 [Levenberg-Marquardt](https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm)).
 
-That means VarPro is *not* a nonlinear least squares minimization algorithm in 
+That means VarPro is *not* a full-featured nonlinear least squares minimization algorithm in 
 and of itself, but a clever way of rewriting the problem before tackling it numerically.
 We will see how to compose Variable Projection with off-the-shelf nonlinear
 least squares solvers. Let's now translate the principle above into formulas.
@@ -132,7 +133,7 @@ of ourselves.
 # Enter the Matrix
 
 To rewrite problem $$\eqref{LSMinimization}$$ using linear algebra we introduce 
-the of *model function matrix* $$\boldsymbol{\Phi}(\boldsymbol{\alpha}) \in \mathbb{R}^{m \times n}$$:
+the *model function matrix* $$\boldsymbol{\Phi}(\boldsymbol{\alpha}) \in \mathbb{R}^{m \times n}$$:
 
 $$\boldsymbol{\Phi}(\boldsymbol{\alpha}) 
 = \left(\begin{matrix}
@@ -179,7 +180,7 @@ $$ \min_{\boldsymbol{\alpha} \in \mathcal{S}_\alpha} \lVert \boldsymbol{P}^\perp
 
 using the matrix
 
-$$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}:= \boldsymbol{1}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha}) \in \mathbb{R}^{m \times m}$$
+$$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}:= \boldsymbol{1}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha}) \in \mathbb{R}^{m \times m} \label{ProjectionMatrix}\tag{8}$$
 
 which is called the *projection onto the orthogonal complement of the range of* 
 $$\boldsymbol{\Phi}_w$$. It's abbreviated to $$\boldsymbol{P}$$ in 
@@ -188,8 +189,10 @@ other publications as well. Using this matrix  we have written the squared
 sum of residuals as
 
 $$\begin{eqnarray}
-R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) &=& \lVert \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\hat{c}}(\boldsymbol{\alpha})\rVert_2^2 = \lVert{\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w}}\rVert_2^2,\\
-\boldsymbol{r}_w (\boldsymbol{\alpha})&:=&  \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\hat{c}}(\boldsymbol{\alpha}) = \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w}\\
+R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) &=& \lVert \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\hat{c}}(\boldsymbol{\alpha})\rVert_2^2 
+= \lVert{\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w}}\rVert_2^2, \label{Rwls-Proj}\tag{9}\\
+\boldsymbol{r}_w (\boldsymbol{\alpha})&:=&  \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\hat{c}}(\boldsymbol{\alpha}) 
+= \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w} \label{rw-Proj}\tag{10}\\
 \end{eqnarray}$$
 
 When written like this, $$R_{WLS}$$ is called the *projection functional*, which
@@ -236,7 +239,8 @@ $$\alpha_k$$. Since $$\boldsymbol{r}_w (\boldsymbol{\alpha})=\boldsymbol{P}^\per
 we know that we can write the $$k$$-th column of the Jacobian as:
 
 $$
-\boldsymbol{j}_k(\boldsymbol\alpha) = \frac{\partial \boldsymbol{r}_w}{\partial \alpha_k} (\boldsymbol{\alpha})= \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}\boldsymbol{y_w},
+\boldsymbol{j}_k(\boldsymbol\alpha) = \frac{\partial \boldsymbol{r}_w}{\partial \alpha_k} (\boldsymbol{\alpha})
+= \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}\boldsymbol{y_w}  \label{jk-column-P}\tag{11},
 $$
 
 where the derivative with respect to the scalar $$\alpha_k$$ for the matrix and vector are
@@ -249,13 +253,17 @@ $$
 = -\left[
 \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha})
 +\left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha})\right)^T
-\right],
+\right]
+\label{diff-Proj}\tag{12},
 $$
 
 where $$D_k$$ is the derivative of the weighted model function matrix with respect to $$\alpha_k$$.
 
 $$
-\boldsymbol{D_k}(\boldsymbol\alpha) := \frac{\partial \boldsymbol{\Phi_w}}{\partial \alpha_k} (\boldsymbol\alpha) =\boldsymbol{W} \frac{\partial \boldsymbol{\Phi}}{\partial \alpha_k} (\boldsymbol\alpha) \in \mathbb{R}^{m\times n},
+\boldsymbol{D_k}(\boldsymbol\alpha) 
+:= \frac{\partial \boldsymbol{\Phi_w}}{\partial \alpha_k} (\boldsymbol\alpha) =
+\boldsymbol{W} \frac{\partial \boldsymbol{\Phi}}{\partial \alpha_k} (\boldsymbol\alpha) \in \mathbb{R}^{m\times n},
+\label{Dk-matrix}\tag{13}
 $$
 
 where the derivative, again, is performed element-wise for $$\boldsymbol{\Phi_w}$$.
@@ -264,20 +272,27 @@ as
 
 $$
 \boldsymbol{j}_k (\boldsymbol{\alpha})= \boldsymbol{a}_k(\boldsymbol{\alpha}) + \boldsymbol{b}_k (\boldsymbol{\alpha}),
+\label{jk-ak-bk}\tag{14}
 $$
 
 where
 
-$$\boldsymbol{a_k}(\boldsymbol\alpha) = \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\, \boldsymbol{D_k} \, \boldsymbol{\Phi_w}^\dagger \, \boldsymbol{y_w}
-=  \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \, \boldsymbol{D_k} \, \boldsymbol{\hat{c}},$$
+$$
+\boldsymbol{a_k}(\boldsymbol\alpha) = \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\, \boldsymbol{D_k} \, \boldsymbol{\Phi_w}^\dagger \, \boldsymbol{y_w}
+=  \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \, \boldsymbol{D_k} \, \boldsymbol{\hat{c}}
+ \label{ak-vector}\tag{14},
+$$
 
 and 
 
-$$\begin{eqnarray}
+$$
+\begin{eqnarray}
 \boldsymbol{b_k}(\boldsymbol\alpha) &=& \left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\, \boldsymbol{D_k}\, \boldsymbol{\Phi_w}^\dagger\right)^T \boldsymbol{y_w} \\
 &=& \left(\boldsymbol{\Phi_w}^\dagger\right)^T \boldsymbol{D_k}^T \, \left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\right)^T \boldsymbol{y_w} \\
-&=& \left(\boldsymbol{\Phi_w}^\dagger\right)^T \boldsymbol{D_k}^T \,  \boldsymbol{r_w}.
-\end{eqnarray}$$
+&=& \left(\boldsymbol{\Phi_w}^\dagger\right)^T \boldsymbol{D_k}^T \,  \boldsymbol{r_w}
+\label{bk-vector}\tag{15}.
+\end{eqnarray}
+$$
 
 Here we used that $$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} = \left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\right)^T$$,
 cf. the Appendix A.
@@ -293,6 +308,7 @@ and approximates it as:
 $$
 \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}
 \approx - \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha})
+\label{diff-Proj-Kaufmann}\tag{15}
 $$
 
 This approximation reduces the computational burden of calculating the Jacobian
@@ -302,6 +318,7 @@ we can approximate the columns of the jacobian as:
 $$
 \boldsymbol{j}_k \approx - \boldsymbol{a_k}
 = \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \, \boldsymbol{D_k} \, \boldsymbol{\hat{c}}.
+\label{jk-Kaufmann}\tag{16}
 $$
 
 This approximation is ubiquitous and seems to do very well for many applications
@@ -343,15 +360,15 @@ is not the identity matrix. For the matrix $$\boldsymbol{V}$$, however, we have
 $$\boldsymbol{I} = \boldsymbol{V}^T\boldsymbol{V}$$. The pseudoinverse of can 
 be expressed as
 
-$$\boldsymbol{\Phi_w}^\dagger = \boldsymbol{V}\boldsymbol\Sigma^{-1}\boldsymbol{U}^T.$$
+$$\boldsymbol{\Phi_w}^\dagger = \boldsymbol{V}\boldsymbol\Sigma^{-1}\boldsymbol{U}^T  \label{pinv-svd}\tag{17}.$$
 
 This implies $$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} =\boldsymbol{I}-\boldsymbol{U}\boldsymbol{U}^T$$ 
 and the expressions for the columns $$\boldsymbol{a_k}$$ and $$\boldsymbol{b_k}$$ 
 can be written as
 
 $$\begin{eqnarray}
-\boldsymbol{a_k} &=& \boldsymbol{D_k}\boldsymbol{\hat{c}} - \boldsymbol{U}(\boldsymbol{U}^T(\boldsymbol{D_k}\boldsymbol{\hat{c}})) \\
-\boldsymbol{b_k} &=& \boldsymbol{U}(\boldsymbol{\Sigma^{-1}}(\boldsymbol{V}^T(\boldsymbol{D_k}^T\boldsymbol{r_w})).
+\boldsymbol{a_k} &=& \boldsymbol{D_k}\boldsymbol{\hat{c}} - \boldsymbol{U}(\boldsymbol{U}^T(\boldsymbol{D_k}\boldsymbol{\hat{c}})) \label{ak-svd}\tag{18} \\
+\boldsymbol{b_k} &=& \boldsymbol{U}(\boldsymbol{\Sigma^{-1}}(\boldsymbol{V}^T(\boldsymbol{D_k}^T\boldsymbol{r_w})) \label{bk-svd}\tag{19}.
 \end{eqnarray}$$
 
 The expressions are grouped in such a way that only matrix vector products need 
@@ -377,6 +394,8 @@ in the time resolved microscopy literature (Mullen 2009).
 **(Mullen 2009)** Mullen, K.M., Stokkum, I.H.M.v.: The variable projection algorithm in time-resolved spectroscopy, microscopy and mass spectrometry applications. *Numer Algor* **51**, 319–340 (2009). [https://doi.org/10.1007/s11075-008-9235-2](https://doi.org/10.1007/s11075-008-9235-2).
 
 **(Warren 2013)** Warren, S.C *et al.* "Rapid global fitting of large fluorescence lifetime imaging microscopy datasets." *PloS one* **8,8 e70687**. 5 Aug. 2013, [doi:10.1371/journal.pone.0070687](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0070687).
+
+**(Baerligea 2023)** Bärligea, A. *et al.* "A Generalized Variable Projection Algorithm for Least Squares Problems in Atmospheric Remote Sensing" *Mathematics* **2023, 11, 2839** [https://doi.org/10.3390/math11132839](https://doi.org/10.3390/math11132839)
 
 # Appendix A: Calculating the Derivative of the Projection Functional
 
