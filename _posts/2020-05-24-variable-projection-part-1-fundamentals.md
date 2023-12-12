@@ -189,8 +189,7 @@ other publications as well. Using this matrix  we have written the squared
 sum of residuals as
 
 $$\begin{eqnarray}
-R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) &=& \lVert \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\hat{c}}(\boldsymbol{\alpha})\rVert_2^2 
-= \lVert{\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w}}\rVert_2^2, \label{Rwls-Proj}\tag{9}\\
+R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) &=& \lVert \boldsymbol{r}_w\rVert^2_2 \label{Rwls}\tag{9}\\
 \boldsymbol{r}_w (\boldsymbol{\alpha})&:=&  \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\hat{c}}(\boldsymbol{\alpha}) 
 = \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w} \label{rw-Proj}\tag{10}\\
 \end{eqnarray}$$
@@ -235,8 +234,7 @@ $$\boldsymbol{J}(\boldsymbol{\alpha}) =  (J_{ik})
 
 The derivative $$\frac{\partial}{\partial \alpha_k} \boldsymbol{r}_w$$ is simply
 the element-wise derivative of the residual vector with respect to the scalar
-$$\alpha_k$$. Since $$\boldsymbol{r}_w (\boldsymbol{\alpha})=\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w}\\$$,
-we know that we can write the $$k$$-th column of the Jacobian as:
+$$\alpha_k$$. Using eq. $$\eqref{rw-Proj}$$ we can write
 
 $$
 \boldsymbol{j}_k(\boldsymbol\alpha) = \frac{\partial \boldsymbol{r}_w}{\partial \alpha_k} (\boldsymbol{\alpha})
@@ -271,7 +269,7 @@ Using these results, we find that we can calculate the $$k$$-th column of the Ja
 as
 
 $$
-\boldsymbol{j}_k (\boldsymbol{\alpha})= \boldsymbol{a}_k(\boldsymbol{\alpha}) + \boldsymbol{b}_k (\boldsymbol{\alpha}),
+\boldsymbol{j}_k (\boldsymbol{\alpha})= -\left(\boldsymbol{a}_k(\boldsymbol{\alpha}) + \boldsymbol{b}_k (\boldsymbol{\alpha})\right),
 \label{jk-ak-bk}\tag{14}
 $$
 
@@ -280,7 +278,7 @@ where
 $$
 \boldsymbol{a_k}(\boldsymbol\alpha) = \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\, \boldsymbol{D_k} \, \boldsymbol{\Phi_w}^\dagger \, \boldsymbol{y_w}
 =  \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \, \boldsymbol{D_k} \, \boldsymbol{\hat{c}}
- \label{ak-vector}\tag{14},
+ \label{ak-vector}\tag{15},
 $$
 
 and 
@@ -290,7 +288,7 @@ $$
 \boldsymbol{b_k}(\boldsymbol\alpha) &=& \left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\, \boldsymbol{D_k}\, \boldsymbol{\Phi_w}^\dagger\right)^T \boldsymbol{y_w} \\
 &=& \left(\boldsymbol{\Phi_w}^\dagger\right)^T \boldsymbol{D_k}^T \, \left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\right)^T \boldsymbol{y_w} \\
 &=& \left(\boldsymbol{\Phi_w}^\dagger\right)^T \boldsymbol{D_k}^T \,  \boldsymbol{r_w}
-\label{bk-vector}\tag{15}.
+\label{bk-vector}\tag{16}.
 \end{eqnarray}
 $$
 
@@ -308,7 +306,7 @@ and approximates it as:
 $$
 \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}
 \approx - \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha})
-\label{diff-Proj-Kaufmann}\tag{15}
+\label{diff-Proj-Kaufmann}\tag{17}
 $$
 
 This approximation reduces the computational burden of calculating the Jacobian
@@ -317,8 +315,8 @@ we can approximate the columns of the jacobian as:
 
 $$
 \boldsymbol{j}_k \approx - \boldsymbol{a_k}
-= \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \, \boldsymbol{D_k} \, \boldsymbol{\hat{c}}.
-\label{jk-Kaufmann}\tag{16}
+= - \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \, \boldsymbol{D_k} \, \boldsymbol{\hat{c}}.
+\label{jk-Kaufmann}\tag{18}
 $$
 
 This approximation is ubiquitous and seems to do very well for many applications
@@ -360,15 +358,15 @@ is not the identity matrix. For the matrix $$\boldsymbol{V}$$, however, we have
 $$\boldsymbol{I} = \boldsymbol{V}^T\boldsymbol{V}$$. The pseudoinverse of can 
 be expressed as
 
-$$\boldsymbol{\Phi_w}^\dagger = \boldsymbol{V}\boldsymbol\Sigma^{-1}\boldsymbol{U}^T  \label{pinv-svd}\tag{17}.$$
+$$\boldsymbol{\Phi_w}^\dagger = \boldsymbol{V}\boldsymbol\Sigma^{-1}\boldsymbol{U}^T  \label{pinv-svd}\tag{19}.$$
 
 This implies $$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} =\boldsymbol{I}-\boldsymbol{U}\boldsymbol{U}^T$$ 
 and the expressions for the columns $$\boldsymbol{a_k}$$ and $$\boldsymbol{b_k}$$ 
 can be written as
 
 $$\begin{eqnarray}
-\boldsymbol{a_k} &=& \boldsymbol{D_k}\boldsymbol{\hat{c}} - \boldsymbol{U}(\boldsymbol{U}^T(\boldsymbol{D_k}\boldsymbol{\hat{c}})) \label{ak-svd}\tag{18} \\
-\boldsymbol{b_k} &=& \boldsymbol{U}(\boldsymbol{\Sigma^{-1}}(\boldsymbol{V}^T(\boldsymbol{D_k}^T\boldsymbol{r_w})) \label{bk-svd}\tag{19}.
+\boldsymbol{a_k} &=& \boldsymbol{D_k}\boldsymbol{\hat{c}} - \boldsymbol{U}(\boldsymbol{U}^T(\boldsymbol{D_k}\boldsymbol{\hat{c}})) \label{ak-svd}\tag{20} \\
+\boldsymbol{b_k} &=& \boldsymbol{U}(\boldsymbol{\Sigma^{-1}}(\boldsymbol{V}^T(\boldsymbol{D_k}^T\boldsymbol{r_w})) \label{bk-svd}\tag{21}.
 \end{eqnarray}$$
 
 The expressions are grouped in such a way that only matrix vector products need 
@@ -415,66 +413,45 @@ compose pretty well with off-the-shelf least squares solvers.
 
 If we want to minimize the weighted residual using a general purpose minimizer, 
 then it is preferrable to know its gradient with respect to $$\boldsymbol{\alpha}$$.
-The weighted residual is $$R_{WLS}=\lVert \boldsymbol{y_w}-\boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))\rVert_2^2$$ 
-and we want to calculate its gradient:
+The weighted residual is given in eq. $$\eqref{Rwls}$$. Its gradient is:
 
 $$\nabla R_{WLS}(\boldsymbol\alpha) = \left(\frac{\partial R_{WLS}}{\partial\alpha_1}(\boldsymbol\alpha),\dots,\frac{\partial R_{WLS}}{\partial\alpha_q}(\boldsymbol\alpha)\right)^T.$$
 
 The $$k$$-th component is calculated using [the product rule for the dot product](https://math.stackexchange.com/questions/159284/product-rule-for-the-derivative-of-a-dot-product):
 
 $$\begin{eqnarray}
-\frac{\partial}{\partial \alpha_k} R_{WLS} &=& \frac{\partial}{\partial \alpha_k} \lVert \boldsymbol{y_w}-\boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))\rVert_2^2 \\
-&=& 2 (\boldsymbol{y_w}-\boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot \frac{\partial}{\partial \alpha_k} (\boldsymbol{y_w}-\boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \\
-&=& 2 (\boldsymbol{y_w}-\boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot (-\frac{\partial}{\partial \alpha_k} \boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \\
-&=& -2 (\boldsymbol{y_w}-\boldsymbol{f}(\boldsymbol\alpha,\boldsymbol{\hat{c}}(\boldsymbol\alpha))) \cdot \boldsymbol{j_k} \\
-&=& -2 \boldsymbol{r_w}\cdot \boldsymbol{j_k} \\
-&=& +2 \boldsymbol{r_w}\cdot (\boldsymbol{a_k}+\boldsymbol{b_k})
+\frac{\partial}{\partial \alpha_k} R_{WLS}(\boldsymbol\alpha) &=& \frac{\partial}{\partial \alpha_k} \lVert \boldsymbol{r}_w(\boldsymbol\alpha) \rVert^2 \\
+ &=& \frac{\partial}{\partial \alpha_k} \left(\boldsymbol{r}_w(\boldsymbol\alpha) \cdot \boldsymbol{r}_w(\boldsymbol\alpha) \right) \\
+ &=& 2\; \frac{\partial\boldsymbol{r}_w(\boldsymbol\alpha) }{\partial \alpha_k} \cdot \boldsymbol{r}_w(\boldsymbol\alpha) \\
+ &=& 2\; \boldsymbol{j}_k (\boldsymbol\alpha) \cdot \boldsymbol{r}_w(\boldsymbol\alpha) \\
 \end{eqnarray}$$
 
-where $$\boldsymbol{j_k}=-(\boldsymbol{a_k}+\boldsymbol{b_k})$$ is the $$k$$-th 
+where $$\boldsymbol{j_k}$$ is the $$k$$-th 
 column of the Jacobian $$\boldsymbol{J}(\boldsymbol\alpha)$$, and $$\boldsymbol{r_w}$$ 
-is the weighted residual vector as defined above.
-
-If we use the Kaufman approximation and the expressions for the Jacobian as defined
-above, then the expressions for the partial derivative of $$R_{WLS}$$ become much 
-simpler:
-
-
-ACATHUNG!! fehler bei calculations, das W muss auch zum eta!!
+is the weighted residual vector as defined above. We can simplify these expressions 
+if we use the Kaufmann approximation for the Jacobian:
 
 $$\begin{eqnarray}
-\frac{\partial}{\partial \alpha_k} R_{WLS} &\approx& 2\, \boldsymbol{r_w}\cdot \boldsymbol{a_k} \\
-&=& 2\,\boldsymbol{P}\boldsymbol{y_w} \cdot \boldsymbol{P}\,\boldsymbol{D_k} \boldsymbol{\hat{c}} \\
-&=& 2\,\boldsymbol{P}^T\boldsymbol{P}\,\boldsymbol{y_w} \cdot \boldsymbol{D_k} \boldsymbol{\hat{c}} \\
-&=& 2\,\boldsymbol{P}\boldsymbol{y_w} \cdot \boldsymbol{D_k} \boldsymbol{\hat{c}} \\
-&=& 2\,\boldsymbol{r_w} \cdot \boldsymbol{D_k} \boldsymbol{\hat{c}}, \label{Kaufman_Approx_Gradient_RWLS} \tag{9}
+\frac{\partial}{\partial \alpha_k} R_{WLS} &\approx& -2\, \boldsymbol{r_w}\cdot \boldsymbol{a_k} \\
+&=& -2\,\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \boldsymbol{y_w} \cdot \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \,\boldsymbol{D_k} \boldsymbol{\hat{c}} \\
+&=& -2\,\left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \right)^T\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \,\boldsymbol{y_w} \cdot \boldsymbol{D_k} \boldsymbol{\hat{c}} \\
+&=& -2\,\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \boldsymbol{y_w} \cdot \boldsymbol{D_k} \boldsymbol{\hat{c}} \\
+&=& -2\,\boldsymbol{r_w} \cdot \boldsymbol{D_k} \boldsymbol{\hat{c}}, \label{Kaufman_Approx_Gradient_RWLS} 
 \end{eqnarray}$$
 
-where we have used $$\boldsymbol{P}^T \boldsymbol{P}=\boldsymbol{P} \boldsymbol{P}=\boldsymbol{P}$$ 
-and the fact that [we can write](https://books.google.de/books?id=sMfjDwAAQBAJ&lpg=PA22&dq=scalar%20product%20X*Ay&hl=de&pg=PA22#v=onepage&q&f=false) 
+where we have used $$\left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \right)^T \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} =\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}  \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} =\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} $$ 
+(see Appendix A) and the fact that [we can write](https://books.google.de/books?id=sMfjDwAAQBAJ&lpg=PA22&dq=scalar%20product%20X*Ay&hl=de&pg=PA22#v=onepage&q&f=false) 
 $$\boldsymbol{x}\cdot \boldsymbol{A} \boldsymbol{y} = \boldsymbol{A}^T\boldsymbol{x}\cdot\boldsymbol{y}$$ 
 for all vectors $$\boldsymbol{x},\boldsymbol{y} \in \mathbb{R^m}$$ and square 
-matrices $$\boldsymbol{A} \in \mathbb{R}^{m\times m}$$. The last expression for 
-the partial derivative is very easy to calculate because it does not require 
-the projection matrix $$\boldsymbol{P}$$ explicitly.
+matrices $$\boldsymbol{A} \in \mathbb{R}^{m\times m}$$. 
+For a general purpose nonlinear minimizer we typically have to supply $$R_{WLS}$$
+and its gradient. That is particularly simple to calculate if we use the Kaufmann
+approximation, since it does not require the projection matrix or its decomposition
+explicitly. I say explicitly because we will still need to solve the linear system
+to obtain $$\boldsymbol{\hat{c}}$$, but we might use a linear algebra library
+that hides that complexity from us.
 
-For a general purpose minimizer we just need to provide the function to minimize, 
-i.e. $$R_{WLS}$$ and its gradient as functions of $$\boldsymbol\alpha$$. Obtaining
-a solution $$\boldsymbol{\hat{c}}(\boldsymbol\alpha)$$ for eq. $$\eqref{c_hat_solution}$$ 
-typically involves choosing an appropriate matrix decomposition (such as QR or SVD)
-to solve the linear system. However, we can often obtain the solution to 
-the linear problem without having to deal with the components of the matrix decomposition 
-explicitly. That  means we can calculate $$R_{WLS}=\lVert\boldsymbol{r_w}\rVert_2^2$$, 
-with $$\boldsymbol{r_w}$$  according to eq. $$\eqref{weighted_residual_vector}$$. 
-Then we can calculate the  the gradient using approximation $$\eqref{Kaufman_Approx_Gradient_RWLS}$$. 
-We merely need three things for that: first, the matrix $$\boldsymbol{D_k}(\boldsymbol\alpha)$$, 
-which we can calculate from the model function derivatives. Second, the solution 
-for the coefficient vector $$\boldsymbol{\hat{c}}(\boldsymbol\alpha)$$, which 
-we have already obtained using the solver. Third, we need the vector of weighted 
-residuals $$\boldsymbol{r_w}(\boldsymbol\alpha)$$, which we have already calculated 
-as part of $$R_{WLS}$$. 
-
-As mentioned in the update, I don't believe these ideas are as useful as I once thought,
+As mentioned in the update to this article, I don't believe these ideas are as useful as I once thought,
 especially for multiple right hand sides. But who knows, maybe I'll try and explore
 them at some point and see how they turn out numerically.
 
@@ -492,4 +469,3 @@ them at some point and see how they turn out numerically.
 [^derivatives]: Under the condition that we have analytical expressions for the partial derivatives $$\partial/\partial\alpha_k \phi_j(\boldsymbol\alpha,t)$$ of the model base functions.
 [^L2Solution]: The solution $$\boldsymbol{\hat{c}}$$ is not unique. The solution given here (using the pseudoinverse) has the smallest 2-Norm $$\lVert\boldsymbol{\hat{c}}\rVert_2^2$$ among all solutions that minimize the problem, see [here](https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse#Linear_least-squares)
 [^rank-conditions]: I've glossed over an important precondition that must hold before we can really separate the linear and nonlinear optimization as shown above. The matrix $$\boldsymbol{\Phi}(\boldsymbol{\alpha})$$ of the model base functions must have locally constant rank in a neighborhood of $$\boldsymbol{\alpha}$$.
-
