@@ -11,10 +11,10 @@ title: 'The Variable Projection Method - Nonlinear Least Squares Fitting with Va
 comments_id: 11
 ---
 
-The Variable Projection method is a relatively unknown algorithm in the context of 
+The Variable Projection method is not a widely known algorithm in the context of 
 nonlinear least squares fitting. It is interesting because it makes 
-clever use of linear algebra to potentially speed up and increase the 
-robustness of nonlinear least squares fitting. I'll introduce the method
+clever use of linear algebra to potentially speed up fitting certain classes
+of functions to data. I'll introduce the method
 such a way that it will enable you to implement your own varpro library in your
 favorite programming language. Only a basic understanding of linear algebra and calculus is required.
 
@@ -172,9 +172,9 @@ A solution to problem $$\eqref{LSMinimizationLinAlg}$$ is[^mistake_paper]<sup>,<
 
 $$\boldsymbol{\hat{c}} = \boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha}) \boldsymbol{y_w}, \label{c_hat_solution} \tag{6}$$
 
-using the pseudoinverse $$\boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha})$$ 
-of $$\boldsymbol{\Phi_w}(\boldsymbol{\alpha})$$. This allows us to rewrite the 
-nonlinear problem by plugging in $$\boldsymbol{\hat{c}}$$ from above
+using the [Moore Penrose pseudoinverse](https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse)
+$$\boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha})$$ of $$\boldsymbol{\Phi_w}(\boldsymbol{\alpha})$$.
+This allows us to rewrite the nonlinear problem by plugging in $$\boldsymbol{\hat{c}}$$ from above
 
 $$ \min_{\boldsymbol{\alpha} \in \mathcal{S}_\alpha} \lVert \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w} \rVert_2^2 \label{NonlinProblemMatrix} \tag{7},$$
 
@@ -397,8 +397,9 @@ in the time resolved microscopy literature (Mullen 2009).
 
 # Appendix A: Calculating the Derivative of the Projection Functional
 
-!!!!!!!!!!!!! achtung hier die calculations nach b'rligea und hochstaffl
-!!!!
+This section follows the very nice paper by Bärligea and Hochstaffl (Baerligea 2023).
+To start calculating the derivative of 
+!!!!!!!!!!!!! achtung hier die calculations nach b'rligea und hochstaffl!
 
 
 
@@ -406,12 +407,14 @@ in the time resolved microscopy literature (Mullen 2009).
 
 **UPDATE 2023** The ideas from this section featured pretty prominently in the
 previous version of this article. While I don't think the ideas are wrong,
-I don't believe they are as useful as I once did. I thought they would
+I am going back and forth on how useful they are. I thought they would
 give me an elegant way of extending my varpro implementation to multiple right
 hand sides. However, there are established methods to do that which still
-compose pretty well with off-the-shelf least squares solvers.
+compose pretty well with off-the-shelf least squares solvers. So I don't feel
+an urgent need to explore the ideas presented here, but I also cannot quite let
+them go.
 
-If we want to minimize the weighted residual using a general purpose minimizer, 
+If we want to minimize the weighted residual $$R_{WLS}$$ using a general purpose minimizer, 
 then it is preferrable to know its gradient with respect to $$\boldsymbol{\alpha}$$.
 The weighted residual is given in eq. $$\eqref{Rwls}$$. Its gradient is:
 
@@ -443,7 +446,15 @@ where we have used $$\left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol
 (see Appendix A) and the fact that [we can write](https://books.google.de/books?id=sMfjDwAAQBAJ&lpg=PA22&dq=scalar%20product%20X*Ay&hl=de&pg=PA22#v=onepage&q&f=false) 
 $$\boldsymbol{x}\cdot \boldsymbol{A} \boldsymbol{y} = \boldsymbol{A}^T\boldsymbol{x}\cdot\boldsymbol{y}$$ 
 for all vectors $$\boldsymbol{x},\boldsymbol{y} \in \mathbb{R^m}$$ and square 
-matrices $$\boldsymbol{A} \in \mathbb{R}^{m\times m}$$. 
+matrices $$\boldsymbol{A} \in \mathbb{R}^{m\times m}$$.
+
+In fact, I believe this formula is not only true under the Kaufmann approximation
+but generally, since the term we neglected vanishes anyways:
+
+
+
+
+
 For a general purpose nonlinear minimizer we typically have to supply $$R_{WLS}$$
 and its gradient. That is particularly simple to calculate if we use the Kaufmann
 approximation, since it does not require the projection matrix or its decomposition
