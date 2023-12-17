@@ -9,6 +9,7 @@ date: 2020-12-30
 #permalink:
 title: 'Back to Basics: The (Discrete) Fourier Transform'
 comments_id: 19
+math: true
 ---
 
 I have extensively worked with the Fourier transform and the DFT but never really taken the time to understand how these two things are truly connected and how that connection explains some of the properties of the DFT. In this article I explore this connection with the aim of answering one question: what does the DFT actually compute?

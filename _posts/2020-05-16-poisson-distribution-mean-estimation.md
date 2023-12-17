@@ -9,6 +9,7 @@ date: 2020-05-16
 #permalink:
 title: 'Estimating the Mean from Poisson Distributed Count Data'
 comments_id: 8
+math: true
 ---
 
 Assume we want to estimate the mean for Poisson count data: is it better to keep all the data, or is the sum and the size of the dataset enough? Let me do the calculations here. I'll also give the posterior distribution for three different choices of prior.

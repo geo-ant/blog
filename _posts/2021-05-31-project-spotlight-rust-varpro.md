@@ -10,6 +10,7 @@ last_updated:
 #permalink:
 title: 'Project Spotlight: varpro - Nonlinear Fitting with A Simple Interface '
 comments_id: 24
+math: true
 ---
 
 In the last months, I have been developing three crates for Rust. All of these crates are open source libraries that use different aspects of the language. The first crate is a numerics library, which emphasizes interfaces that are powerful but simple to use. The second one is a fluent coding library using mostly declarative macros and the third crate uses procedural macros to help with expressive assertions. For my next series of posts I am going to introduce these three crates and highlight a particular aspect of each one. First up is the `varpro` library.

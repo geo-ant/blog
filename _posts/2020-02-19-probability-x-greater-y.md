@@ -9,6 +9,7 @@ date: 2020-02-19
 #permalink:
 title: 'Bayesian Interlude - Calculating P(X>Y)'
 comments_id: 2
+math: true
 ---
 This post is a little sidenote to the last post on the Bayesian analysis of a game for children. Here we will calculate the expression $$P(X>Y \vert I)$$ given information about two variables $$X$$, $$Y$$.
 

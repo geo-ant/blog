@@ -80,7 +80,7 @@ assert(proxy1(params)==func1(1.));
 assert(proxy2(params)==func2(1.,2.));
 ```
 
-To implement the `create_proxy` function we'll manually create function overloads for callables of different arguments. This is analogous to what we did with `evaluate`. These overloads make sure we are truly dealing with functions $$f(T)$$, $$f(T,T)$$ by removing unfitting overloads from the set.
+To implement the `create_proxy` function we'll manually create function overloads for callables of different arguments. This is analogous to what we did with `evaluate`. These overloads make sure we are truly dealing with functions f(T), f(T,T) by removing unfitting overloads from the set.
 
 
 ```c++

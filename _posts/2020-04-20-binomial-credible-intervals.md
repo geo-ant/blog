@@ -9,6 +9,7 @@ date: 2020-04-20
 #permalink:
 title: 'Binomial Distribution: Credible Intervals under Normal Approximation'
 comments_id: 7
+math: true
 ---
 
 These are my calculations to understand the credible intervals for a Binomial Distribution under the Normal approximation from a Bayesian perspective.

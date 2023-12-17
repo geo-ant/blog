@@ -8,6 +8,7 @@ date: 2020-01-23 00:00:00
 #description:
 #permalink:
 title: 'A null-conditional chaining operator for `std::optional` inspired by C#'
+math: true
 ---
 
 In C++, `std::optional<T>` is a great way to represent a type that could hold a value of type `T` or nothing. However, it is somewhat clumsy to work with optional types when you want to chain operations on them, because you have to account for the `nullopt` case.

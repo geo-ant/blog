@@ -9,6 +9,7 @@ date: 2020-05-15
 #permalink:
 title: 'Bayesian Analysis of a Game for Children - Part 2: The Results And The Twist'
 comments_id: 6
+math: true
 ---
 
 These are the results of my foray into Bayesian data analysis applied to a childrens game. This post ties the previous posts concerning simple games, probability theory and functional programming together. After recapping the rules of the particular game I will present the winningest strategy, which will surprise nobody. But I will finish with a plot twist.

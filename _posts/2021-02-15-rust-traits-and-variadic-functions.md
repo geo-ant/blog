@@ -10,6 +10,7 @@ last_updated:
 #permalink:
 title: 'Rust: A Common Interface for Functions Taking Different Numbers of Arguments'
 comments_id: 21
+math: 
 ---
 
 I am working on a little numerics project where the goal is to let the user pass base functions to a data-fitting model in a simple fashion. And while I really like what Rust's lambdas can already do for me, I was wondering if I can pass functions with different (but compile time constant) numbers of parameters using a single interface. It turns out that I can, and the answer is a nice combination of Rust and C++ metaprogramming idioms.
@@ -81,7 +82,7 @@ error[E0119]: conflicting implementations of trait `VariadicFunction`:
 
 error: aborting due to previous error
 ```
-The compiler thinks that the implementations could be conflicting. Intuitively, that did not make much sense to me, because $$f(x)$$ is a different type than $$f(x,y)$$, but there are some obscure reasons for this problem:
+The compiler thinks that the implementations could be conflicting. Intuitively, that did not make much sense to me, because f(x) is a different type than f(x,y), but there are some obscure reasons for this problem:
 
 > This is an issue because a closure could implement both Fn traits (even though they never will), e.g. using some nightly features you can manually implement the traits for a custom type
 >

@@ -9,6 +9,7 @@ date: 2020-03-10
 #permalink:
 title: 'Immutability in C++ (1/2): Immutable Members'
 comments_id: 3
+math: true
 ---
 
 In an attempt to increase my functional programming skills in C++, I went full functional when writing a simulation for a childrens game. Trying to implement a game state using the paradigms of functional programming presents some interesting challenges. In this post I will explore the concept of *immutability* and how we can implement it in C++ for all kinds of stateful objects.
