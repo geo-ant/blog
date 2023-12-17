@@ -31,10 +31,10 @@ in 1973 in their seminal (Golub 1973) paper.
 I based much of the content of this article on the publication of Dianne O'Leary 
 and Bert Rust (O'Leary 2007). They do an excellent job of breaking the method 
 down in terms of familiar linear algebra. Furthermore, they give helpful practical 
-tips on the implementation. However, there are errors and typos in some crucial 
-formulas in their publication, which I have hopefully corrected. I will, for 
+tips on the implementation. However, there are typos in some crucial 
+formulae in their publication, which I have hopefully corrected. I will, for 
 the most part, use the notation of O'Leary and Rust so that it is easy to go 
-back and forth. Let's dive in.
+back and forth[^errors_notation]. Let's dive in.
 
 # The Idea of VarPro
 
@@ -42,11 +42,11 @@ back and forth. Let's dive in.
 is the process of fitting a model function to data by minimizing the sum of the squared 
 residuals. It's called *nonlinear* least squares as opposed to *linear* least 
 squares because the function in question can be nonlinear in the fitting parameters. 
-If the function was purely linear in the fitting parameters we could take advantage 
+If the function was purely linear in the fitting parameters, we could take advantage 
 of the fact that linear least squares problems can be [very efficiently solved](https://en.wikipedia.org/wiki/Linear_least_squares). 
 
 VarPro shines when fitting a model function that is comprised of both linear
-and nonlinear parameters or, to be more precise, if the model is _separable_.
+and nonlinear parameters or rather, to be more precise, if the model is _separable_.
 Separable models are linear combinations of nonlinear functions.
 The fundamental idea of VarPro is to separate the linear parameters from the 
 nonlinear parameters during the fitting process. In doing so we can take advantage 
@@ -58,7 +58,7 @@ reduced problem using a nonlinear minimization algorithm of our choice (e.g.
 That means VarPro is *not* a full-featured nonlinear least squares minimization algorithm in 
 and of itself, but a clever way of rewriting the problem before tackling it numerically.
 We will see how to compose Variable Projection with off-the-shelf nonlinear
-least squares solvers. Let's now translate the principle above into formulas.
+least squares solvers. Let's now translate the principle above into formulae.
 
 # The Model Function
 
@@ -112,7 +112,7 @@ a coefficient vector $$\boldsymbol{\hat{c}}(\boldsymbol{\alpha})$$ which is
 $$ \boldsymbol{\hat{c}}(\boldsymbol\alpha) = \arg \min_{\boldsymbol{c} \in \mathbb{R}^n} \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c}))}\rVert_2^2 \label{LSMinimization} \tag{3},$$
 
 for any fixed $$\boldsymbol{\alpha}$$, which just means that $$\boldsymbol{c}(\boldsymbol{\alpha})$$
-solves the linear subproblem. Then, assuming certain conditions[^rank-conditions], the full problem 
+solves the linear subproblem. Then, given certain assumptions[^rank-conditions], the full problem 
 $$\eqref{FullMinimization}$$ is equivalent to the following reduced problem:
 
 $$ \min_{\boldsymbol{\alpha} \in \mathcal{S}_\alpha} \lVert{\boldsymbol{W}(\boldsymbol{y}-\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha})))}\rVert_2^2 \label{ReducedMinimization} \tag{4},$$
@@ -120,12 +120,12 @@ $$ \min_{\boldsymbol{\alpha} \in \mathcal{S}_\alpha} \lVert{\boldsymbol{W}(\bold
 where, as stated above, $$\boldsymbol{\hat{c}}(\boldsymbol{\alpha})$$ solves 
 minimization problem $$\eqref{LSMinimization}$$. We have reduced a minimization 
 problem with respect to $$\boldsymbol{\alpha}$$ _and_ $$\boldsymbol{c}$$ to a minimization 
-problem with respect to $$\boldsymbol{\alpha}$$ only. However, the reduced minimization 
+problem with respect to $$\boldsymbol{\alpha}$$ _only_. However, the reduced minimization 
 problem requires the solution of a subproblem, which is finding $$\boldsymbol{\hat{c}}(\boldsymbol\alpha)$$. 
 At first it looks like nothing is gained. Until we realize that problem $$\eqref{LSMinimization}$$ 
 is a *linear* least squares problem, which can be efficiently solved using linear algebra.
 
-The additional brilliance of VarPro is that it gives us expressions for the derivatives 
+The additional giant benefit of VarPro is that it gives us expressions for the derivatives 
 of the function $$R_{WLS}(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha}))$$, 
 too[^derivatives]. $$R_{WLS}(\boldsymbol{\alpha},\boldsymbol{\hat{c}}(\boldsymbol{\alpha}))$$ 
 is the target we want to minimize for the nonlinear problem $$\eqref{ReducedMinimization}$$, 
@@ -135,12 +135,11 @@ of ourselves.
 # Enter the Matrix
 
 To rewrite problem $$\eqref{LSMinimization}$$ using linear algebra we introduce 
-the *model function matrix* $$\boldsymbol{\Phi}(\boldsymbol{\alpha}) \in \mathbb{R}^{m \times n}$$:
+the *model function matrix* $$\boldsymbol{\Phi}(\boldsymbol{\alpha})$$:
 
 $$\boldsymbol{\Phi}(\boldsymbol{\alpha}) 
 = \left(\begin{matrix}
 \phi_1(\boldsymbol{\alpha},t_1) & \dots & \phi_n(\boldsymbol{\alpha},t_1) \\
-\vdots & \ddots & \vdots \\
 \vdots & \ddots & \vdots \\
 \phi_1(\boldsymbol{\alpha},t_m) & \dots & \phi_n(\boldsymbol{\alpha},t_m) \\
 \end{matrix}\right)
@@ -148,7 +147,7 @@ $$\boldsymbol{\Phi}(\boldsymbol{\alpha})
 \vert & & \vert \\
 \boldsymbol\phi_1(\boldsymbol{\alpha}), & \dots & ,\boldsymbol\phi_n(\boldsymbol{\alpha}) \\
 \vert & & \vert  \\
-\end{matrix}\right),$$
+\end{matrix}\right)\in \mathbb{R}^{m \times n},$$
 
 so for the matrix elements we have $$\Phi_{ik} = \phi_k(\boldsymbol{\alpha},t_i)$$. 
 For fitting problems I assume we have more observations than model base functions, 
@@ -202,7 +201,7 @@ is the  the reason why the method is called  *Variable Projection* (Mullen 2009)
 
 At this point we are almost halfway there. Our aim is to minimize the projection 
 functional using a (possibly constrained) minimization algorithm. If we want to 
-use high quality off-the-shelf least squared solvers, we need two things: first
+use high quality off-the-shelf least squared solvers, we typically need two things: first
 we need to calculate the residual vector $$\boldsymbol{r}_w$$. This requires us
 to solve the linear system in a numerically feasible manner to obtain $$\boldsymbol{\hat{c}}(\boldsymbol{\alpha})$$
 for a given $$\boldsymbol{\alpha}$$. Secondly, we need 
@@ -232,7 +231,7 @@ $$\boldsymbol{J}(\boldsymbol{\alpha}) =  (J_{ik})
 \vert & \dots & \vert \\
 \frac{\partial}{\partial \alpha_1}\boldsymbol{r}_w, & \dots &  ,\frac{\partial}{\partial \alpha_q}\boldsymbol{r}_w & \\
 \vert & \dots & \vert \\
-\end{matrix}\right) $$
+\end{matrix}\right) \in \mathbb{R}^{m\times q}$$
 
 The derivative $$\frac{\partial}{\partial \alpha_k} \boldsymbol{r}_w$$ is simply
 the element-wise derivative of the residual vector with respect to the scalar
@@ -244,7 +243,7 @@ $$
 $$
 
 where the derivative with respect to the scalar $$\alpha_k$$ for the matrix and vector are
-just applied element-wise. So we need an expression for 
+just applied element-wise. So, we need an expression for 
 $$ \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}$$ and
 it turns out it is not that hard to calculate (see Appendix A):
 
@@ -309,7 +308,7 @@ $$
 \label{diff-Proj-Kaufmann}\tag{17}
 $$
 
-This approximation reduces the computational burden of calculating the Jacobian
+This approximation reduces the computational burden of calculating the Jacobian,
 while still retaining good numerical accuracy (Kaufman 1975). It implies that
 we can approximate the columns of the jacobian as:
 
@@ -343,8 +342,8 @@ $$\boldsymbol{\Phi_w}^\dagger=(\boldsymbol{\Phi}^T \boldsymbol{\Phi})^{-1} \bold
 which is [usually a bad idea](https://eigen.tuxfamily.org/dox/group__LeastSquares.html) 
 numerically. Furthermore, if $$\boldsymbol{\Phi_w}$$ does not have full rank, 
 then $$(\boldsymbol{\Phi}^T \boldsymbol{\Phi})^{-1}$$ does not exist and we need 
-a different expression for the pseudoinverse. This can be given in terms of the 
-[*reduced* Singular Value Decomposition](http://www.omgwiki.org/hpec/files/hpec-challenge/svd.html) 
+a different expression for the pseudoinverse. This can be given in terms of the :
+[*reduced* Singular Value Decomposition](https://en.wikipedia.org/wiki/Singular_value_decomposition#Reduced_SVDs) 
 of $$\boldsymbol{\Phi_w}$$:
 
 $$\boldsymbol{\Phi_w} = \boldsymbol{U}\boldsymbol\Sigma\boldsymbol{V}^T,$$
@@ -382,12 +381,16 @@ from scratch, it can make a lot of sense to use an off-the-shelf solver.
 
 Typical nonlinear least squares solvers will request from us the residual vector
 $$\boldsymbol{r_w}$$ and its Jacobian $$\boldsymbol{J}$$ at the nonlinear
-parameters $$\boldsymbol{\alpha}$$, the latter of which requires the singular
-value decomposition of the matrix $$\boldsymbol{\Phi_w}$$. Refer to the respective
-formulas for the exact expressions. One implementation detail is that the linear
-algebra involved will require us to use a linear algebra library. Ideally we 
-would chose the same linear algebra library that the nonlinear solver uses to 
-request the residual vector and the Jacobian.
+parameters $$\boldsymbol{\alpha}$$. For that, we first build the model function
+matrix $$\boldsymbol{\Phi_w}$$ and calculate its SVD. This allows us to solve
+the linear subproblem to obtain $$\boldsymbol{\hat{c}}$$ and then calculate
+the residual vector. We'll then use the singular value decomposition to
+populate the columns of the Jacobian. One implementation detail is that we
+might want to use a linear algebra library for the matrix calculations and 
+decompositions. It might be worth considering to chose the same library that
+the nonlinear solver uses as part of its API (since it will likely request
+the residual as a vector and the Jacobian in matrix form). This is just to 
+avoid unneccessary copying of data.
 
 This concludes my first article on Variable Projection. In the next part of the 
 series I'll explore how to fit multiple right hand sides, also termed *global analysis* 
@@ -401,7 +404,7 @@ but steadily. It's fast, simple to use, and very well tested.
 
 **(Kaufman 1975)** Kaufman, L. "A variable projection method for solving separable nonlinear least squares problems." *BIT* **15**, 49–57 (1975). [https://doi.org/10.1007/BF01932995](https://doi.org/10.1007/BF01932995)
 
-**(O'Leary 2007)** O’Leary, D.P., Rust, B.W. "Variable projection for nonlinear least squares problems." *Comput Optim Appl* **54**, 579–593 (2013). [https://doi.org/10.1007/s10589-012-9492-9](https://doi.org/10.1007/s10589-012-9492-9). The article is behind a paywall. You can find the manuscript by O'Leary and Rust [publicly available here](https://www.cs.umd.edu/users/oleary/software/varpro.pdf). *Caution*: There are typos / errors in some important formulas in the paper and manuscript. I have (hopefully) corrected these mistakes in my post.
+**(O'Leary 2007)** O’Leary, D.P., Rust, B.W. "Variable projection for nonlinear least squares problems." *Comput Optim Appl* **54**, 579–593 (2013). [https://doi.org/10.1007/s10589-012-9492-9](https://doi.org/10.1007/s10589-012-9492-9). The article is behind a paywall. You can find the manuscript by O'Leary and Rust [publicly available here](https://www.cs.umd.edu/users/oleary/software/varpro.pdf). *Caution*: There are typos / errors in some important formulae in the paper and manuscript. I have (hopefully) corrected these mistakes in my post.
 
 **(Sima 2007)** Sima, D.M., Van Huffel, S. "Separable nonlinear least squares fitting with linear bound constraints and its application in magnetic resonance spectroscopy data quantification," *J Comput Appl Math*.**203**, 264-278 (2007) [https://doi.org/10.1016/j.cam.2006.03.025](https://doi.org/10.1016/j.cam.2006.03.025).
 
@@ -567,7 +570,7 @@ But who knows, maybe I'll try and explore them at some point and see how they tu
 [^nonlinear_base]: These functions could also be linear in their parameters but it makes little sense to have them be linear without good reason. One such reason could be that the parameter space is constrained, because the derivatives presented in here are only true for unconstrained linear parameters.
 [^unconstrained]: This is not a principal limitation of the method. But in this post I am only reproducing the expressions for unconstrained fitting of the linear parameters. If the linear parameters were constrained, this would influence the derivatives presented later. See (Sima 2007) for more information.
 [^notation_c_alpha]: In their manuscript, O'Leary and Rust refer to  $$\boldsymbol{\hat{c}}(\boldsymbol{\alpha})$$ as $$\boldsymbol{c}(\boldsymbol{\alpha})$$. I decided to add the hat to emphasize that this is the particular value that solves the linear least squares problem.
-[^mistake_paper]: In the published version of the paper it is mistakenly stated that $$\boldsymbol{\hat{c}}$$ equals $$\boldsymbol{\Phi_w}(\boldsymbol{\alpha})^\dagger \boldsymbol{y}$$ instead of $$\boldsymbol{\Phi_w}(\boldsymbol{\alpha})^\dagger \boldsymbol{y_w}$$. This mistake is corrected in the online manuscript. However the mistake also occurs when the expression for the derivatives are given and is not corrected in either version. In both expressions for $$\boldsymbol{a_k}$$ and $$\boldsymbol{b_k}$$ the symbol $$\boldsymbol{y}$$ needs to be replaced by $$\boldsymbol{y_w}$$. Unless I am completely mistaken, which is always possible\dots
+[^mistake_paper]: In the published version of the paper it is mistakenly stated that $$\boldsymbol{\hat{c}}$$ equals $$\boldsymbol{\Phi_w}(\boldsymbol{\alpha})^\dagger \boldsymbol{y}$$ instead of $$\boldsymbol{\Phi_w}(\boldsymbol{\alpha})^\dagger \boldsymbol{y_w}$$. This mistake is corrected in the online manuscript. However the mistake also occurs when the expression for the derivatives are given and is not corrected in either version. In both expressions for $$\boldsymbol{a_k}$$ and $$\boldsymbol{b_k}$$ the symbol $$\boldsymbol{y}$$ needs to be replaced by $$\boldsymbol{y_w}$$. Unless I am completely mistaken, which is always possible.
 [^rank_of_Phi]: For any $$m \times n$$ matrix witn $$n<m$$ the rank is less than or equal to $$n$$. The matrix is [considered to have full rank](https://www.cds.caltech.edu/~murray/amwiki/index.php/FAQ:_What_does_it_mean_for_a_non-square_matrix_to_be_full_rank%3F) if its rank equals $$n$$.
 [^full_rank_Phi]: Ideally the function matrix $$\boldsymbol{\Phi}(\boldsymbol{\alpha})$$ should have full rank, since the model is not well designed if the model base functions are linearly dependent. However, there are cases under which that could happen for particular values $$\boldsymbol{\alpha}$$. For example when fitting sums of exponential models with background terms.
 [^model_base_functions]: This name might not always be accurate because the functions don't necessarily have to be linearly independent. However, for a good model they should be. See also the discussions later on the rank of $$\boldsymbol{\Phi}$$.
