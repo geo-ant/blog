@@ -3,11 +3,19 @@ layout: post
 tags: least-squares image-processing algorithm math varpro
 #categories: []
 date: 2020-05-24
+last_updated: 2023-12-17
 #excerpt: ''
 #image: 'BASEURL/assets/blog/img/.png'
 #description:
 #permalink:
 title: 'The Variable Projection Method - Nonlinear Least Squares Fitting with VarPro (Update 12/2023)'
+#
+#
+# Make sure this image is correct !!!
+og_image: vapro-introduction.png
+#
+#
+# make suren comments are enabled
 comments_id: 11
 math: true
 ---
