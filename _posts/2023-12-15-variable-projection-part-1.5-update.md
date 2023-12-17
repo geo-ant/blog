@@ -20,5 +20,5 @@ VarPro library in a language of your choice.
 I've decided not to move the original post since it would break all internal
 and external links to it. The update lays the foundation for a future article
 on variable projection for problems with multiple right hand sides. That one is
-finally coming, after I had it announced at the end of the previous article
+finally coming, after I had announced it  at the end of the previous article
 roughly three years ago. 

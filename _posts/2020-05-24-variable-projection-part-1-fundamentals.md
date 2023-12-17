@@ -375,16 +375,26 @@ to be calculated (O'Leary 2007).
 # Putting It All Together
 
 Now we have all the ingredients to implement our own fitting library that
-makes use of Variable Projection. As noted above, VarPro an algorithm that rewrites
+makes use of Variable Projection. As noted above, VarPro is an algorithm that rewrites
 a separable problem into a purely nonlinear least squares problem. That problem
 still has to be solved. Rather than implementing a nonlinear least squares solver
-from scratch, it makes sense to use an off-the-shelf solver.
+from scratch, it can make a lot of sense to use an off-the-shelf solver.
 
+Typical nonlinear least squares solvers will request from us the residual vector
+$$\boldsymbol{r_w}$$ and its Jacobian $$\boldsymbol{J}$$ at the nonlinear
+parameters $$\boldsymbol{\alpha}$$, the latter of which requires the singular
+value decomposition of the matrix $$\boldsymbol{\Phi_w}$$. Refer to the respective
+formulas for the exact expressions. One implementation detail is that the linear
+algebra involved will require us to use a linear algebra library. Ideally we 
+would chose the same linear algebra library that the nonlinear solver uses to 
+request the residual vector and the Jacobian.
 
 This concludes my first article on Variable Projection. In the next part of the 
-series I will go into more detail on how to implement this with the aim of fitting 
-large problems with multiple right hand sides. This is also termed *global analysis* 
-in the time resolved microscopy literature (Mullen 2009). 
+series I'll explore how to fit multiple right hand sides, also termed *global analysis* 
+in the time resolved microscopy literature (Mullen 2009). Feel free to 
+check out my [vapro](https://crates.io/crates/varpro) Rust library, which
+I have been maintaining since a couple of years and is still evolving slowly but
+but steadily. It's fast, simple to use, and very well tested.
 
 # Literature
 **(Golub 1973)** Golub, G.; Pereyra, V. "The Differentiation of Pseudo-Inverses and Nonlinear Least Squares Problems Whose Variables Separate". SIAM J. Numer. Anal. **1973, 10, 413–432**. [https://doi.org/10.1137/0710036](https://doi.org/10.1137/0710036)
