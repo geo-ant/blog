@@ -9,9 +9,10 @@ date: 2020-05-24
 #permalink:
 title: 'The Variable Projection Method - Nonlinear Least Squares Fitting with VarPro (Update 12/2023)'
 comments_id: 11
+math: true
 ---
 
-The Variable Projection method is not a widely known algorithm in the context of 
+The Variable Projection method is a lesser known algorithm in the domain of 
 nonlinear least squares fitting. It is interesting because it makes 
 clever use of linear algebra to potentially speed up fitting certain classes
 of functions to data. I'll introduce the method
@@ -25,7 +26,8 @@ also relegated a few more non-standard ideas to the appendix.
 
 # Before We Dive In
 
-Variable Projection was introduced by Gene Golub and Victor Pereyra[^golub_pereyra2002]. 
+Variable Projection was introduced by Gene Golub and Victor Pereyra[^golub_pereyra2002]
+in 1973 in their seminal (Golub 1973) paper. 
 I based much of the content of this article on the publication of Dianne O'Leary 
 and Bert Rust (O'Leary 2007). They do an excellent job of breaking the method 
 down in terms of familiar linear algebra. Furthermore, they give helpful practical 
@@ -57,7 +59,6 @@ That means VarPro is *not* a full-featured nonlinear least squares minimization 
 and of itself, but a clever way of rewriting the problem before tackling it numerically.
 We will see how to compose Variable Projection with off-the-shelf nonlinear
 least squares solvers. Let's now translate the principle above into formulas.
-Much of the content in this section is taken from O'Leary and Rust (O'Leary 2007).
 
 # The Model Function
 
@@ -67,9 +68,10 @@ in their parameters:
 
 $$f(\boldsymbol{\alpha},\boldsymbol{c},t) = \sum_{j=1}^{n} c_j\phi_j(\boldsymbol{\alpha},t).$$
 
+Note that O'Leary and Rust call this function $$\eta$$ rather than $$f$$.
 I will refer to the $$\phi_j$$ as the *model base functions*[^model_base_functions]. 
-We group the linear parameters in the vector $$\boldsymbol{c}=(c_1,\dots,c_n)^T\in\mathbb{R}^n$$ 
-and the nonlinear parameters in $$\boldsymbol{\alpha}=(\alpha_1,\dots,\alpha_q)^T\in\mathcal{S}_\alpha \subseteq \mathbb{R}^q$$.
+Now let's group the linear parameters in the vector $$\boldsymbol{c}=(c_1,\dots,c_n)^T\in\mathbb{R}^n$$ 
+and the nonlinear parameters in the vector $$\boldsymbol{\alpha}=(\alpha_1,\dots,\alpha_q)^T\in\mathcal{S}_\alpha \subseteq \mathbb{R}^q$$.
 So we have $$n$$ linear parameters and $$q$$ nonlinear parameters. The independent 
 variable of the model function is $$t$$. It could, for example, represent physical 
 quantities such as time or space. It is important to note that when I use the 
@@ -117,7 +119,7 @@ $$ \min_{\boldsymbol{\alpha} \in \mathcal{S}_\alpha} \lVert{\boldsymbol{W}(\bold
 
 where, as stated above, $$\boldsymbol{\hat{c}}(\boldsymbol{\alpha})$$ solves 
 minimization problem $$\eqref{LSMinimization}$$. We have reduced a minimization 
-problem with respect to $$\boldsymbol{\alpha}$$ and $$\boldsymbol{c}$$ to a minimization 
+problem with respect to $$\boldsymbol{\alpha}$$ _and_ $$\boldsymbol{c}$$ to a minimization 
 problem with respect to $$\boldsymbol{\alpha}$$ only. However, the reduced minimization 
 problem requires the solution of a subproblem, which is finding $$\boldsymbol{\hat{c}}(\boldsymbol\alpha)$$. 
 At first it looks like nothing is gained. Until we realize that problem $$\eqref{LSMinimization}$$ 
@@ -159,7 +161,7 @@ We can now write
 
 $$\boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c})=\boldsymbol{\Phi}(\boldsymbol{\alpha})\boldsymbol{c},$$
 
-so the linear problem $$\eqref{LSMinimization}$$ becomes
+so the linear subproblem $$\eqref{LSMinimization}$$ becomes
 
 $$ \boldsymbol{\hat{c}}(\boldsymbol\alpha) = \arg \min_{\boldsymbol{c} \in \mathbb{R}^n} \lVert{\boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\,\boldsymbol{c}}\rVert_2^2 \label{LSMinimizationLinAlg} \tag{5},$$
 
@@ -191,25 +193,25 @@ sum of residuals as
 $$\begin{eqnarray}
 R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) &=& \lVert \boldsymbol{r}_w\rVert^2_2 \label{Rwls}\tag{9}\\
 \boldsymbol{r}_w (\boldsymbol{\alpha})&:=&  \boldsymbol{y_w}-\boldsymbol{\Phi_w}(\boldsymbol{\alpha})\boldsymbol{\hat{c}}(\boldsymbol{\alpha}) 
-= \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w} \label{rw-Proj}\tag{10}\\
+= \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}\boldsymbol{y_w} \label{rw-Proj}\tag{10}, \\
 \end{eqnarray}$$
 
+where $$\boldsymbol{r}_w$$ is the _residual vector_.
 When written like this, $$R_{WLS}$$ is called the *projection functional*, which
 is the  the reason why the method is called  *Variable Projection* (Mullen 2009).
-We can see that it is just the squared 2-norm of the residual vector $$\boldsymbol{r}_w$$.
 
 At this point we are almost halfway there. Our aim is to minimize the projection 
 functional using a (possibly constrained) minimization algorithm. If we want to 
 use high quality off-the-shelf least squared solvers, we need two things: first
-we need to calculate the residual vector $$\boldsymbol{r}_w$$, which requires us
+we need to calculate the residual vector $$\boldsymbol{r}_w$$. This requires us
 to solve the linear system in a numerically feasible manner to obtain $$\boldsymbol{\hat{c}}(\boldsymbol{\alpha})$$
 for a given $$\boldsymbol{\alpha}$$. Secondly, we need 
 to supply the [Jacobian](https://de.wikipedia.org/wiki/Jacobi-Matrix)
 of $$\boldsymbol{r}_w$$ with respect to $$\boldsymbol{\alpha}$$. Solving the linear
 system is typically achieved using either a [QR Decomposition](https://en.wikipedia.org/wiki/QR_decomposition#Rectangular_matrix) 
 or [Singular Value Decomposition (SVD)](http://www.omgwiki.org/hpec/files/hpec-challenge/svd.html)
-of $$\boldsymbol{\Phi}_w$$. We'll revisit those decompositions when calculating
-the Jacobian.
+of $$\boldsymbol{\Phi}_w$$. These decompositions will also come in helpful when
+calculating the Jacobian and we'll get back to them later.
 
 # Analytical Derivatives
 
@@ -218,7 +220,7 @@ we have to supply the Jacobian $$\boldsymbol{J}(\boldsymbol{\alpha})$$
 of $$\boldsymbol{r}_w(\boldsymbol{\alpha})$$ with respect to $$\alpha$$. The Jacobian
 Matrix of $$\boldsymbol{r}_w$$ is defined as the matrix $$\boldsymbol{J}$$ with entries
 $$J_{ik} = \left(\frac{\partial \boldsymbol{r}_w}{\partial \alpha_k}\right)_i$$. It's a bit
-more helpful for the following calculations to write it in a column format:
+more helpful for the following calculations to write it in a columnar format:
 
 $$\boldsymbol{J}(\boldsymbol{\alpha}) =  (J_{ik})
 = \left(\begin{matrix}
@@ -255,7 +257,7 @@ $$
 \label{diff-Proj}\tag{12},
 $$
 
-where $$D_k$$ is the derivative of the weighted model function matrix with respect to $$\alpha_k$$.
+where $$\boldsymbol{D_k}$$ is the derivative of the weighted model function matrix with respect to $$\alpha_k$$.
 
 $$
 \boldsymbol{D_k}(\boldsymbol\alpha) 
@@ -298,14 +300,12 @@ cf. the Appendix A.
 ## The Kaufman Approximation
 
 A widely used approximation in the context of Variable Projection is the Kaufman
-approximation, which neglects the second summand in the derivative 
-$$\frac{\partial}{\partial\alpha_k}\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}$$
+approximation, which neglects the second term in eq. $$\eqref{diff-Proj}$$
 and approximates it as:
-
 
 $$
 \frac{\partial \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}}{\partial \alpha_k}
-\approx - \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha})
+\approx - \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}D_k \boldsymbol{\Phi_w}^\dagger(\boldsymbol{\alpha}).
 \label{diff-Proj-Kaufmann}\tag{17}
 $$
 
@@ -374,8 +374,12 @@ to be calculated (O'Leary 2007).
 
 # Putting It All Together
 
+Now we have all the ingredients to implement our own fitting library that
+makes use of Variable Projection. As noted above, VarPro an algorithm that rewrites
+a separable problem into a purely nonlinear least squares problem. That problem
+still has to be solved. Rather than implementing a nonlinear least squares solver
+from scratch, it makes sense to use an off-the-shelf solver.
 
-!!!!!!!!!!!!
 
 This concludes my first article on Variable Projection. In the next part of the 
 series I will go into more detail on how to implement this with the aim of fitting 
@@ -383,6 +387,8 @@ large problems with multiple right hand sides. This is also termed *global analy
 in the time resolved microscopy literature (Mullen 2009). 
 
 # Literature
+**(Golub 1973)** Golub, G.; Pereyra, V. "The Differentiation of Pseudo-Inverses and Nonlinear Least Squares Problems Whose Variables Separate". SIAM J. Numer. Anal. **1973, 10, 413–432**. [https://doi.org/10.1137/0710036](https://doi.org/10.1137/0710036)
+
 **(Kaufman 1975)** Kaufman, L. "A variable projection method for solving separable nonlinear least squares problems." *BIT* **15**, 49–57 (1975). [https://doi.org/10.1007/BF01932995](https://doi.org/10.1007/BF01932995)
 
 **(O'Leary 2007)** O’Leary, D.P., Rust, B.W. "Variable projection for nonlinear least squares problems." *Comput Optim Appl* **54**, 579–593 (2013). [https://doi.org/10.1007/s10589-012-9492-9](https://doi.org/10.1007/s10589-012-9492-9). The article is behind a paywall. You can find the manuscript by O'Leary and Rust [publicly available here](https://www.cs.umd.edu/users/oleary/software/varpro.pdf). *Caution*: There are typos / errors in some important formulas in the paper and manuscript. I have (hopefully) corrected these mistakes in my post.
@@ -395,12 +401,74 @@ in the time resolved microscopy literature (Mullen 2009).
 
 **(Baerligea 2023)** Bärligea, A. *et al.* "A Generalized Variable Projection Algorithm for Least Squares Problems in Atmospheric Remote Sensing" *Mathematics* **2023, 11, 2839** [https://doi.org/10.3390/math11132839](https://doi.org/10.3390/math11132839)
 
-# Appendix A: Calculating the Derivative of the Projection Functional
+# Appendix A: Calculating the Derivative of $$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}$$
 
 This section follows the very nice paper by Bärligea and Hochstaffl (Baerligea 2023).
-To start calculating the derivative of 
-!!!!!!!!!!!!! achtung hier die calculations nach b'rligea und hochstaffl!
+To simplify notation, we will refer to $$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}$$
+as $$\boldsymbol{P}^\perp$$. Also we'll write $$\boldsymbol{\Phi_w}(\alpha)$$
+as $$\boldsymbol\Phi$$ and it's Moore-Penrose pseudoinverse as $$\boldsymbol\Phi^\dagger$$.
+We'll also note that $$\boldsymbol\Phi^\dagger$$ [by definition](https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse#Definition)
+satisfies the following equations (among other ones):
 
+$$\begin{eqnarray}
+\boldsymbol\Phi \boldsymbol\Phi^\dagger \boldsymbol\Phi &=& \boldsymbol\Phi \tag{A.1} \label{A-pseudo1} \\
+(\boldsymbol\Phi  \boldsymbol\Phi^\dagger)^T &=&\boldsymbol\Phi  \boldsymbol\Phi^\dagger \tag{A.2} \label{A-pseudo2}
+\end{eqnarray}$$
+
+We now concern ourselves with the matrix $$P$$
+
+$$\boldsymbol{P} := \boldsymbol\Phi  \boldsymbol\Phi^\dagger, \tag{A.3} \label{A-def-P}$$
+
+which is related to $$\boldsymbol{P}^\perp$$ by
+
+$$\boldsymbol{P}^\perp = \boldsymbol{1} - \boldsymbol{P}. \tag{A.4} \label{A-def-P-perp}$$
+
+From the properties of the pseudoinverse we can see that:
+
+$$\begin{eqnarray}
+\boldsymbol{P}^T &=& \boldsymbol{P} \tag{A.5} \label{A-P-sym}\\
+\boldsymbol{P}^2 &=& \boldsymbol{P} \tag{A.6} \label{A-P2}\\
+\boldsymbol{P} \boldsymbol \Phi &=& \boldsymbol\Phi \tag{A.7} \label{A-P3}
+\end{eqnarray}$$
+
+Using the shorthand $$\partial_k$$ for the partial derivative
+$$\frac{\partial}{\partial \alpha_k}$$ we can now write
+
+$$\begin{eqnarray}
+\partial_k \boldsymbol\Phi &=& \partial_k (\boldsymbol{P} \boldsymbol\Phi) \\
+\Leftrightarrow \partial_k \boldsymbol\Phi &=& (\partial_k \boldsymbol{P}) \boldsymbol \Phi + \boldsymbol{P} (\partial_k \boldsymbol\Phi) \\
+\Leftrightarrow (\boldsymbol{1} - \boldsymbol{P})\partial_k \boldsymbol\Phi &=& (\partial_k \boldsymbol{P}) \boldsymbol \Phi \\
+\Leftrightarrow \boldsymbol{P}^\perp(\partial_k \boldsymbol\Phi) &=& (\partial_k \boldsymbol{P}) \boldsymbol \Phi \\
+\Leftrightarrow \boldsymbol{P}^\perp(\partial_k \boldsymbol\Phi) \boldsymbol{\Phi}^\dagger &=& (\partial_k \boldsymbol{P}) \boldsymbol{P}. \tag{A.8} \label{A-partial-P}
+\end{eqnarray}$$
+
+In the last line we right-multiplied with $$\boldsymbol\Phi^\dagger$$ and used
+$$\boldsymbol\Phi \boldsymbol\Phi^\dagger = \boldsymbol{P}$$. The right hand
+side already looks like a term that would occur in $$\partial_k \boldsymbol{P}^2$$.
+So let's look at that expression and use the fact that $$\boldsymbol{P}^2 = \boldsymbol{P}$$:
+
+$$\begin{eqnarray}
+\partial_k \boldsymbol{P} = \partial_k \boldsymbol{P}^2 = (\partial_k \boldsymbol{P})\boldsymbol{P}+\boldsymbol{P}(\partial_k \boldsymbol{P}) \tag{A.9} \label{A-partial-P-2}
+\end{eqnarray}$$
+
+For the final piece of the puzzle, we use eq. $$\eqref{A-P-sym}$$, which implies
+that $$\partial_k \boldsymbol{P} = (\partial_k \boldsymbol{P})^T$$,
+so that we can rewrite the second term in eq. $$\eqref{A-partial-P-2}$$ as
+
+$$
+\boldsymbol{P}(\partial_k \boldsymbol{P}) = \left( \boldsymbol{P}^T (\partial_k \boldsymbol{P})^T\right)^T = \left((\partial_k \boldsymbol{P})\boldsymbol{P} \right)^T. \tag{A.10}
+$$
+
+We can combine this result with eqns. $$\eqref{A-partial-P}$$ and $$\eqref{A-partial-P-2}$$ 
+to obtain an expression for the partial derivative of $$\boldsymbol{P}$$. However,
+we are interested in the partial derivative of $$\boldsymbol{P}^\perp$$. Luckily,
+it follows from eq. $$\eqref{A-def-P-perp}$$, that 
+$$\partial_k \boldsymbol{P}^\perp = -\partial_k \boldsymbol{P}$$, so that we
+can write
+
+$$\partial_k \boldsymbol{P}^\perp = - \left[ (\boldsymbol{P} (\partial_k {\Phi}) \boldsymbol{\Phi}^\dagger) + (\boldsymbol{P}(\partial_k \boldsymbol{\Phi}) \boldsymbol{\Phi}^\dagger)^T\right],$$
+
+which, at last, is the result we set out to prove.
 
 
 # Appendix B: VarPro with General Purpose Nonlinear Minimization
@@ -410,7 +478,7 @@ previous version of this article. While I don't think the ideas are wrong,
 I am going back and forth on how useful they are. I thought they would
 give me an elegant way of extending my varpro implementation to multiple right
 hand sides. However, there are established methods to do that which still
-compose pretty well with off-the-shelf least squares solvers. So I don't feel
+compose well with off-the-shelf least squares solvers. So I don't feel
 an urgent need to explore the ideas presented here, but I also cannot quite let
 them go.
 
@@ -435,7 +503,7 @@ is the weighted residual vector as defined above. We can simplify these expressi
 if we use the Kaufmann approximation for the Jacobian:
 
 $$\begin{eqnarray}
-\frac{\partial}{\partial \alpha_k} R_{WLS} &\approx& -2\, \boldsymbol{r_w}\cdot \boldsymbol{a_k} \\
+\frac{\partial}{\partial \alpha_k} R_{WLS} &=& -2\, \boldsymbol{r_w}\cdot \boldsymbol{a_k} \\
 &=& -2\,\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \boldsymbol{y_w} \cdot \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \,\boldsymbol{D_k} \boldsymbol{\hat{c}} \\
 &=& -2\,\left(\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \right)^T\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \,\boldsymbol{y_w} \cdot \boldsymbol{D_k} \boldsymbol{\hat{c}} \\
 &=& -2\,\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \boldsymbol{y_w} \cdot \boldsymbol{D_k} \boldsymbol{\hat{c}} \\
@@ -448,28 +516,44 @@ $$\boldsymbol{x}\cdot \boldsymbol{A} \boldsymbol{y} = \boldsymbol{A}^T\boldsymbo
 for all vectors $$\boldsymbol{x},\boldsymbol{y} \in \mathbb{R^m}$$ and square 
 matrices $$\boldsymbol{A} \in \mathbb{R}^{m\times m}$$.
 
-In fact, I believe this formula is not only true under the Kaufmann approximation
-but generally, since the term we neglected vanishes anyways:
+It turns out that this formula is not only true under the Kaufmann approximation
+but that it is exact. We can see that the second term always vanishes:
 
+$$\begin{eqnarray}
+\boldsymbol{r_w}\cdot \boldsymbol{b_k} &=& \boldsymbol{r_w}\cdot (\boldsymbol{D_k} \boldsymbol{\Phi_w}^\dagger)^T\,\boldsymbol{r_w} \\
+&=& \boldsymbol{D_k}\boldsymbol{\Phi_w}^\dagger\, \boldsymbol{r_w} \cdot \boldsymbol{r_w} \\
+&=& \boldsymbol{D_k} \boldsymbol{\Phi_w}^\dagger \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \boldsymbol{y_w}  \cdot \boldsymbol{r_w} \\
+&=& \boldsymbol{D_k} \boldsymbol{\Phi_w}^\dagger (\boldsymbol{1}-\boldsymbol{\Phi_w}\boldsymbol{\Phi_w}^\dagger )\boldsymbol{y_w}  \cdot \boldsymbol{r_w} \\
+&=& \boldsymbol{D_k} (\boldsymbol{\Phi_w}^\dagger - \boldsymbol{\Phi_w}^\dagger \boldsymbol{\Phi_w}\boldsymbol{\Phi_w}^\dagger )\boldsymbol{y_w}  \cdot \boldsymbol{r_w} \\
+&=& \boldsymbol{0},
+\end{eqnarray}$$
 
-
-
+where we have used the property $$\boldsymbol{\Phi_w}^\dagger = \boldsymbol{\Phi_w}^\dagger \boldsymbol{\Phi_w}\boldsymbol{\Phi_w}^\dagger$$
+of the Moore-Penrose pseudoinverse.
 
 For a general purpose nonlinear minimizer we typically have to supply $$R_{WLS}$$
-and its gradient. That is particularly simple to calculate if we use the Kaufmann
-approximation, since it does not require the projection matrix or its decomposition
-explicitly. I say explicitly because we will still need to solve the linear system
-to obtain $$\boldsymbol{\hat{c}}$$, but we might use a linear algebra library
-that hides that complexity from us.
+and its gradient, maybe additionally the Hessian if we feel particularly adventurous.
+The gradient is very simple to calculate,since it does not 
+require the projection matrix or its decomposition explicitly. I say explicitly 
+because we will still need to solve the linear system to obtain $$\boldsymbol{\hat{c}}$$,
+but we might use a linear algebra library that hides that complexity from us.
 
-As mentioned in the update to this article, I don't believe these ideas are as useful as I once thought,
-especially for multiple right hand sides. But who knows, maybe I'll try and explore
-them at some point and see how they turn out numerically.
+As an additional benefit, we can even give an analytical expression for the 
+Hessian of $$R_{WLS}$$. I won't give the expression here because it's not as
+simple as the ones above. I'll just note that calculating the partial derivative
+$$\partial/\partial\alpha_l \boldsymbol{\hat{c}}$$ will require the partial derivatives
+of the pseudoinverse. As noted [here](https://mathoverflow.net/questions/25778/analytical-formula-for-numerical-derivative-of-the-matrix-pseudo-inverse),
+the formula for that is given as eq. $$(4.12)$$ in the orginal (Golub 1973)
+publication. Note also that they give an expression for the gradient in eq $$(4.7)$$
+of their paper, which is consistent with the expression I gave.
+
+As mentioned in the update to this article, I don't believe these ideas are as useful as I once thought.
+But who knows, maybe I'll try and explore them at some point and see how they turn out numerically.
 
 # Endnotes
 
 [^golub_pereyra2002]: See [here](https://pdfs.semanticscholar.org/3f20/1634276f9c1c79e421355b4915b69b4aae24.pdf) for a review paper on Variable Projection by Golub and Pereyra in 2002. In there you can also find references to their original work as well as the contributions by Linda Kaufman. There is also [a follow-up by Pereyra](http://vpereyra.com/wp-content/uploads/2019/08/Surveypaper2019.pdf) covering the time from 2002 until 2019.
-[^errors_notation]: Errors are mine of course. I will also use their notation to make it easy to go back and forth from this article and their publication. This is why I am sparing you the references to their publication in the next sections. Assume everything is taken from O'Leary and Rust unless stated otherwise.
+[^errors_notation]: Errors are mine of course. I will also use their notation to make it easy to go back and forth from this article and their publication. This is why I am sparing you the references to their publication in the next sections. Just assume everything is taken from O'Leary and Rust unless stated otherwise.
 [^nonlinear_base]: These functions could also be linear in their parameters but it makes little sense to have them be linear without good reason. One such reason could be that the parameter space is constrained, because the derivatives presented in here are only true for unconstrained linear parameters.
 [^unconstrained]: This is not a principal limitation of the method. But in this post I am only reproducing the expressions for unconstrained fitting of the linear parameters. If the linear parameters were constrained, this would influence the derivatives presented later. See (Sima 2007) for more information.
 [^notation_c_alpha]: In their manuscript, O'Leary and Rust refer to  $$\boldsymbol{\hat{c}}(\boldsymbol{\alpha})$$ as $$\boldsymbol{c}(\boldsymbol{\alpha})$$. I decided to add the hat to emphasize that this is the particular value that solves the linear least squares problem.
@@ -479,4 +563,4 @@ them at some point and see how they turn out numerically.
 [^model_base_functions]: This name might not always be accurate because the functions don't necessarily have to be linearly independent. However, for a good model they should be. See also the discussions later on the rank of $$\boldsymbol{\Phi}$$.
 [^derivatives]: Under the condition that we have analytical expressions for the partial derivatives $$\partial/\partial\alpha_k \phi_j(\boldsymbol\alpha,t)$$ of the model base functions.
 [^L2Solution]: The solution $$\boldsymbol{\hat{c}}$$ is not unique. The solution given here (using the pseudoinverse) has the smallest 2-Norm $$\lVert\boldsymbol{\hat{c}}\rVert_2^2$$ among all solutions that minimize the problem, see [here](https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse#Linear_least-squares)
-[^rank-conditions]: I've glossed over an important precondition that must hold before we can really separate the linear and nonlinear optimization as shown above. The matrix $$\boldsymbol{\Phi}(\boldsymbol{\alpha})$$ of the model base functions must have locally constant rank in a neighborhood of $$\boldsymbol{\alpha}$$.
+[^rank-conditions]: I've glossed over an important precondition that must hold before we can really separate the linear and nonlinear optimization as shown above. The matrix $$\boldsymbol{\Phi}(\boldsymbol{\alpha})$$ of the model base functions must have locally constant rank in a neighborhood of $$\boldsymbol{\alpha}$$. $$\boldsymbol{\Phi}$$ is the matrix introduced in the next sections.
