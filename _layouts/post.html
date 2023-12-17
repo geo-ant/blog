@@ -25,5 +25,9 @@ layout: default
     {% if page.comments_id %}
       {% include comments.html %}
     {% endif %}
+
+    {%if page.math == true %}
+      {% include mathjax.html %}
+    {% endif %}
   </div>
 </article>
