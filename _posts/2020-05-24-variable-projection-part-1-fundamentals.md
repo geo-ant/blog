@@ -3,7 +3,7 @@ layout: post
 tags: least-squares image-processing algorithm math varpro
 #categories: []
 date: 2020-05-24
-last_updated: 2023-12-17
+last_updated: 2023-12-22
 #excerpt: ''
 #image: 'BASEURL/assets/blog/img/.png'
 #description:
@@ -231,14 +231,14 @@ more helpful for the following calculations to write it in a columnar format:
 
 $$\boldsymbol{J}(\boldsymbol{\alpha}) =  (J_{ik})
 = \left(\begin{matrix}
-\vert & \dots & \vert \\
-\boldsymbol{j}_1 & \dots &  , \boldsymbol{j}_q \\
-\vert & \dots & \vert \\
+\vert & & \vert \\
+\boldsymbol{j}_1, & \dots, &  \boldsymbol{j}_q \\
+\vert & & \vert \\
 \end{matrix}\right)
 = \left(\begin{matrix}
-\vert & \dots & \vert \\
-\frac{\partial}{\partial \alpha_1}\boldsymbol{r}_w, & \dots &  ,\frac{\partial}{\partial \alpha_q}\boldsymbol{r}_w & \\
-\vert & \dots & \vert \\
+\vert & & \vert \\
+\frac{\partial}{\partial \alpha_1}\boldsymbol{r}_w, & \dots, &  \frac{\partial}{\partial \alpha_q}\boldsymbol{r}_w & \\
+\vert & & \vert \\
 \end{matrix}\right) \in \mathbb{R}^{m\times q}$$
 
 The derivative $$\frac{\partial}{\partial \alpha_k} \boldsymbol{r}_w$$ is simply
