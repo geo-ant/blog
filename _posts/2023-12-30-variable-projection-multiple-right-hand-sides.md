@@ -46,14 +46,14 @@ computational benefits. However, not every fitting problem will fit this bill.
 We need a problem where it truly makes sense that the nonlinear parameters are
 shared among datasets, while the linear coefficients are not. 
 
-One example of a problem
-that satisfies the condition above is Fluorescence Lifetime Imaging ([FLIM](https://en.wikipedia.org/wiki/Fluorescence-lifetime_imaging_microscopy)): 
-it requires us to fit a number of lifetimes (the nonlinear parameters) from a multiexponential decay,
-with varying amplitudes of the individual exponential terms (the linear coefficients).
-It is a reasonable approximation that only a handful of distinct lifetimes are present
-in any one particular sample (corresponding to different fluorophores), but that
-the linear coefficients (corresponding to fluorophore concentration) might vary
-spatially across a sample (Warren2013). 
+One example of a problem that satisfies the condition above is Fluorescence Lifetime 
+Imaging ([FLIM](https://en.wikipedia.org/wiki/Fluorescence-lifetime_imaging_microscopy)): 
+it requires us to fit a number of lifetimes (the nonlinear parameters) from a 
+multiexponential decay, with varying amplitudes of the individual exponential  
+terms (the linear coefficients). It is a reasonable approximation that only a 
+handful of distinct lifetimes are present in any one particular sample (corresponding 
+to different fluorophores), but that the linear coefficients (corresponding to 
+fluorophore concentration) might vary spatially across a sample (Warren2013). 
 
 # VarPro: A Quick Recap
 Since this article is a follow up of my [previous article](/blog/2020/variable-projection-part-1-fundamentals/),
@@ -137,13 +137,38 @@ $$\boldsymbol C
 \in \mathbb{R}^{n \times S}.\label{def-C} \tag{9}
 $$
 
-Since we want to share the nonlinear parameters $$\boldsymbol \alpha$$ across
-all datasets we can rewrite the minimization problem as:
+Finally, we can also group the weighted residual vectors for each member
+of a dataset into a matrix:
+
+$$\boldsymbol R_w
+= \left(\begin{matrix}
+\vert & & \vert \\
+\boldsymbol r_{w,1}, & \dots, & \boldsymbol r_{w,S} \\
+\vert & & \vert \\
+\end{matrix}\right)
+\in \mathbb{R}^{m \times S}, \label{def-Rmatrix} \tag{10}
+$$
+
+where $$\boldsymbol r_{w,s} = \boldsymbol y_{w,s} - \boldsymbol \Phi_w(\boldsymbol \alpha) \boldsymbol c_s$$.
+Here, $$\boldsymbol \alpha$$ and thus $$\boldsymbol \Phi_w(\alpha)$$ is the same
+for each residual vector. Our minimization problem is now to minimize $$\sum_s \lVert r_{w,s} \rVert_2^2$$,
+which we can write in matrix form like so: 
 
 $$\begin{eqnarray}
-&\min_{\boldsymbol \alpha, \boldsymbol C}& \rho_{WLS}(\boldsymbol \alpha, \boldsymbol C) \label{min-rho-mrhs} \tag{10} \\
-todo
+&\min_{\boldsymbol \alpha, \boldsymbol C}& \rho_{WLS}(\boldsymbol \alpha, \boldsymbol C) \label{min-rho-mrhs} \tag{11} \\
+\rho_{WLS} &:=& \lVert R \rVert_F^2 \label{redef-rho} \tag{12} \\
+\boldsymbol R_w &:=& \boldsymbol Y_w - \boldsymbol \Phi_w \boldsymbol C \label{def-residual-matrix} \tag{13}, \\
 \end{eqnarray}$$
+
+where $$\boldsymbol Y_w = \boldsymbol W \boldsymbol Y$$ and $$\lVert . \rVert_F$$
+is the [Frobenius Norm](https://mathworld.wolfram.com/FrobeniusNorm.html), i.e.
+the sum of absolute squares of the matrix elements. I have reused the symbol
+$$\rho_{WLS}$$ for the sum of the squared residuals, since this contains eq.
+$$\eqref{def-rwls}$$ as a special case for a dataset with only one element ($$S = 1$$).
+
+Using the ideas of presented in the last article, we can rewrite this minimization
+problem into a minimization over $$\bolsymbol \alpha$$ only:
+
 
 # References
 
