@@ -24,7 +24,7 @@ significant computational savings. Let's dive right in.
 Global fitting is a term I came across in fluorescence lifetime literature
 back in the day when I was working in the field (cf. e.g. Warren2013). I am not
 sure whether it is a widely used term, but the professional data analysis software
-OriginLab&reg; Origin&reg; also seems to use it and [their definition]
+OriginLab&reg; Origin&reg; also seems to use it and [their definition](https://www.originlab.com/doc/Tutorials/Fitting-Global)
 is quite instructive:
 
 > The term "global fitting" generally refers to simultaneous curve fitting operations
@@ -156,7 +156,7 @@ which we can write in matrix form like so:
 
 $$\begin{eqnarray}
 &\min_{\boldsymbol \alpha, \boldsymbol C}& \rho_{WLS}(\boldsymbol \alpha, \boldsymbol C) \label{min-rho-mrhs} \tag{11} \\
-\rho_{WLS} &:=& \lVert R \rVert_F^2 \label{redef-rho} \tag{12} \\
+\rho_{WLS} &:=& \lVert R(\boldsymbol \alpha, \boldsymbol C) \rVert_F^2 \label{redef-rho} \tag{12} \\
 \boldsymbol R_w &:=& \boldsymbol Y_w - \boldsymbol \Phi_w \boldsymbol C \label{def-residual-matrix} \tag{13}, \\
 \end{eqnarray}$$
 
@@ -166,8 +166,15 @@ the sum of absolute squares of the matrix elements. I have reused the symbol
 $$\rho_{WLS}$$ for the sum of the squared residuals, since this contains eq.
 $$\eqref{def-rwls}$$ as a special case for a dataset with only one element ($$S = 1$$).
 
-Using the ideas of presented in the last article, we can rewrite this minimization
-problem into a minimization over $$\bolsymbol \alpha$$ only:
+Using the ideas VarPro as presented in the presivous article, we can rewrite 
+minimization problem $$\eqref{min-rho-mrhs}$$ into a minimization 
+over $$\boldsymbol \alpha$$ only:
+
+$$\begin{eqnarray}
+&\min_{\boldsymbol \alpha}& \boldsymbol \rho_{WLS}(\boldsymbol \alpha) \label{min-rho-mrhs-varpro} \tag{14} \\
+\boldsymbol \rho_{WLS} (\boldsymbol \alpha) &=& \lVert R (\boldsymbol \alpha) \rVert_F^2\\
+\boldsymbol R &=& \boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)} \boldsymbol Y_w \\
+\end{eqnarray}$$
 
 
 # References
