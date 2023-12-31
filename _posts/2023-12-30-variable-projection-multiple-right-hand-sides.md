@@ -156,8 +156,8 @@ which we can write in matrix form like so:
 
 $$\begin{eqnarray}
 &\min_{\boldsymbol \alpha, \boldsymbol C}& \rho_{WLS}(\boldsymbol \alpha, \boldsymbol C) \label{min-rho-mrhs} \tag{11} \\
-\rho_{WLS} &:=& \lVert R(\boldsymbol \alpha, \boldsymbol C) \rVert_F^2 \label{redef-rho} \tag{12} \\
-\boldsymbol R_w &:=& \boldsymbol Y_w - \boldsymbol \Phi_w \boldsymbol C \label{def-residual-matrix} \tag{13}, \\
+\rho_{WLS}(\boldsymbol \alpha, \boldsymbol C) &:=& \lVert \boldsymbol R_w(\boldsymbol \alpha, \boldsymbol C) \rVert_F^2 \label{redef-rho} \tag{12} \\
+\boldsymbol R_w(\boldsymbol \alpha, \boldsymbol C) &:=& \boldsymbol Y_w - \boldsymbol \Phi_w \boldsymbol C \label{def-residual-matrix} \tag{13}, \\
 \end{eqnarray}$$
 
 where $$\boldsymbol Y_w = \boldsymbol W \boldsymbol Y$$ and $$\lVert . \rVert_F$$
@@ -172,10 +172,13 @@ over $$\boldsymbol \alpha$$ only:
 
 $$\begin{eqnarray}
 &\min_{\boldsymbol \alpha}& \boldsymbol \rho_{WLS}(\boldsymbol \alpha) \label{min-rho-mrhs-varpro} \tag{14} \\
-\boldsymbol \rho_{WLS} (\boldsymbol \alpha) &=& \lVert R (\boldsymbol \alpha) \rVert_F^2\\
-\boldsymbol R &=& \boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)} \boldsymbol Y_w \\
+\boldsymbol \rho_{WLS} (\boldsymbol \alpha) &=& \lVert \boldsymbol R_w (\boldsymbol \alpha) \rVert_F^2 \label{rho-varpro} \tag{15} \\
+\boldsymbol R_w(\boldsymbol \alpha) &=& \boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)} \boldsymbol Y_w \label{rw-varpro} \tag{16} \\
 \end{eqnarray}$$
 
+The matrix equations $$\eqref{rho-varpro},\eqref{rw-varpro}$$ are generalizations
+of the vector identities eqns. $$\eqref{def-rwls}, \eqref{def-rw}$$. But there's
+a problem here: we can directly feed .....
 
 # References
 
