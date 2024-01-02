@@ -7,7 +7,7 @@ date: 2023-12-30
 #image: 'BASEURL/assets/blog/img/.png'
 #description:
 #permalink:
-title: 'Global Fitting with Variable Projection of Multiple Right Hand Sides'
+title: 'Global Fitting of Multiple Right Hand Sides with Variable Projection'
 # todo add correct comment id
 comments_id: 
 math: true
@@ -177,8 +177,35 @@ $$\begin{eqnarray}
 \end{eqnarray}$$
 
 The matrix equations $$\eqref{rho-varpro},\eqref{rw-varpro}$$ are generalizations
-of the vector identities eqns. $$\eqref{def-rwls}, \eqref{def-rw}$$. But there's
-a problem here: we can directly feed .....
+of the vector identities $$\eqref{def-rwls}, \eqref{def-rw}$$. But there's
+a problem here, that prevents us from just plugging these results into off-the-shelf
+nonlinear least squares -such as Levenberg-Marquardt- minimizers like we did last time.
+The problem is that those implementations usually require us to give the 
+residual as one single vector. Additionally, we typically need to specify the
+Jacobian matrix of the residual vector.
+
+Luckily, all is not lost and we are not forced to resort to inefficient
+approaches[^naive-approach] to shoehorn our nice matrix calculation into vector format.
+The residual $$\rho_{WLS}$$ in eq. $$\eqref{rho-varpro}$$ is just the squared
+sum of the elements of the matrix $$\boldsymbol R_w$$. So if we collect the columns
+of $$\boldsymbol R_w$$ into a vector like so
+
+$$\boldsymbol z_w := \text{vec} (\boldsymbol R) = 
+\left(
+\begin{matrix}
+\boldsymbol r_{w,1} \\
+\vdots \\
+\boldsymbol r_w{w,S} \\
+\end{matrix}
+\right)
+=
+\left(
+\begin{matrix}
+\boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha) \boldsymbol y_1\\
+\vdots \\
+\boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha) \boldsymbol y_S\\
+\end{matrix}
+\right)$$
 
 # References
 
@@ -187,4 +214,5 @@ a problem here: we can directly feed .....
 **(Baerligea2023)** Bärligea, A. *et al.* (2023) "A Generalized Variable Projection Algorithm for Least Squares Problems in Atmospheric Remote Sensing," *Mathematics* **2023, 11, 2839** ([link](https://doi.org/10.3390/math11132839))
 
 # Endnotes
-[^baerligea-extension]: They extend the method for datasets where the members of a dataset may have different sizes. This is out of scope for this here article because we have to sacrifice computational savings for this extension. However, it's definitely worth checking out their paper. 
+[^baerligea-extension]: They extend the method for datasets where the members of a dataset may have different numbers of elements. This is out of scope for this here article because we have to sacrifice computational savings for this extension. However, it's definitely worth checking out their paper. 
+[^naive-approach]: If you're interested, check out the section titled _naive approach_ in the Bärligea paper.
