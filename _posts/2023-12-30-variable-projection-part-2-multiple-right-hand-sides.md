@@ -100,7 +100,7 @@ It is often favorable to provide the Jacobian $$\boldsymbol J(\boldsymbol \alpha
 matrix of the residuals as well, and it turns out we can calculate the $$k$$-th column
 $$\boldsymbol j_k$$ of the Jacobian as
 
-$$ \boldsymbol j_k = \frac{\partial\boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)}}{\partial \alpha_k} \boldsymbol y_w, \label{jk} \tag{7}$$
+$$ \boldsymbol j_k = \frac{\partial \boldsymbol r_w}{\partial \alpha_k} = \frac{\partial\boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)}}{\partial \alpha_k} \boldsymbol y_w, \label{jk} \tag{7}$$
 
 where the expression for the derivative of the projection matrix is given in the
 previous article. Now we have all the ingredients together to tackle the global
@@ -149,15 +149,20 @@ $$\boldsymbol R_w
 \in \mathbb{R}^{m \times S}, \label{def-Rmatrix} \tag{10}
 $$
 
-where $$\boldsymbol r_{w,s} = \boldsymbol y_{w,s} - \boldsymbol \Phi_w(\boldsymbol \alpha) \boldsymbol c_s$$.
-Here, $$\boldsymbol \alpha$$ and thus $$\boldsymbol \Phi_w(\alpha)$$ is the same
+where $$\boldsymbol r_{w,s} = \boldsymbol y_{w,s} - \boldsymbol \Phi_w(\boldsymbol \alpha) \boldsymbol c_s$$,
+where 
+
+$$\boldsymbol y_{w,s} = \boldsymbol W \boldsymbol y_s \tag{11} \label{weighted-data}$$ 
+
+are the weighted data sets. Note that the same weights are applied to each dataset.
+Note further, that $$\boldsymbol \alpha$$ and thus $$\boldsymbol \Phi_w(\alpha)$$ are the same
 for each residual vector. Our minimization problem is now to minimize $$\sum_s \lVert r_{w,s} \rVert_2^2$$,
 which we can write in matrix form like so: 
 
 $$\begin{eqnarray}
-&\min_{\boldsymbol \alpha, \boldsymbol C}& \rho_{WLS}(\boldsymbol \alpha, \boldsymbol C) \label{min-rho-mrhs} \tag{11} \\
-\rho_{WLS}(\boldsymbol \alpha, \boldsymbol C) &:=& \lVert \boldsymbol R_w(\boldsymbol \alpha, \boldsymbol C) \rVert_F^2 \label{redef-rho} \tag{12} \\
-\boldsymbol R_w(\boldsymbol \alpha, \boldsymbol C) &:=& \boldsymbol Y_w - \boldsymbol \Phi_w \boldsymbol C \label{def-residual-matrix} \tag{13}, \\
+&\min_{\boldsymbol \alpha, \boldsymbol C}& \rho_{WLS}(\boldsymbol \alpha, \boldsymbol C) \label{min-rho-mrhs} \tag{12} \\
+\rho_{WLS}(\boldsymbol \alpha, \boldsymbol C) &:=& \lVert \boldsymbol R_w(\boldsymbol \alpha, \boldsymbol C) \rVert_F^2 \label{redef-rho} \tag{13} \\
+\boldsymbol R_w(\boldsymbol \alpha, \boldsymbol C) &:=& \boldsymbol Y_w - \boldsymbol \Phi_w \boldsymbol C \label{def-residual-matrix} \tag{14}, \\
 \end{eqnarray}$$
 
 where $$\boldsymbol Y_w = \boldsymbol W \boldsymbol Y$$ and $$\lVert . \rVert_F$$
@@ -171,9 +176,9 @@ minimization problem $$\eqref{min-rho-mrhs}$$ into a minimization
 over $$\boldsymbol \alpha$$ only:
 
 $$\begin{eqnarray}
-&\min_{\boldsymbol \alpha}& \boldsymbol \rho_{WLS}(\boldsymbol \alpha) \label{min-rho-mrhs-varpro} \tag{14} \\
-\boldsymbol \rho_{WLS} (\boldsymbol \alpha) &=& \lVert \boldsymbol R_w (\boldsymbol \alpha) \rVert_F^2 \label{rho-varpro} \tag{15} \\
-\boldsymbol R_w(\boldsymbol \alpha) &=& \boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)} \boldsymbol Y_w \label{rw-varpro} \tag{16} \\
+&\min_{\boldsymbol \alpha}& \boldsymbol \rho_{WLS}(\boldsymbol \alpha) \label{min-rho-mrhs-varpro} \tag{15} \\
+\boldsymbol \rho_{WLS} (\boldsymbol \alpha) &=& \lVert \boldsymbol R_w (\boldsymbol \alpha) \rVert_F^2 \label{rho-varpro} \tag{16} \\
+\boldsymbol R_w(\boldsymbol \alpha) &=& \boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)} \boldsymbol Y_w \label{rw-varpro} \tag{17} \\
 \end{eqnarray}$$
 
 The matrix equations $$\eqref{rho-varpro},\eqref{rw-varpro}$$ are generalizations
@@ -185,27 +190,76 @@ residual as one single vector. Additionally, we typically need to specify the
 Jacobian matrix of the residual vector.
 
 Luckily, all is not lost and we are not forced to resort to inefficient
-approaches[^naive-approach] to shoehorn our nice matrix calculation into vector format.
+approaches[^naive-approach] to shoehorn our nice matrix equations into vector format.
 The residual $$\rho_{WLS}$$ in eq. $$\eqref{rho-varpro}$$ is just the squared
-sum of the elements of the matrix $$\boldsymbol R_w$$. So if we collect the columns
-of $$\boldsymbol R_w$$ into a vector like so
+sum of the elements of the matrix $$\boldsymbol R_w$$. It's obvious that
+$$\lVert \boldsymbol R_w (\boldsymbol \alpha) \rVert_F^2$$ is the same as the 
+L2-norm $$\lVert \boldsymbol z_w (\boldsymbol \alpha)\rVert_2^2$$ of a vector
+$$\boldsymbol z_w (\boldsymbol \alpha)$$ defined as:
 
-$$\boldsymbol z_w := \text{vec} (\boldsymbol R) = 
+$$
+\boldsymbol z_w(\boldsymbol \alpha) := \text{vec}\; \boldsymbol R (\boldsymbol \alpha) = 
 \left(
 \begin{matrix}
 \boldsymbol r_{w,1} \\
 \vdots \\
-\boldsymbol r_w{w,S} \\
+\boldsymbol r_{w,S} \\
 \end{matrix}
-\right)
-=
+\right) =
 \left(
 \begin{matrix}
-\boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha) \boldsymbol y_1\\
+\boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha)} \boldsymbol y_{w,1}\\
 \vdots \\
-\boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha) \boldsymbol y_S\\
+\boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha)} \boldsymbol y_{w,S}\\
 \end{matrix}
-\right)$$
+\right), \label{z-vec} \tag{18}
+$$
+
+The mathematical operation $$\text{vec}$$ is called 
+[vectorization](https://en.wikipedia.org/wiki/Vectorization_(mathematics))[^caveat-vectorization]
+and turns a matrix into a vector by stacking the matrix columns on top of each
+other. Now we have a vector that we can pass into our nonlinear minimization
+step. We can use eq. $$\eqref{rw-varpro}$$ to calculate $$\boldsymbol z_w$$ and
+then turn the resulting matrix into a vector by stacking the columns. Ideally,
+this is basically a free operation in our linear algebra backend.
+
+The final piece of the puzzle is an expression for the Jacobian of $$\boldsymbol z_w(\boldsymbol \alpha)$$,
+which I'll denote $$\boldsymbol J \{\boldsymbol z_w\}(\boldsymbol \alpha)$$.
+It's $$k-th$$ column is, by definition, just
+
+$$\boldsymbol j_k^z = \frac{\partial z_w}{\partial \alpha_k},$$
+
+which, using the same insights as above, we can write it as
+
+$$\boldsymbol j_k^z = 
+\left(
+\begin{matrix}
+\frac{\partial \boldsymbol r_{w,1} }{\partial \alpha_k} \\
+\vdots \\
+\frac{\partial \boldsymbol r_{w,S} }{\partial \alpha_k} \\
+\end{matrix}
+\right) =
+\left(
+\begin{matrix}
+\frac{\partial \boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha)}}{\partial \alpha_k} \boldsymbol y_{w,1}\\
+\vdots \\
+\frac{\partial \boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha)}}{\partial \alpha_k} \boldsymbol y_{w,S}\\
+\end{matrix}
+\right) \label{jz-vec} \tag{19} = \text{vec} 
+\left(
+\frac{\partial \boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha)}}{\partial \alpha_k}
+\boldsymbol Y_w
+\right).
+$$
+
+The previous article explains how to calculate the matrix
+$$\frac{\partial \boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha)}}{\partial \alpha_k}$$.
+Again, we can use the matrix form to efficiently calculate the result and then
+transform the matrix into a column vector. If we compare the equations $$\eqref
+
+# Advantages and Limitations
+
+The presented approach 
 
 # References
 
@@ -216,3 +270,4 @@ $$\boldsymbol z_w := \text{vec} (\boldsymbol R) =
 # Endnotes
 [^baerligea-extension]: They extend the method for datasets where the members of a dataset may have different numbers of elements. This is out of scope for this here article because we have to sacrifice computational savings for this extension. However, it's definitely worth checking out their paper. 
 [^naive-approach]: If you're interested, check out the section titled _naive approach_ in the Bärligea paper.
+[^caveat-vectorization]: Not to be confused with the concept of _vectorization_ in programming.
