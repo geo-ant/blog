@@ -38,13 +38,13 @@ to $$S$$ vector valued datasets $$\boldsymbol y_s \in \mathbb{R}^m$$, $$s = 1,\d
 For this article, we are concerned only with fittin a so called _separable_ model
 function $$\boldsymbol f$$, which can be written as the linear combination of $$n$$
 nonlinear functions. Now for our problem, we will assume that the nonlinear parameters
-are the same for all the datasets, while the linear coefficients are allowed to
-vary between datasets. Using the formulation above, that implies that the nonlinear parameters of the fitting
-problems are shared between datasets while the linear parameters are not. This
+are the same for all the members of the datasets, while the linear coefficients are allowed to
+vary between members. Using the formulation above, that implies that the nonlinear parameters of the fitting
+problems are shared between members of the dataset while the linear parameters are not. This
 will allow us to use VarPro to its full potential and reap potentially massive
 computational benefits. However, not every fitting problem will fit this bill.
 We need a problem where it truly makes sense that the nonlinear parameters are
-shared among datasets, while the linear coefficients are not. 
+shared among members of the datasets, while the linear coefficients are not. 
 
 One example of a problem that satisfies the condition above is Fluorescence Lifetime 
 Imaging ([FLIM](https://en.wikipedia.org/wiki/Fluorescence-lifetime_imaging_microscopy)): 
@@ -125,7 +125,7 @@ $$\boldsymbol Y
 $$
 
 We allowed the linear coefficients to vary across the data set, so 
-each dataset has its own vector of linear coefficients $$\boldsymbol c_s$$. We
+each member of the dataset has its own vector of linear coefficients $$\boldsymbol c_s$$. We
 can also group those into a matrix
 
 $$\boldsymbol C
@@ -154,7 +154,7 @@ where
 
 $$\boldsymbol y_{w,s} = \boldsymbol W \boldsymbol y_s \tag{11} \label{weighted-data}$$ 
 
-are the weighted data sets. Note that the same weights are applied to each dataset.
+are the weighted data sets. Note that the same weights are applied to each membre of the dataset.
 Note further, that $$\boldsymbol \alpha$$ and thus $$\boldsymbol \Phi_w(\alpha)$$ are the same
 for each residual vector. Our minimization problem is now to minimize $$\sum_s \lVert r_{w,s} \rVert_2^2$$,
 which we can write in matrix form like so: 
@@ -227,11 +227,11 @@ The final piece of the puzzle is an expression for the Jacobian of $$\boldsymbol
 which I'll denote $$\boldsymbol J \{\boldsymbol z_w\}(\boldsymbol \alpha)$$.
 It's $$k-th$$ column is, by definition, just
 
-$$\boldsymbol j_k^z = \frac{\partial z_w}{\partial \alpha_k},$$
+$$\boldsymbol j_k^{(z)} = \frac{\partial z_w}{\partial \alpha_k},$$
 
 which, using the same insights as above, we can write it as
 
-$$\boldsymbol j_k^z = 
+$$\boldsymbol j_k^{(z)} = 
 \left(
 \begin{matrix}
 \frac{\partial \boldsymbol r_{w,1} }{\partial \alpha_k} \\
@@ -245,21 +245,51 @@ $$\boldsymbol j_k^z =
 \vdots \\
 \frac{\partial \boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha)}}{\partial \alpha_k} \boldsymbol y_{w,S}\\
 \end{matrix}
-\right) \label{jz-vec} \tag{19} = \text{vec} 
+\right) = \text{vec} 
 \left(
 \frac{\partial \boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha)}}{\partial \alpha_k}
 \boldsymbol Y_w
 \right).
+\label{jkz} \tag{19}
 $$
 
 The previous article explains how to calculate the matrix
 $$\frac{\partial \boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha)}}{\partial \alpha_k}$$.
 Again, we can use the matrix form to efficiently calculate the result and then
-transform the matrix into a column vector. If we compare the equations $$\eqref
+transform the matrix into a column vector. If we compare the equations for the
+single right hand side $$\eqref{rw-P-y}, \eqref{jk}$$ with the equations for multiple
+right hand sides $$\eqref{rw-varpro}, \eqref{jkz}$$, we can see that the matrix equations
+are just pretty straightforward generalizations of the original vector identities.
 
 # Advantages and Limitations
 
-The presented approach 
+The presented approach to solving multiple right hand sides with variable
+projection has many advantages. VarPro eliminates the linear parameters from
+the nonlinear minimization process, which -together with the fact that the nonlinear
+parameters are shared across the dataset- means that instead of $$S\cdot n + q$$ parameters,
+the nonlinear solver only has to solve for $$q$$ parameters. This is a
+substantial reduction in parameters even for moderately sized datasets. Furthermore,
+the matrix $$\boldsymbol P^\perp_{\boldsymbol \Phi_w}$$ and it's derivative only needs
+to be calculated once for the whole dataset. This will also massively speed up
+the fitting process.
+
+However, this comes at a price: the whole calculation that I presented here depends on
+the fact that the same weights are applied to all members of the dataset, see eq. $$\eqref{weighted-data}$$.
+This might not be as bad of a limitation as it sounds at first. Warrent _et al._
+show that [it's pretty simple](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0070687#s2)
+to come up with decent global weights even for Poisson distributed data (Warren2013).
+
+# Further Extensions
+
+I'll conclude this article here, since it is the simplest and most efficient
+application of VarPro to problems with multiple right hand sides. It's main
+limitation is that the model functions and the weights must be the same for
+each member of the dataset, i.e. they may not vary with the member index $$s$$ of the dataset. However,
+it is straightforward to extend the method presented here to allow a dependency
+on $$s$$, cf. eg. (Baerligea2023). The problem then is that we will need to 
+calculate the matrix $$\boldsymbol \Phi_w^{(s)}$$, and consequently the projection
+matrix and it's derivative, for each member of the dataset. This will cost us
+dearly[^svd-product] but can still beat a purely nonlinear minimization without VarPro (Baerligea2023).
 
 # References
 
@@ -271,3 +301,4 @@ The presented approach
 [^baerligea-extension]: They extend the method for datasets where the members of a dataset may have different numbers of elements. This is out of scope for this here article because we have to sacrifice computational savings for this extension. However, it's definitely worth checking out their paper. 
 [^naive-approach]: If you're interested, check out the section titled _naive approach_ in the Bärligea paper.
 [^caveat-vectorization]: Not to be confused with the concept of _vectorization_ in programming.
+[^svd-product]: _Maybe_ [this](https://math.stackexchange.com/questions/67231/singular-value-decomposition-of-product-of-matrices) could help for the case where only the weights vary with $$s$$. But I'm not so sure...
