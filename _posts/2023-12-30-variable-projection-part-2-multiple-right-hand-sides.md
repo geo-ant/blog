@@ -15,50 +15,52 @@ math: true
 
 About three years ago, I announced in my [previous article](/blog/2020/variable-projection-part-1-fundamentals/)
 on variable projection, that I would write a follow up about VarPro with
-multiple right hand sides. This is that article. Global fitting with multiple
+multiple right hand sides. This is it. Global fitting with multiple
 right hand sides is an application where VarPro really shines because it offers
 significant computational savings. Let's dive right in.
 
-# Motivation or: What is Global Fitting?
+# What is Global Fitting?
 
-Global fitting is a term I came across in fluorescence lifetime literature
-back in the day when I was working in the field (cf. e.g. Warren2013). I am not
-sure whether it is a widely used term, but the professional data analysis software
+Global fitting is a term I came across in the fluorescence lifetime literature
+back when I was working in the field (see e.g. Warren2013). I am not
+sure whether it is a widely used term, but the data analysis software
 OriginLab&reg; Origin&reg; also seems to use it and [their definition](https://www.originlab.com/doc/Tutorials/Fitting-Global)
-is quite instructive:
+is quite instructive[^slight-changes]:
 
 > The term "global fitting" generally refers to simultaneous curve fitting operations
-> performed on multiple datasets. Because datasets remain distinct, they may or
-> may not "share" parameter values during the fit process. When a parameter is shared
-> a single parameter value is calculated for all datasets. When a parameter is
-> not shared, a separate parameter value is calculated for each dataset. 
+> performed on multiple right hand sides. Because right hand sides remain distinct, they may or
+> may not "share" parameter values during the fit process. When a parameter is shared,
+> a single parameter value is calculated for all right hand sides. When a parameter is
+> not shared, a separate parameter value is calculated for each right hand side. 
 
-For this article we are concerned with global fitting of a vector valued function $$\boldsymbol f \in \mathbb{R}^m$$
-to $$S$$ vector valued datasets $$\boldsymbol y_s \in \mathbb{R}^m$$, $$s = 1,\dots,S$$.
-For this article, we are concerned only with fittin a so called _separable_ model
-function $$\boldsymbol f$$, which can be written as the linear combination of $$n$$
+The topic of this article is global fitting of a vector valued function $$\boldsymbol f \in \mathbb{R}^m$$
+to $$S$$ vector valued right hand sides $$\boldsymbol y_s \in \mathbb{R}^m$$, $$s = 1,\dots,S$$.
+We are concerned only with fitting certain kinds of functions, so called _separable_ model
+functions. Those are functions $$\boldsymbol f$$ which can be written as the linear combination of $$n$$
 nonlinear functions. Now for our problem, we will assume that the nonlinear parameters
-are the same for all the members of the datasets, while the linear coefficients are allowed to
-vary between members. Using the formulation above, that implies that the nonlinear parameters of the fitting
-problems are shared between members of the dataset while the linear parameters are not. This
-will allow us to use VarPro to its full potential and reap potentially massive
+are shared for all the members of the datasets, while the linear coefficients are allowed to
+vary between members. I'll formalize this prose in the next section, so please bear with
+me.
+
+The fitting problem as stated above will allow us to use VarPro to its full potential and reap potentially massive
 computational benefits. However, not every fitting problem will fit this bill.
-We need a problem where it truly makes sense that the nonlinear parameters are
+Firstly, we need a model function that is truly separable and secondly
+we need a problem where it is justified to assume that the nonlinear parameters are
 shared among members of the datasets, while the linear coefficients are not. 
 
 One example of a problem that satisfies the condition above is Fluorescence Lifetime 
 Imaging ([FLIM](https://en.wikipedia.org/wiki/Fluorescence-lifetime_imaging_microscopy)): 
 it requires us to fit a number of lifetimes (the nonlinear parameters) from a 
-multiexponential decay, with varying amplitudes of the individual exponential  
-terms (the linear coefficients). It is a reasonable approximation that only a 
+multiexponential decay, with varying amplitudes of the individual exponential decays
+(the linear coefficients). It is a reasonable approximation that only a 
 handful of distinct lifetimes are present in any one particular sample (corresponding 
-to different fluorophores), but that the linear coefficients (corresponding to 
+to different fluorophores[^lifetimes]), but that the linear coefficients (corresponding to 
 fluorophore concentration) might vary spatially across a sample (Warren2013). 
 
 # VarPro: A Quick Recap
 Since this article is a follow up of my [previous article](/blog/2020/variable-projection-part-1-fundamentals/),
-so I assume that you, kind reader, are familiar with it. I'll use the same notation
-as before so that its easy to go back and forth between the articles and
+I assume that you, kind reader, are familiar with it. I'll use the same notation
+as before, so that its easy to go back and forth between the articles and
 I'll keep repetition to a minimum.
 
 In the last article we were concerned with least squares fitting a vector valued
@@ -95,8 +97,9 @@ $$ \boldsymbol r_w = \boldsymbol r_w (\boldsymbol \alpha) = \boldsymbol P^\perp_
 The [previous article](/blog/2020/variable-projection-part-1-fundamentals/) goes
 into detail on how the _projection matrix_ $$\boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)}$$
 is calculated. To minimize the squared sum of the residuals, we feed
-$$\boldsymbol r_w (\boldsymbol \alpha)$$ into a least squares solver of our choice.
-It is often favorable to provide the Jacobian $$\boldsymbol J(\boldsymbol \alpha)$$
+$$\boldsymbol r_w (\boldsymbol \alpha)$$ into a least squares solver of our choice,
+like e.g. the Levenberg-Marquardt algorithm.
+It is typically required to provide the Jacobian $$\boldsymbol J(\boldsymbol \alpha)$$
 matrix of the residuals as well, and it turns out we can calculate the $$k$$-th column
 $$\boldsymbol j_k$$ of the Jacobian as
 
@@ -104,16 +107,18 @@ $$ \boldsymbol j_k = \frac{\partial \boldsymbol r_w}{\partial \alpha_k} = \frac{
 
 where the expression for the derivative of the projection matrix is given in the
 previous article. Now we have all the ingredients together to tackle the global
-fitting problem.
+fitting problem. 
 
 # Global Fitting with VarPro
 
 In this section I'll follow the excellent presentation of Bärligea and Hochstaffl
-(Baerligea2023) [^baerligea-extension]. In the initial motivation I stated this
+(Baerligea2023)[^baerligea-extension]. As I said above, this
 article is concerned with fitting separable models to a dataset where the nonlinear
 parameters are shared across the whole dataset, while the linear coefficients
-are allowed to vary for each member of the set. Let's formalize this now and group
-the data vectors $$\boldsymbol y_s$$ for $$s = 1,\dots,S$$ into a matrix:
+are allowed to vary across the members of the set. Let's formalize this now. Our
+dataset is an ordered set of vectors for the right hand sides of the problem:
+$$\left\{\boldsymbol y_s \in \mathbb{R}^m | s=1,\dots,S\right\}$$.
+We'll now collect the members of the dataset into a matrix:
 
 $$\boldsymbol Y 
 = \left(\begin{matrix}
@@ -124,7 +129,7 @@ $$\boldsymbol Y
 \in \mathbb{R}^{m \times S}. \label{def-Y} \tag{8}
 $$
 
-We allowed the linear coefficients to vary across the data set, so 
+Since we allowed the linear coefficients to vary across the data set,
 each member of the dataset has its own vector of linear coefficients $$\boldsymbol c_s$$. We
 can also group those into a matrix
 
@@ -149,13 +154,16 @@ $$\boldsymbol R_w
 \in \mathbb{R}^{m \times S}, \label{def-Rmatrix} \tag{10}
 $$
 
-where $$\boldsymbol r_{w,s} = \boldsymbol y_{w,s} - \boldsymbol \Phi_w(\boldsymbol \alpha) \boldsymbol c_s$$,
-where 
+where
 
-$$\boldsymbol y_{w,s} = \boldsymbol W \boldsymbol y_s \tag{11} \label{weighted-data}$$ 
+$$\begin{eqnarray}
+\boldsymbol r_{w,s} &=& \boldsymbol W (\boldsymbol y_s - \boldsymbol \Phi_w(\boldsymbol \alpha) \boldsymbol c_s) \\
+ &=& \boldsymbol y_{w,s} - \boldsymbol \Phi_w(\boldsymbol \alpha) \boldsymbol c_s \tag{11} \label{weighted-data}\\
+\boldsymbol y_{w,s} &:=& \boldsymbol W \boldsymbol y_s 
+\end{eqnarray}$$
 
-are the weighted data sets. Note that the same weights are applied to each membre of the dataset.
-Note further, that $$\boldsymbol \alpha$$ and thus $$\boldsymbol \Phi_w(\alpha)$$ are the same
+Note that this implies that the same weights are applied to each member of
+the dataset. Note further, that $$\boldsymbol \alpha$$ and thus $$\boldsymbol \Phi_w(\alpha)$$ are the same
 for each residual vector. Our minimization problem is now to minimize $$\sum_s \lVert r_{w,s} \rVert_2^2$$,
 which we can write in matrix form like so: 
 
@@ -171,7 +179,7 @@ the sum of absolute squares of the matrix elements. I have reused the symbol
 $$\rho_{WLS}$$ for the sum of the squared residuals, since this contains eq.
 $$\eqref{def-rwls}$$ as a special case for a dataset with only one element ($$S = 1$$).
 
-Using the ideas VarPro as presented in the presivous article, we can rewrite 
+Using the ideas of VarPro as presented in the previous article, we can rewrite 
 minimization problem $$\eqref{min-rho-mrhs}$$ into a minimization 
 over $$\boldsymbol \alpha$$ only:
 
@@ -184,7 +192,7 @@ $$\begin{eqnarray}
 The matrix equations $$\eqref{rho-varpro},\eqref{rw-varpro}$$ are generalizations
 of the vector identities $$\eqref{def-rwls}, \eqref{def-rw}$$. But there's
 a problem here, that prevents us from just plugging these results into off-the-shelf
-nonlinear least squares -such as Levenberg-Marquardt- minimizers like we did last time.
+nonlinear least squares minimizers like we did last time.
 The problem is that those implementations usually require us to give the 
 residual as one single vector. Additionally, we typically need to specify the
 Jacobian matrix of the residual vector.
@@ -302,3 +310,5 @@ dearly[^svd-product] but can still beat a purely nonlinear minimization without 
 [^naive-approach]: If you're interested, check out the section titled _naive approach_ in the Bärligea paper.
 [^caveat-vectorization]: Not to be confused with the concept of _vectorization_ in programming.
 [^svd-product]: _Maybe_ [this](https://math.stackexchange.com/questions/67231/singular-value-decomposition-of-product-of-matrices) could help for the case where only the weights vary with $$s$$. But I'm not so sure...
+[^slight-changes]: They use the term _dataset_ instead of _right hand side_ in their definition, but I am going to use the term dataset slightly differently. So that is why I changed it to right hand side.
+[^lifetimes]: However, it is _also_ well known that the fluorescence lifetime of a fluorophore depends on it's chemical surroundings, among other things. So the most likely scenario is that both the concentration as well as the lifetimes actually change across a sample. However, exponential fitting is a notoriously ill conditioned problem and the change in lifetime might or might not be detectable within the accuracy of the fit. At the end of the day, it's a decision that must be made based on our knowledge of the data. Also consider the principle that ["all models are wrong, but some are useful"](https://en.wikipedia.org/wiki/All_models_are_wrong).
