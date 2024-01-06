@@ -16,15 +16,15 @@ math: true
 About three years ago, I announced in my [previous article](/blog/2020/variable-projection-part-1-fundamentals/)
 on variable projection, that I would write a follow up about VarPro with
 multiple right hand sides. This is it. Global fitting with multiple
-right hand sides is an application where VarPro really shines because it offers
-significant computational savings. Let's dive right in.
+right hand sides is an application where VarPro shines because it can
+bring significant computational savings. Let's dive right in.
 
 # What is Global Fitting?
 
-Global fitting is a term I came across in the fluorescence lifetime literature
-back when I was working in the field (see e.g. Warren2013). I am not
+_Global fitting_ is a term that I came across back when I was working in
+fluorescence lifetime imaging, see e.g. (Warren2013). I am not
 sure whether it is a widely used term, but the data analysis software
-OriginLab&reg; Origin&reg; also seems to use it and [their definition](https://www.originlab.com/doc/Tutorials/Fitting-Global)
+OriginLab&reg; Origin&reg; also seems to use it, and [their definition](https://www.originlab.com/doc/Tutorials/Fitting-Global)
 is quite instructive[^slight-changes]:
 
 > The term "global fitting" generally refers to simultaneous curve fitting operations
@@ -34,36 +34,28 @@ is quite instructive[^slight-changes]:
 > not shared, a separate parameter value is calculated for each right hand side. 
 
 The topic of this article is global fitting of a vector valued function $$\boldsymbol f \in \mathbb{R}^m$$
-to $$S$$ vector valued right hand sides $$\boldsymbol y_s \in \mathbb{R}^m$$, $$s = 1,\dots,S$$.
+to $$S \in \mathbb{N}$$ vector valued right hand sides $$\boldsymbol y_s \in \mathbb{R}^m$$, $$s = 1,\dots,S$$.
 We are concerned only with fitting certain kinds of functions, so called _separable_ model
 functions. Those are functions $$\boldsymbol f$$ which can be written as the linear combination of $$n$$
-nonlinear functions. Now for our problem, we will assume that the nonlinear parameters
-are shared for all the members of the datasets, while the linear coefficients are allowed to
-vary between members. I'll give a more formal description in the next section
-me.
+nonlinear functions. For our problem, we will assume that the nonlinear parameters
+are shared across all the members of the datasets, while the linear coefficients are allowed to
+vary between members. I'll give a more formal description soon.
 
 The fitting problem as stated above will allow us to use VarPro to its full potential and reap potentially massive
 computational benefits. However, not every fitting problem will fit this bill.
-Firstly, we need a model function that is truly separable and secondly
+Firstly, we need a model function that is truly separable. Secondly,
 we need a problem where it is justified to assume that the nonlinear parameters are
-shared among members of the datasets, while the linear coefficients are not. 
-
-One example of a problem that satisfies the condition above is Fluorescence Lifetime 
-Imaging ([FLIM](https://en.wikipedia.org/wiki/Fluorescence-lifetime_imaging_microscopy)): 
-it requires us to fit a number of lifetimes (the nonlinear parameters) from a 
-multiexponential decay, with varying amplitudes of the individual exponential decays
-(the linear coefficients). It is a reasonable approximation that only a 
-handful of distinct lifetimes are present in any one particular sample (corresponding 
-to different fluorophores[^lifetimes]), but that the linear coefficients (corresponding to 
-fluorophore concentration) might vary spatially across a sample (Warren2013). 
+shared across the dataset, while the linear coefficients are not. Fluorescence 
+lifetime imaging is an example of such a problem[^lifetimes]. 
 
 # VarPro: A Quick Recap
+
 Since this article is a follow up of my [previous article](/blog/2020/variable-projection-part-1-fundamentals/),
 I assume that you, kind reader, are familiar with it. I'll use the same notation
 as before, so that its easy to go back and forth between the articles and
 I'll keep repetition to a minimum.
 
-In the last article we were concerned with least squares fitting a vector valued
+In the last article, we were concerned with least squares fitting a vector valued
 separable model function $$\boldsymbol{f}$$, written as a linear combination
 of nonlinear basis functions:
  
@@ -92,15 +84,15 @@ problem from a minimization over $$\boldsymbol \alpha$$ _and_ $$\boldsymbol c$$
 to a minimization problem over the nonlinear parameters $$\boldsymbol \alpha$$ _only_
 
 
-$$ \boldsymbol r_w = \boldsymbol r_w (\boldsymbol \alpha) = \boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)} \boldsymbol y_w. \label{rw-P-y} \tag{6}$$
+$$ \boldsymbol r_w (\boldsymbol \alpha) = \boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)} \boldsymbol y_w. \label{rw-P-y} \tag{6}$$
 
 The [previous article](/blog/2020/variable-projection-part-1-fundamentals/) goes
 into detail on how the _projection matrix_ $$\boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)}$$
-is calculated. To minimize the squared sum of the residuals, we feed
-$$\boldsymbol r_w (\boldsymbol \alpha)$$ into a least squares solver of our choice,
-like e.g. the Levenberg-Marquardt algorithm.
-It is typically required to provide the Jacobian $$\boldsymbol J(\boldsymbol \alpha)$$
-matrix of the residuals as well, and it turns out we can calculate the $$k$$-th column
+is calculated. It depends on $$\boldsymbol \Phi(\boldsymbol \alpha)$$ and $$\boldsymbol W$$.
+To minimize the squared sum of the residuals, we feed $$\boldsymbol r_w (\boldsymbol \alpha)$$
+into a least squares solver of our choice, like e.g. the Levenberg-Marquardt algorithm.
+We are typically required to provide the Jacobian matrix $$\boldsymbol J(\boldsymbol \alpha)$$
+of the residuals as well. It turns out we can calculate the $$k$$-th column
 $$\boldsymbol j_k$$ of the Jacobian as
 
 $$ \boldsymbol j_k = \frac{\partial \boldsymbol r_w}{\partial \alpha_k} = \frac{\partial\boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)}}{\partial \alpha_k} \boldsymbol y_w, \label{jk} \tag{7}$$
@@ -116,7 +108,7 @@ In this section I'll follow the excellent presentation of Bärligea and Hochstaf
 article is concerned with fitting separable models to a dataset where the nonlinear
 parameters are shared across the whole dataset, while the linear coefficients
 are allowed to vary across the members of the set. Let's formalize this now. Our
-dataset is an ordered set of vectors for the right hand sides of the problem:
+dataset is an ordered set of vectors for the vector valued right hand sides of the problem:
 $$\left\{\boldsymbol y_s \in \mathbb{R}^m | s=1,\dots,S\right\}$$.
 We'll now collect the members of the dataset into a matrix:
 
@@ -142,8 +134,7 @@ $$\boldsymbol C
 \in \mathbb{R}^{n \times S}.\label{def-C} \tag{9}
 $$
 
-Finally, we can also group the weighted residual vectors for each member
-of a dataset into a matrix:
+Finally, we can also group the weighted residual vectors into a matrix:
 
 $$\boldsymbol R_w
 = \left(\begin{matrix}
@@ -162,7 +153,7 @@ $$\begin{eqnarray}
 \boldsymbol y_{w,s} &:=& \boldsymbol W \boldsymbol y_s 
 \end{eqnarray}$$
 
-Note that this implies that the same weights are applied to each member of
+Note that this implies, that the same weights are applied to each member of
 the dataset. Note further, that $$\boldsymbol \alpha$$ and thus $$\boldsymbol \Phi_w(\alpha)$$ are the same
 for each residual vector. Our fitting problem now is to minimize $$\sum_s \lVert r_{w,s} \rVert_2^2$$,
 which we can write in matrix form like so: 
@@ -170,7 +161,8 @@ which we can write in matrix form like so:
 $$\begin{eqnarray}
 &\min_{\boldsymbol \alpha, \boldsymbol C}& \rho_{WLS}(\boldsymbol \alpha, \boldsymbol C) \label{min-rho-mrhs} \tag{12} \\
 \rho_{WLS}(\boldsymbol \alpha, \boldsymbol C) &:=& \lVert \boldsymbol R_w(\boldsymbol \alpha, \boldsymbol C) \rVert_F^2 \label{redef-rho} \tag{13} \\
-\boldsymbol R_w(\boldsymbol \alpha, \boldsymbol C) &:=& \boldsymbol Y_w - \boldsymbol \Phi_w \boldsymbol C \label{def-residual-matrix} \tag{14}, \\
+\boldsymbol R_w(\boldsymbol \alpha, \boldsymbol C) &:=& \boldsymbol W (\boldsymbol Y - \boldsymbol \Phi \boldsymbol C \label{def-residual-matrix} \tag{14}) \\
+&=& \boldsymbol Y_w - \boldsymbol \Phi_w \boldsymbol C ,\\
 \end{eqnarray}$$
 
 where $$\boldsymbol Y_w = \boldsymbol W \boldsymbol Y$$ and $$\lVert . \rVert_F$$
@@ -190,11 +182,11 @@ $$\begin{eqnarray}
 
 The matrix equations $$\eqref{rho-varpro},\eqref{rw-varpro}$$ are generalizations
 of the vector identities $$\eqref{def-rwls}, \eqref{def-rw}$$. But there's
-a problem here, that prevents us from just plugging these results into off-the-shelf
-nonlinear least squares minimizers like we did last time.
+a problem that prevents us from just plugging these results into off-the-shelf
+nonlinear least squares minimizers, as we did in the previous article.
 The problem is, that those implementations usually require us to give the 
 residual as one single vector. Additionally, we typically need to specify the
-Jacobian matrix of the residual vector.
+Jacobian matrix of that residual vector.
 
 Luckily, all is not lost and we are not forced to resort to inefficient
 approaches[^naive-approach] to shoehorn our nice matrix equations into vector format.
@@ -205,7 +197,7 @@ L2-norm $$\lVert \boldsymbol z_w (\boldsymbol \alpha)\rVert_2^2$$ of a vector
 $$\boldsymbol z_w (\boldsymbol \alpha)$$ defined as:
 
 $$
-\boldsymbol z_w(\boldsymbol \alpha) := \text{vec}\; \boldsymbol R (\boldsymbol \alpha) = 
+\boldsymbol z_w(\boldsymbol \alpha) := \text{vec}\; \boldsymbol R_w (\boldsymbol \alpha) = 
 \left(
 \begin{matrix}
 \boldsymbol r_{w,1} \\
@@ -220,7 +212,7 @@ $$
 \boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha)} \boldsymbol y_{w,S}\\
 \end{matrix}
 \right)
-\in \mathbb{R}^{m\cdot S}, \label{z-vec} \tag{18}
+\in \mathbb{R}^{m\cdot S}. \label{z-vec} \tag{18}
 $$
 
 The mathematical operation $$\text{vec}$$ is called 
@@ -277,9 +269,9 @@ the nonlinear minimization process, which --together with the fact that the nonl
 parameters are shared across the dataset-- means that instead of $$S\cdot n + q$$ parameters,
 the nonlinear solver only has to solve for $$q$$ parameters. This is a
 substantial reduction in parameters even for moderately sized datasets. Furthermore,
-the matrix $$\boldsymbol P^\perp_{\boldsymbol \Phi_w}$$ and it's derivative only need
+the matrix $$\boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)d}$$ and its derivative only need
 to be calculated once for the whole dataset for a given value of $$\boldsymbol \alpha$$.
-This can also massively speed up the fit.
+This can massively speed up the fit.
 
 However, this comes at a price: the whole calculation that I presented here depends on
 the fact that the same weights are applied to all members of the dataset, see eq. $$\eqref{weighted-data}$$.
@@ -302,7 +294,7 @@ This limitation enables us to calculate the projection matrix and its derivative
 only once for the whole dataset and brings us substantial computational savings.
 It is pretty straightforward to extend the method presented here to allow a dependency
 on $$s$$, cf. eg. (Baerligea2023). We will then need to 
-recalculate the matrix $$\boldsymbol \Phi_w^{(s)}$$ for every index $$s$$, and consequently also the projection
+recalculate the matrix $$\boldsymbol \Phi_w^{(s)}$$ for every index $$s$$, and also the projection
 matrix and it's derivative. This will cost us some significant compute[^svd-product]
 but can still beat a purely nonlinear minimization without VarPro (Baerligea2023).
 
@@ -321,7 +313,7 @@ However, there are some downsides that come with this approach. One problem is
 that both the residual vector and the Jacobian matrix will have $$m\cdot S$$ rows,
 which can become quite large for big datasets. In their paper, Warren _et al._
 report an approach termed _partitioned variable projection_ that implements
-a modified version of the LM solver which does not require to store the full
+a modified version of the LM solver, which does not require to store the full
 Jacobian (Warren2023).
 
 # References
@@ -331,9 +323,10 @@ Jacobian (Warren2023).
 **(Baerligea2023)** Bärligea, A. *et al.* (2023) "A Generalized Variable Projection Algorithm for Least Squares Problems in Atmospheric Remote Sensing," *Mathematics* **2023, 11, 2839** ([link](https://doi.org/10.3390/math11132839))
 
 # Endnotes
+
 [^baerligea-extension]: They extend the method for datasets where the members of a dataset may have different numbers of elements. This is out of scope for this here article because we have to sacrifice computational savings for this extension. However, it's definitely worth checking out their paper. 
 [^naive-approach]: If you're interested, check out the section titled _naive approach_ in the Bärligea paper.
 [^caveat-vectorization]: Not to be confused with the concept of _vectorization_ in programming.
 [^svd-product]: _Maybe_ [this](https://math.stackexchange.com/questions/67231/singular-value-decomposition-of-product-of-matrices) could help for the case where only the weights vary with $$s$$. But I'm not so sure...
 [^slight-changes]: They use the term _dataset_ instead of _right hand side_ in their definition, but I am going to use the term dataset slightly differently. So that is why I changed it to right hand side.
-[^lifetimes]: However, it is _also_ well known that the fluorescence lifetime of a fluorophore depends on it's chemical surroundings, among other things. So the most likely scenario is that both the concentration as well as the lifetimes actually change across a sample. However, exponential fitting is a notoriously ill conditioned problem and the change in lifetime might or might not be detectable within the accuracy of the fit. At the end of the day, it's a decision that must be made based on our knowledge of the data. Also consider the principle that ["all models are wrong, but some are useful"](https://en.wikipedia.org/wiki/All_models_are_wrong).
+[^lifetimes]: Fluorescence Lifetime Imaging ([FLIM](https://en.wikipedia.org/wiki/Fluorescence-lifetime_imaging_microscopy)) requires us to fit a number of lifetimes (the nonlinear parameters) from a  multiexponential decay, with varying amplitudes of the individual exponential decays (the linear coefficients). It is a reasonable approximation that only a  handful of distinct lifetimes are present in any one particular sample (corresponding  to different fluorophores), but that the linear coefficients (corresponding to  fluorophore concentration) might vary spatially across a sample (Warren2013).  However, it is _also_ well known that the fluorescence lifetime of a fluorophore depends on it's chemical surroundings, among other things. So the most likely scenario is that both the concentration as well as the lifetimes actually change across a sample. However, exponential fitting is a notoriously ill conditioned problem and the change in lifetime might or might not be detectable within the accuracy of the fit. At the end of the day, it's a decision that must be made based on our knowledge of the data. Also consider the principle that ["all models are wrong, but some are useful"](https://en.wikipedia.org/wiki/All_models_are_wrong).
