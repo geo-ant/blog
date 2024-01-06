@@ -39,7 +39,7 @@ We are concerned only with fitting certain kinds of functions, so called _separa
 functions. Those are functions $$\boldsymbol f$$ which can be written as the linear combination of $$n$$
 nonlinear functions. Now for our problem, we will assume that the nonlinear parameters
 are shared for all the members of the datasets, while the linear coefficients are allowed to
-vary between members. I'll formalize this prose in the next section, so please bear with
+vary between members. I'll give a more formal description in the next section
 me.
 
 The fitting problem as stated above will allow us to use VarPro to its full potential and reap potentially massive
@@ -90,7 +90,7 @@ where $$\boldsymbol W \in \mathbb{R}^{m\times m}$$ is a weighting matrix.
 We learned that the magic of VarPro is to rewrite the minimization
 problem from a minimization over $$\boldsymbol \alpha$$ _and_ $$\boldsymbol c$$
 to a minimization problem over the nonlinear parameters $$\boldsymbol \alpha$$ _only_
-by rewriting the vector of residuals as
+
 
 $$ \boldsymbol r_w = \boldsymbol r_w (\boldsymbol \alpha) = \boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)} \boldsymbol y_w. \label{rw-P-y} \tag{6}$$
 
@@ -157,14 +157,14 @@ $$
 where
 
 $$\begin{eqnarray}
-\boldsymbol r_{w,s} &=& \boldsymbol W (\boldsymbol y_s - \boldsymbol \Phi_w(\boldsymbol \alpha) \boldsymbol c_s) \\
- &=& \boldsymbol y_{w,s} - \boldsymbol \Phi_w(\boldsymbol \alpha) \boldsymbol c_s \tag{11} \label{weighted-data}\\
+\boldsymbol r_{w,s} &=& \boldsymbol W (\boldsymbol y_s - \boldsymbol \Phi(\boldsymbol \alpha) \boldsymbol c_s) \tag{11} \label{weighted-data}\\
+ &=& \boldsymbol y_{w,s} - \boldsymbol \Phi_w(\boldsymbol \alpha) \boldsymbol c_s \\
 \boldsymbol y_{w,s} &:=& \boldsymbol W \boldsymbol y_s 
 \end{eqnarray}$$
 
 Note that this implies that the same weights are applied to each member of
 the dataset. Note further, that $$\boldsymbol \alpha$$ and thus $$\boldsymbol \Phi_w(\alpha)$$ are the same
-for each residual vector. Our minimization problem is now to minimize $$\sum_s \lVert r_{w,s} \rVert_2^2$$,
+for each residual vector. Our fitting problem now is to minimize $$\sum_s \lVert r_{w,s} \rVert_2^2$$,
 which we can write in matrix form like so: 
 
 $$\begin{eqnarray}
@@ -174,9 +174,8 @@ $$\begin{eqnarray}
 \end{eqnarray}$$
 
 where $$\boldsymbol Y_w = \boldsymbol W \boldsymbol Y$$ and $$\lVert . \rVert_F$$
-is the [Frobenius Norm](https://mathworld.wolfram.com/FrobeniusNorm.html), i.e.
-the sum of absolute squares of the matrix elements. I have reused the symbol
-$$\rho_{WLS}$$ for the sum of the squared residuals, since this contains eq.
+is the [Frobenius Norm](https://mathworld.wolfram.com/FrobeniusNorm.html).
+I have reused the symbol $$\rho_{WLS}$$ for the sum of the squared residuals, since this trivially contains eq.
 $$\eqref{def-rwls}$$ as a special case for a dataset with only one element ($$S = 1$$).
 
 Using the ideas of VarPro as presented in the previous article, we can rewrite 
@@ -193,7 +192,7 @@ The matrix equations $$\eqref{rho-varpro},\eqref{rw-varpro}$$ are generalization
 of the vector identities $$\eqref{def-rwls}, \eqref{def-rw}$$. But there's
 a problem here, that prevents us from just plugging these results into off-the-shelf
 nonlinear least squares minimizers like we did last time.
-The problem is that those implementations usually require us to give the 
+The problem is, that those implementations usually require us to give the 
 residual as one single vector. Additionally, we typically need to specify the
 Jacobian matrix of the residual vector.
 
@@ -220,22 +219,23 @@ $$
 \vdots \\
 \boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha)} \boldsymbol y_{w,S}\\
 \end{matrix}
-\right), \label{z-vec} \tag{18}
+\right)
+\in \mathbb{R}^{m\cdot S}, \label{z-vec} \tag{18}
 $$
 
 The mathematical operation $$\text{vec}$$ is called 
 [vectorization](https://en.wikipedia.org/wiki/Vectorization_(mathematics))[^caveat-vectorization]
 and turns a matrix into a vector by stacking the matrix columns on top of each
-other. Now we have a vector that we can pass into our nonlinear minimization
+other. We now obtained a vector that we can pass into our nonlinear minimization
 step. We can use eq. $$\eqref{rw-varpro}$$ to calculate $$\boldsymbol z_w$$ and
 then turn the resulting matrix into a vector by stacking the columns. Ideally,
-this is basically a free operation in our linear algebra backend.
+this is a very cheap operation in our linear algebra backend.
 
 The final piece of the puzzle is an expression for the Jacobian of $$\boldsymbol z_w(\boldsymbol \alpha)$$,
-which I'll denote $$\boldsymbol J \{\boldsymbol z_w\}(\boldsymbol \alpha)$$.
+which we'll denote $$\boldsymbol J \{\boldsymbol z_w\}(\boldsymbol \alpha) \in \mathbb{R}^{m\cdot S \times q}$$.
 It's $$k-th$$ column is, by definition, just
 
-$$\boldsymbol j_k^{(z)} = \frac{\partial z_w}{\partial \alpha_k},$$
+$$\boldsymbol j_k^{(z)} = \frac{\partial z_w}{\partial \alpha_k} \in \mathbb{R}^{m \cdot S},$$
 
 which, using the same insights as above, we can write it as
 
@@ -273,13 +273,13 @@ are just pretty straightforward generalizations of the original vector identitie
 
 The presented approach to solving multiple right hand sides with variable
 projection has many advantages. VarPro eliminates the linear parameters from
-the nonlinear minimization process, which -together with the fact that the nonlinear
-parameters are shared across the dataset- means that instead of $$S\cdot n + q$$ parameters,
+the nonlinear minimization process, which --together with the fact that the nonlinear
+parameters are shared across the dataset-- means that instead of $$S\cdot n + q$$ parameters,
 the nonlinear solver only has to solve for $$q$$ parameters. This is a
 substantial reduction in parameters even for moderately sized datasets. Furthermore,
-the matrix $$\boldsymbol P^\perp_{\boldsymbol \Phi_w}$$ and it's derivative only needs
-to be calculated once for the whole dataset. This will also massively speed up
-the fitting process.
+the matrix $$\boldsymbol P^\perp_{\boldsymbol \Phi_w}$$ and it's derivative only need
+to be calculated once for the whole dataset for a given value of $$\boldsymbol \alpha$$.
+This can also massively speed up the fit.
 
 However, this comes at a price: the whole calculation that I presented here depends on
 the fact that the same weights are applied to all members of the dataset, see eq. $$\eqref{weighted-data}$$.
@@ -287,17 +287,42 @@ This might not be as bad of a limitation as it sounds at first. Warrent _et al._
 show that [it's pretty simple](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0070687#s2)
 to come up with decent global weights even for Poisson distributed data (Warren2013).
 
-# Further Extensions
+# Limitations and Extensions
 
 I'll conclude this article here, since it is the simplest and most efficient
-application of VarPro to problems with multiple right hand sides. It's main
-limitation is that the model functions and the weights must be the same for
-each member of the dataset, i.e. they may not vary with the member index $$s$$ of the dataset. However,
-it is straightforward to extend the method presented here to allow a dependency
-on $$s$$, cf. eg. (Baerligea2023). The problem then is that we will need to 
-calculate the matrix $$\boldsymbol \Phi_w^{(s)}$$, and consequently the projection
-matrix and it's derivative, for each member of the dataset. This will cost us
-dearly[^svd-product] but can still beat a purely nonlinear minimization without VarPro (Baerligea2023).
+application of VarPro to problems with multiple right hand sides. Let me 
+mention some limitations of the presented approach and how to overcome them, without
+going into too much detail.
+
+## Depending on the Data Index
+One important limitation of the approach presented here is, that the model functions
+and the weights must be the same for each member of the dataset, i.e. they may
+not vary with the index $$s$$ across the dataset.
+This limitation enables us to calculate the projection matrix and its derivative
+only once for the whole dataset and brings us substantial computational savings.
+It is pretty straightforward to extend the method presented here to allow a dependency
+on $$s$$, cf. eg. (Baerligea2023). We will then need to 
+recalculate the matrix $$\boldsymbol \Phi_w^{(s)}$$ for every index $$s$$, and consequently also the projection
+matrix and it's derivative. This will cost us some significant compute[^svd-product]
+but can still beat a purely nonlinear minimization without VarPro (Baerligea2023).
+
+## More Efficient Solvers
+
+The methodology presented here assumes we want to plug our residual and Jacobian
+into an existing nonlinear least squares solver. This has many advantages. For example,
+in our implementation we can concentrate on the actual VarPro part and leave the
+minimization to a well crafted third party library. We can also switch out the
+minimization backend, by switching to a different library or exchanging the
+underlying algorithm. Usually, VarPro implementations use the Levenberg-Marquardt (LM)
+algorithm for minimization, but any nonlinear least squares solver will do. Bärligea
+actually reports better results with algorithms other than LM (Baerligea2023). 
+
+However, there are some downsides that come with this approach. One problem is
+that both the residual vector and the Jacobian matrix will have $$m\cdot S$$ rows,
+which can become quite large for big datasets. In their paper, Warren _et al._
+report an approach termed _partitioned variable projection_ that implements
+a modified version of the LM solver which does not require to store the full
+Jacobian (Warren2023).
 
 # References
 
