@@ -24,7 +24,7 @@ bring significant computational savings. Let's dive right in.
 _Global fitting_ is a term that I came across back when I was working in
 fluorescence lifetime imaging, see e.g. (Warren2013). I am not
 sure whether it is a widely used term, but the data analysis software
-OriginLab&reg; Origin&reg; also seems to use it, and [their definition](https://www.originlab.com/doc/Tutorials/Fitting-Global)
+OriginLab Origin<sup>&reg;</sup> also seems to use it, and [their definition](https://www.originlab.com/doc/Tutorials/Fitting-Global)
 is quite instructive[^slight-changes]:
 
 > The term "global fitting" generally refers to simultaneous curve fitting operations
@@ -55,8 +55,8 @@ I assume that you, kind reader, are familiar with it. I'll use the same notation
 as before, so that its easy to go back and forth between the articles and
 I'll keep repetition to a minimum.
 
-In the last article, we were concerned with least squares fitting a vector valued
-separable model function $$\boldsymbol{f}$$, written as a linear combination
+In the last article, we were concerned with least squares fitting a vector valued,
+separable model function $$\boldsymbol{f}$$, which is written as a linear combination
 of nonlinear basis functions:
  
 $$
@@ -134,7 +134,7 @@ $$\boldsymbol C
 \in \mathbb{R}^{n \times S}.\label{def-C} \tag{9}
 $$
 
-Finally, we can also group the weighted residual vectors into a matrix:
+Finally, we can group the weighted residual vectors into a matrix:
 
 $$\boldsymbol R_w
 = \left(\begin{matrix}
@@ -219,12 +219,12 @@ The mathematical operation $$\text{vec}$$ is called
 [vectorization](https://en.wikipedia.org/wiki/Vectorization_(mathematics))[^caveat-vectorization]
 and turns a matrix into a vector by stacking the matrix columns on top of each
 other. We now obtained a vector that we can pass into our nonlinear minimization
-step. We can use eq. $$\eqref{rw-varpro}$$ to calculate $$\boldsymbol z_w$$ and
+step. We can use the matrix form of eq. $$\eqref{rw-varpro}$$ to calculate $$\boldsymbol z_w$$ and
 then turn the resulting matrix into a vector by stacking the columns. Ideally,
 this is a very cheap operation in our linear algebra backend.
 
 The final piece of the puzzle is an expression for the Jacobian of $$\boldsymbol z_w(\boldsymbol \alpha)$$,
-which we'll denote $$\boldsymbol J \{\boldsymbol z_w\}(\boldsymbol \alpha) \in \mathbb{R}^{m\cdot S \times q}$$.
+which we'll denote $$\boldsymbol J \{\boldsymbol z_w\}(\boldsymbol \alpha) \in \mathbb{R}^{m\cdot S\, \times \, q}$$.
 It's $$k-th$$ column is, by definition, just
 
 $$\boldsymbol j_k^{(z)} = \frac{\partial z_w}{\partial \alpha_k} \in \mathbb{R}^{m \cdot S},$$
@@ -253,9 +253,10 @@ $$\boldsymbol j_k^{(z)} =
 \label{jkz} \tag{19}
 $$
 
-The previous article explains how to calculate the matrix
+The previous article shows how to calculate the matrix
 $$\frac{\partial \boldsymbol P^\perp_{\boldsymbol \Phi_w (\boldsymbol \alpha)}}{\partial \alpha_k}$$.
-Again, we can use the matrix form to efficiently calculate the result and then
+It's the same matrix as for a single right hand side.
+Again, we can use the matrix form to efficiently calculate eq. $$\eqref{jkz}$$ and then
 transform the matrix into a column vector. If we compare the equations for the
 single right hand side $$\eqref{rw-P-y}, \eqref{jk}$$ with the equations for multiple
 right hand sides $$\eqref{rw-varpro}, \eqref{jkz}$$, we can see that the matrix equations
