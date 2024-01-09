@@ -8,8 +8,14 @@ date: 2023-12-30
 #description:
 #permalink:
 title: 'Global Fitting of Multiple Right Hand Sides with Variable Projection'
-# todo add correct comment id
-comments_id: 
+#
+#
+# Make sure this image is correct !!!
+og_image: vapro-multiple-rhs.png
+#
+#
+# make sure comments are enabled
+comments_id: 59
 math: true
 ---
 
