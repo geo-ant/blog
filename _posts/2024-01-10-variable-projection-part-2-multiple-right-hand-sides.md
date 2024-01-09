@@ -2,7 +2,7 @@
 layout: post
 tags: least-squares image-processing algorithm math varpro
 #categories: []
-date: 2023-12-30
+date: 2024-01-10
 #excerpt: ''
 #image: 'BASEURL/assets/blog/img/.png'
 #description:
