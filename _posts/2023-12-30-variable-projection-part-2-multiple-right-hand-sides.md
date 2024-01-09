@@ -63,7 +63,7 @@ I'll keep repetition to a minimum.
 
 In the last article, we were concerned with least squares fitting a vector valued,
 separable model function $$\boldsymbol{f}$$, which is written as a linear combination
-of nonlinear basis functions:
+of nonlinear basis functions
  
 $$
 \boldsymbol{f}(\boldsymbol{\alpha},\boldsymbol{c}) = \boldsymbol{\Phi}(\boldsymbol\alpha)\boldsymbol{c} \in \mathbb{R}^m \label{def-f} \tag{0}
@@ -71,7 +71,10 @@ $$
 
 to a vector of observations $$\boldsymbol{y} \in \mathbb{R}^m$$. Here $$\boldsymbol \alpha$$
 are the nonlinear parameters of the model function, while $$\boldsymbol c$$ are the linear
-coefficients. Specifically we were concerned with finding $$\boldsymbol{\alpha} \in \mathbb{R}^q$$
+coefficients. The vector $$\boldsymbol y$$ is the (single) right hand side of
+our problem.
+
+Specifically we were concerned with finding $$\boldsymbol{\alpha} \in \mathbb{R}^q$$
 and $$\boldsymbol c \in \mathbb{R}^n$$ such that the weighted sum of 
 squared residuals $$\rho_{WLS}$$ is minimized
 
@@ -85,20 +88,19 @@ $$\begin{eqnarray}
 \end{eqnarray}$$
 
 where $$\boldsymbol W \in \mathbb{R}^{m\times m}$$ is a weighting matrix. 
-We learned that the magic of VarPro is to rewrite the minimization
+We learned that the magic of VarPro is to rewrite the
 problem from a minimization over $$\boldsymbol \alpha$$ _and_ $$\boldsymbol c$$
-to a minimization problem over the nonlinear parameters $$\boldsymbol \alpha$$ _only_
-
+to a minimization over the nonlinear parameters $$\boldsymbol \alpha$$ _only_:
 
 $$ \boldsymbol r_w (\boldsymbol \alpha) = \boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)} \boldsymbol y_w. \label{rw-P-y} \tag{6}$$
 
 The [previous article](/blog/2020/variable-projection-part-1-fundamentals/) goes
-into detail on how the _projection matrix_ $$\boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)}$$
-is calculated. It depends on $$\boldsymbol \Phi(\boldsymbol \alpha)$$ and $$\boldsymbol W$$.
+into detail on how the _projection matrix_ $$\boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)}$$,
+which depends on $$\boldsymbol \Phi(\boldsymbol \alpha)$$ and $$\boldsymbol W$$, is calculated.
 To minimize the squared sum of the residuals, we feed $$\boldsymbol r_w (\boldsymbol \alpha)$$
 into a least squares solver of our choice, like e.g. the Levenberg-Marquardt algorithm.
 We are typically required to provide the Jacobian matrix $$\boldsymbol J(\boldsymbol \alpha)$$
-of the residuals as well. It turns out we can calculate the $$k$$-th column
+of the residuals as well. It turns out, that we can calculate the $$k$$-th column
 $$\boldsymbol j_k$$ of the Jacobian as
 
 $$ \boldsymbol j_k = \frac{\partial \boldsymbol r_w}{\partial \alpha_k} = \frac{\partial\boldsymbol P^\perp_{\boldsymbol \Phi_w(\boldsymbol \alpha)}}{\partial \alpha_k} \boldsymbol y_w, \label{jk} \tag{7}$$
@@ -109,12 +111,12 @@ fitting problem.
 
 # Global Fitting with VarPro
 
-In this section I'll follow the excellent presentation of Bärligea and Hochstaffl
+In this section I'll follow the clear presentation of Bärligea and Hochstaffl
 (Baerligea2023)[^baerligea-extension]. As I said above, this
 article is concerned with fitting separable models to a dataset where the nonlinear
 parameters are shared across the whole dataset, while the linear coefficients
 are allowed to vary across the members of the set. Let's formalize this now. Our
-dataset is an ordered set of vectors for the vector valued right hand sides of the problem:
+dataset is an ordered set of vector valued right hand sides
 $$\left\{\boldsymbol y_s \in \mathbb{R}^m | s=1,\dots,S\right\}$$.
 We'll now collect the members of the dataset into a matrix:
 
@@ -127,8 +129,8 @@ $$\boldsymbol Y
 \in \mathbb{R}^{m \times S}. \label{def-Y} \tag{8}
 $$
 
-Since we allowed the linear coefficients to vary across the data set,
-each member of the dataset has its own vector of linear coefficients $$\boldsymbol c_s$$. We
+Since we allowed the linear coefficients to vary across the dataset,
+each member has its own vector of linear coefficients $$\boldsymbol c_s$$. We
 can also group those into a matrix
 
 $$\boldsymbol C
@@ -159,10 +161,12 @@ $$\begin{eqnarray}
 \boldsymbol y_{w,s} &:=& \boldsymbol W \boldsymbol y_s 
 \end{eqnarray}$$
 
-Note that this implies, that the same weights are applied to each member of
+This implies that the same weights are applied to each member of
 the dataset. Note further, that $$\boldsymbol \alpha$$ and thus $$\boldsymbol \Phi_w(\alpha)$$ are the same
-for each residual vector. Our fitting problem now is to minimize $$\sum_s \lVert r_{w,s} \rVert_2^2$$,
-which we can write in matrix form like so: 
+for each residual vector.
+
+Our fitting problem now is to minimize the sum of squared residual vector 2-norms,
+i.e. $$\sum_s \lVert r_{w,s} \rVert_2^2$$, which we can write in matrix form like so: 
 
 $$\begin{eqnarray}
 &\min_{\boldsymbol \alpha, \boldsymbol C}& \rho_{WLS}(\boldsymbol \alpha, \boldsymbol C) \label{min-rho-mrhs} \tag{12} \\
@@ -174,7 +178,7 @@ $$\begin{eqnarray}
 where $$\boldsymbol Y_w = \boldsymbol W \boldsymbol Y$$ and $$\lVert . \rVert_F$$
 is the [Frobenius Norm](https://mathworld.wolfram.com/FrobeniusNorm.html).
 I have reused the symbol $$\rho_{WLS}$$ for the sum of the squared residuals, since this trivially contains eq.
-$$\eqref{def-rwls}$$ as a special case for a dataset with only one element ($$S = 1$$).
+$$\eqref{def-rwls}$$ as a special case for a dataset with only one member ($$S = 1$$).
 
 Using the ideas of VarPro as presented in the previous article, we can rewrite 
 minimization problem $$\eqref{min-rho-mrhs}$$ into a minimization 
@@ -199,7 +203,7 @@ approaches[^naive-approach] to shoehorn our nice matrix equations into vector fo
 The residual $$\rho_{WLS}$$ in eq. $$\eqref{rho-varpro}$$ is just the squared
 sum of the elements of the matrix $$\boldsymbol R_w$$. It's obvious that
 $$\lVert \boldsymbol R_w (\boldsymbol \alpha) \rVert_F^2$$ is the same as the 
-L2-norm $$\lVert \boldsymbol z_w (\boldsymbol \alpha)\rVert_2^2$$ of a vector
+squared norm $$\lVert \boldsymbol z_w (\boldsymbol \alpha)\rVert_2^2$$ of a vector
 $$\boldsymbol z_w (\boldsymbol \alpha)$$ defined as:
 
 $$
@@ -301,8 +305,8 @@ This limitation enables us to calculate the projection matrix and its derivative
 only once for the whole dataset and brings us substantial computational savings.
 It is pretty straightforward to extend the method presented here to allow a dependency
 on $$s$$, cf. eg. (Baerligea2023). We will then need to 
-recalculate the matrix $$\boldsymbol \Phi_w^{(s)}$$ for every index $$s$$, and also the projection
-matrix and it's derivative. This will cost us some significant compute[^svd-product]
+recalculate the matrix $$\boldsymbol \Phi_w^{(s)}$$ for every index $$s$$, and likewise the
+projection matrix and it's derivative. This will cost us some significant compute[^svd-product]
 but can still beat a purely nonlinear minimization without VarPro (Baerligea2023).
 
 ## More Efficient Solvers
@@ -314,7 +318,8 @@ minimization to a well crafted third party library. We can also switch out the
 minimization backend, by switching to a different library or exchanging the
 underlying algorithm. Usually, VarPro implementations use the Levenberg-Marquardt (LM)
 algorithm for minimization, but any nonlinear least squares solver will do. Bärligea
-actually reports better results with algorithms other than LM (Baerligea2023). 
+actually presents some evidence that solvers other than LM can be more efficient 
+for certain problems (Baerligea2023). 
 
 However, there are some downsides that come with this approach. One problem is
 that both the residual vector and the Jacobian matrix will have $$m\cdot S$$ rows,
