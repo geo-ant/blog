@@ -7,15 +7,15 @@ date: 2024-06-10
 #image: 'BASEURL/assets/blog/img/.png'
 #description:
 #permalink:
-title: 'Coding Wherever: My Fully-Featured Travel Dev Setup for Sea Level to 40,000 feet'
+title: 'Coding Wherever: My Fully-Featured Travel Dev Setup from Sea Level to 40,000 feet'
 #
 #
 # Make sure this image is correct !!!
-og_image: 
+og_image: sea-air.png
 #
 #
 # make sure comments are enabled
-comments_id: 
+comments_id: 61
 math: false
 ---
 
@@ -31,7 +31,10 @@ tablet with a bluetooth keyboard.
 
 # Overview
 
-!!! Insert picture here
+<figure>
+ <img src="/blog/images/travel-coding/sea-air.png" alt="travel setup in action" style="width:100%">
+ <figcaption>Figure 1. Action shots of my trusty (and dusty) tablet at sea level and in front of an airplane window 40,000 feet above the Atlantic.</figcaption>
+</figure>
 
 As you can see, my travel setup demonstrably works from sea level up to at least 40,000 feet.
 I'm pretty sure it would work even higher, and if some billionaire wants to take me up to space
@@ -73,7 +76,7 @@ which is also excellent and can make some steps of this setup even easier[^lsps-
 I just switched over to helix as a matter of personal preference.
 
 To me, the most important thing is having an editor that is keyboard-first, because
-it saves me from using a mouse or my fingers on the screen. Plus the way that
+it saves me from using a mouse or my fingers on the screen. Plus, the way that
 helix or neovim deal with screen real estate is great. There is no unneccessary clutter,
 just the code, which is all the more valuable on a limited tablet display[^sidebar]. 
 Helix also has great LSP-integration which allows it to provide the IDE goodness 
@@ -82,7 +85,10 @@ I'll get back to this in more detail below.
 
 ## The Multiplexer - Tmux
 
-!!! insert image here
+<figure>
+ <img src="/blog/images/travel-coding/tmux-helix.jpg" alt="travel setup in action" style="width:100%">
+ <figcaption>Figure 2. The terminal multiplexer allows me to quickly open (and close) terminal panes as background tabs or even in a new split.</figcaption>
+</figure>
 
 The third pillar of my setup is [tmux](https://github.com/tmux/tmux/wiki), which
 is a terminal multiplexer that allows me (among other things) to add panes to my terminal
@@ -93,7 +99,7 @@ in the spirit of "do one thing well" and the integration with tmux is seamless.
 I usually have two tabs open where I use one for editing in helix and the other
 one for git operations and running my binary or test suite. If I need to see code
 and output together, I open a vertical split and close it as soon as I don't need it
-anymore to save valuable screen real estate. 
+anymore, to save valuable screen real estate. 
 
 Termux, by default, displays some extra keys as a touch keyboard on screen that
 aren't really useful when using a bluetooth keyboard. I suggest to get rid of them as
