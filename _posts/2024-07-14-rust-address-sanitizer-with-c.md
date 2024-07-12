@@ -33,7 +33,7 @@ is written in C++ and exposes its functions via `extern "C"` linkage.
 
 Let's assume that we have the source code of the C or C++ library and we are able
 to rebuild it. Here, we'll use CMake for building, but the specific build system is
-not important as long as we can pass the correct compiler and linker commands
+not important, as long as we can pass the correct compiler and linker flags
 to our library during the build process. Other options are available, this workflow has just
 become a preference for me personally. Finally, I also assume that we are running on x86 Linux,
 since I am not sure what the status of address sanitizer is on Windows and I am too
@@ -42,7 +42,7 @@ lazy to find out right now.
 # The C Library Code
 
 The code in this article contains everything you need to run this example. Thus,
-we'll use some silly example code for both the C and the Rust part, just enough to trigger
+we'll use some silly code for both the C and the Rust part, just enough to trigger
 problems that we can examine with ASan.
 
 ```c
