@@ -11,7 +11,7 @@ title: 'Using Address Sanitizer for a C or C++ Library Linked to a Rust Executab
 #
 #
 # Make sure this image is correct !!!
-og_image: 
+og_image: cpp-asan-rust.png
 #
 #
 # make sure comments are enabled
