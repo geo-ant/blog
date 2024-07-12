@@ -1,129 +1,97 @@
-/*.highlight table td { padding: 5px; }
+.highlight table td { padding: 5px; }
 .highlight table pre { margin: 0; }
 .highlight, .highlight .w {
   color: #fbf1c7;
   background-color: #282828;
-}*/
-
-@import "variables.scss";
-
-div.highlight {
-  color: var(--foreground-color);
-  background-color: var(--code-background);
-  padding: 7px 7px 7px 10px;
-  //border: 1px solid #ddd;
-  //-moz-box-shadow: 3px 3px rgba(0,0,0,0.1);
-  //-webkit-box-shadow: 3px 3px rgba(0,0,0,0.1);
-  //box-shadow: 3px 3px rgba(0,0,0,0.1);
-  margin: 20px 0 20px 0;
-  overflow: scroll;
-  clear: both;
 }
-
-/*
-* Explanations on abbreviations, see:
-* https://gist.github.com/edwardhotchkiss/2005058
-*/
-
 .highlight .err {
   color: #fb4934;
   background-color: #282828;
   font-weight: bold;
 }
-
-/*Comments*/
 .highlight .c, .highlight .ch, .highlight .cd, .highlight .cm, .highlight .cpf, .highlight .c1, .highlight .cs {
-  color: #1d7ca1;
-  //font-style: italic;
-}
-/*Comment. Preproc*/
-.highlight .cp {
-  color: var(--foreground-color);
+  color: #928374;
   font-style: italic;
 }
-/*Name.Tag*/
+.highlight .cp {
+  color: #8ec07c;
+}
 .highlight .nt {
-  color: #BD2C2C;
+  color: #fb4934;
 }
-/*Operator.Word*/
 .highlight .o, .highlight .ow {
-  color: #BD2C2C;
+  color: #fbf1c7;
 }
-/*Punctuation*/
 .highlight .p, .highlight .pi {
-  color: var(--foreground-color);
+  color: #fbf1c7;
 }
-/*Generic.Inserted*/
 .highlight .gi {
   color: #b8bb26;
   background-color: #282828;
 }
-/*Generic.Deleted*/
 .highlight .gd {
   color: #fb4934;
   background-color: #282828;
 }
-/*Generic.Heading*/
 .highlight .gh {
   color: #b8bb26;
   font-weight: bold;
 }
-/*Keywords*/
+.highlight .ge {
+  font-style: italic;
+}
+.highlight .ges {
+  font-weight: bold;
+  font-style: italic;
+}
+.highlight .gs {
+  font-weight: bold;
+}
 .highlight .k, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kv {
-  color: #BD2C2C; /*fb4934*/
+  color: #fb4934;
 }
-/*Keyword.Constant*/
 .highlight .kc {
-  color: #BD2C2C;
+  color: #d3869b;
 }
-/*Keyword.Type*/
 .highlight .kt {
-  color: #BD2C2C;
+  color: #fabd2f;
 }
-/*Keyword.Declaration*/
 .highlight .kd {
-  color: #BD2C2C;
+  color: #fe8019;
 }
-/*Strings*/
-.highlight .s, .highlight .sa, .highlight .sb, .highlight .sc, .highlight .dl, .highlight .sd, .highlight .s2, .highlight .sh, .highlight .sx, .highlight .s1 {
-  color: var(--foreground-color);
+.highlight .s, .highlight .sb, .highlight .sc, .highlight .dl, .highlight .sd, .highlight .s2, .highlight .sh, .highlight .sx, .highlight .s1 {
+  color: #b8bb26;
   font-style: italic;
 }
-/*String.Interpol*/
 .highlight .si {
-  color: var(--foreground-color);
+  color: #b8bb26;
   font-style: italic;
 }
-/*String.Regex*/
 .highlight .sr {
-  color: var(--foreground-color);
+  color: #b8bb26;
   font-style: italic;
 }
-/*String.Escape*/
+.highlight .sa {
+  color: #fb4934;
+}
 .highlight .se {
-  color: var(--foreground-color);
+  color: #fe8019;
 }
-/*Name.Namespace*/
 .highlight .nn {
-  color: var(--foreground-color);
+  color: #8ec07c;
 }
-/*Name.Class*/
 .highlight .nc {
-  color: var(--foreground-color);
+  color: #8ec07c;
 }
-/*Name.Constant*/
 .highlight .no {
-  color: var(--foreground-color);
+  color: #d3869b;
 }
-/*Name.Attribute*/
 .highlight .na {
-  color: var(--foreground-color);
+  color: #b8bb26;
 }
-/*Numbers*/
 .highlight .m, .highlight .mb, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .il, .highlight .mo, .highlight .mx {
-  color: var(--foreground-color);
+  color: #d3869b;
 }
-/*String.Symbol*/
 .highlight .ss {
-  color: var(--foreground-color);
+  color: #83a598;
 }
