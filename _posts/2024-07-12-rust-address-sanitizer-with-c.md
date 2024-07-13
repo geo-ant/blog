@@ -172,7 +172,7 @@ We have now made sure that the static runtime of ASan gets linked to our library
 # Running the Executable With Address Sanitizer
 
 At the time of writing, we need the _nightly_ rust compiler to use Address Sanitizer
-in our programs. So we have to make sure that our project uses the nightly
+in our programs[^stabilize]. So we have to make sure that our project uses the nightly
 toolchain, if it's not already doing that:
 
 ```shell
@@ -278,11 +278,13 @@ where ASan lets the program run much faster than miri.
 
 # Further Reading
 
-* [rust-san](https://github.com/japaric/rust-san): (almost) all the sanitizers for Rust.
+* [Rust documentation](https://doc.rust-lang.org/beta/unstable-book/compiler-flags/sanitizer.html) for sanitizers.
 * [Google's documentation](https://github.com/google/sanitizers/wiki/AddressSanitizer) for Address Sanitizer.
+* [Stabilization PR](https://github.com/rust-lang/rust/pull/123617) for AddressSanitizer and LeakSanitizer in rustc.
 
 # Endnotes
 
 [^static]: The correct term is _static_ or _internal_ linkage. In effect, the function cannot be called from outside the library (or even outside of this particular C File... _compilation unit_... damn you voice in my head!).
 [^ub]: But we cannot rely on that. Accessing an invalid pointer is _undefined behavior_, which can mean any number of things.
 [^target]: Though I have also seen it work without the explicit target, but better safe than sorry.
+[^stabilize]: Sanitizers [may soon be stabilized](https://github.com/rust-fuzz/cargo-fuzz/pull/376), so make sure to check. See also [this stabilization PR](https://github.com/rust-lang/rust/pull/123617). Thanks to u/Shnatsel for [pointing that out](https://www.reddit.com/r/rust/comments/1e1tkpz/comment/lcwkw0g/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button).
