@@ -582,12 +582,42 @@ derivative $$\partial/\partial \theta_k = \partial/\partial p_k$$ for $$k=1,\dot
 and $$\partial/\partial \theta_{N_p+1} = \partial/\partial \sigma$$. That means
 we can write the Fisher information matrix as a block matrix like so:
 
-$$I(\boldsymbol{p},\sigma) = \left(\begin{matrix} \boldsymbol{I}_{PP}(\boldsymbol{p},\sigma) & \boldsymbol{I}_{P\sigma}(\boldsymbol{p},\sigma) \\
-                           \boldsymbol{I}_{P\sigma}(\boldsymbol{p},\sigma) & I_{\sigma\sigma} \\
+$$I(\boldsymbol{p},\sigma) = \left(\begin{matrix} \boldsymbol{I}_{PP}(\boldsymbol{p},\sigma) & \boldsymbol{I}_{PS}(\boldsymbol{p},\sigma) \\
+                           \boldsymbol{I}_{PS}^T(\boldsymbol{p},\sigma) & I_{\sigma\sigma}, \\
 \end{matrix}\right)$$
-                    
 
+with the square matrix $$\boldsymbol{I}_{PP} \in \mathbb{R}^{N_p \times N_p}$$, 
+the column matrix $$\boldsymbol{I}_{PS} \in \mathbb{R}^{N_p\times 1}$$, and the
+scalar entry $$I_{\sigma\sigma} \in \mathbb{R}$$. The elements of the matrices are as follows:
 
+$$\begin{eqnarray}
+[\boldsymbol{I}_{PP}(\boldsymbol{p},\sigma)]_{kl} &=& E\left[ \frac{\partial \mathcal{L}}{\partial p_k} \cdot \frac{\partial \mathcal{L}}{\partial p_l} \right]\\
+[\boldsymbol{I}_{PS}(\boldsymbol{p},\sigma)]_{k1} &=& E\left[ \frac{\partial \mathcal{L}}{\partial p_k} \cdot \frac{\partial \mathcal{L}}{\partial \sigma} \right]\\
+I_{\sigma\sigma}(\boldsymbol{p},\sigma) &=& E\left[ \frac{\partial \mathcal{L}}{\partial \sigma} \cdot \frac{\partial \mathcal{L}}{\partial \sigma} \right]\\
+\end{eqnarray}$$
+
+where we defined $$\mathcal{L}$$ as follows:
+
+$$\begin{eqnarray}
+\mathcal{L}(\boldsymbol{p},\sigma) &:=& \log P(\boldsymbol{y}|\boldsymbol{p},\sigma) \\
+ &=& -N_y\log\sigma-\frac{1}{2\sigma^2}\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2}+\text{const.}, \\
+\end{eqnarray}$$
+
+which means we can calculate the partial derivatives like so:
+
+$$\begin{eqnarray}                    
+\frac{\partial \mathcal{L}}{\partial \sigma} (\boldsymbol{p},\sigma) &=& -\frac{N_y}{\sigma}+\frac{1}{\sigma^3}\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2}\\
+\frac{\partial \mathcal{L}}{\partial p_k} (\boldsymbol{p},\sigma) &=& \frac{1}{\sigma^2}\sum_j \frac{y_j-f_j(\boldsymbol{p})}{w_j^2}\cdot\frac{\partial f_j}{\partial p_k}(\boldsymbol{p}).
+\end{eqnarray}$$
+
+Now let's first calculate the elements of the matrices starting with the single
+scalar entry $$I_{\sigma\sigma}$$.
+
+## B.1 Calculating $$I_{\sigma\sigma}$$
+
+## B.2 Calculating $$[I_{PS}]_{k1}$$
+
+## B.3 Calculating $$[I_{PP}]_{kl}$$
 
 
 !!!!!!!!!!!!!! todo
