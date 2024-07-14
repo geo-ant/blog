@@ -362,7 +362,7 @@ have to calculate $$L(\boldsymbol{p})$$ and its Hessian at the best fit paramete
 
 $$L(\boldsymbol{p}) = -\log P(\boldsymbol{p}|\boldsymbol{y}) = \frac{N_y-1}{2} \log \lVert \boldsymbol{r}(\boldsymbol{p})\rVert^2. \label{L-uniform}\tag{4.10}$$ 
 
-After some calculations (which I have relegated to the appendix), we see that
+After some calculations (which I have relegated to Appendix A), we see that
 we can approximate the Hessian as
 
 $$\boldsymbol{H}_L(\boldsymbol{p}^\dagger)\approx \frac{2}{\lVert \boldsymbol{r}(\boldsymbol{p}) \rVert^2}\boldsymbol{J}^T_{r_w}(\boldsymbol{p}^\dagger) \boldsymbol{J}_{r_w}(\boldsymbol{p}^\dagger) \label{hessian-uniform}\tag{4.11},$$
@@ -582,17 +582,17 @@ derivative $$\partial/\partial \theta_k = \partial/\partial p_k$$ for $$k=1,\dot
 and $$\partial/\partial \theta_{N_p+1} = \partial/\partial \sigma$$. That means
 we can write the Fisher information matrix as a block matrix like so:
 
-$$I(\boldsymbol{p},\sigma) = \left(\begin{matrix} \boldsymbol{I}_{PP}(\boldsymbol{p},\sigma) & \boldsymbol{I}_{PS}(\boldsymbol{p},\sigma) \\
-                           \boldsymbol{I}_{PS}^T(\boldsymbol{p},\sigma) & I_{\sigma\sigma}, \\
-\end{matrix}\right)$$
+$$I(\boldsymbol{p},\sigma) = \left(\begin{matrix} \boldsymbol{I}_{PP}(\boldsymbol{p},\sigma) & \boldsymbol{v}_{PS}(\boldsymbol{p},\sigma) \\
+                           \boldsymbol{v}_{PS}^T(\boldsymbol{p},\sigma) & I_{\sigma\sigma}, \\
+\end{matrix}\right)\in \mathbb{R}^{N_p+1 \;\times\; N_p+1}$$
 
 with the square matrix $$\boldsymbol{I}_{PP} \in \mathbb{R}^{N_p \times N_p}$$, 
-the column matrix $$\boldsymbol{I}_{PS} \in \mathbb{R}^{N_p\times 1}$$, and the
+the column vector $$\boldsymbol{v}_{PS} \in \mathbb{R}^{N_p\times}$$, and the
 scalar entry $$I_{\sigma\sigma} \in \mathbb{R}$$. The elements of the matrices are as follows:
 
 $$\begin{eqnarray}
 [\boldsymbol{I}_{PP}(\boldsymbol{p},\sigma)]_{kl} &=& E\left[ \frac{\partial \mathcal{L}}{\partial p_k} \cdot \frac{\partial \mathcal{L}}{\partial p_l} \right]\\
-[\boldsymbol{I}_{PS}(\boldsymbol{p},\sigma)]_{k1} &=& E\left[ \frac{\partial \mathcal{L}}{\partial p_k} \cdot \frac{\partial \mathcal{L}}{\partial \sigma} \right]\\
+[\boldsymbol{v}_{PS}(\boldsymbol{p},\sigma)]_k &=& E\left[ \frac{\partial \mathcal{L}}{\partial p_k} \cdot \frac{\partial \mathcal{L}}{\partial \sigma} \right]\\
 I_{\sigma\sigma}(\boldsymbol{p},\sigma) &=& E\left[ \frac{\partial \mathcal{L}}{\partial \sigma} \cdot \frac{\partial \mathcal{L}}{\partial \sigma} \right]\\
 \end{eqnarray}$$
 
@@ -616,14 +616,13 @@ scalar entry $$I_{\sigma\sigma}$$.
 ## B.1 Calculating $$I_{\sigma\sigma}$$
 $$\begin{eqnarray}
 I_{\sigma\sigma} &=& E\left[ \left( \frac{-N_y\sigma^2+\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2}}{\sigma^3} \right)^2 \right]\\
- &=& \frac{1}{\sigma^6} E \left[ \sum_{i,j} \frac{(y_i-f_i(\boldsymbol{p}))^2 (y_j-f_j(\boldsymbol{p}))^2}{w_i^2 w_j^2}  \right] - \frac{2 N_y}{\sigma^4} E\left[\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2}\right]+\frac{N_y^2}{\sigma^2} E[1] 
- &=&
+ &=& \frac{1}{\sigma^6} E \left[ \sum_{i,j} \frac{(y_i-f_i(\boldsymbol{p}))^2 (y_j-f_j(\boldsymbol{p}))^2}{w_i^2 w_j^2}  \right] - \frac{2 N_y}{\sigma^4} E\left[\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2}\right]+\frac{N_y^2}{\sigma^2} E[1] .
 \end{eqnarray}$$
 
 The key to calculate that the expectected values inside the sums are, is to
-understand that the $$y_j$$ are independent random variables with Gaussian
-distributions centered around a mean value $$\mu_j = f_j(\boldsymbol{p})$$
-and with a standard deviation of $$\sigma_j = w_j \sigma$$. This allows us
+understand that the $$y_j-f_j(\boldsymbol{p})$$ are independent variables, with Gaussian
+distributions centered around a mean value $$\mu_j = 0$$
+and with a standard deviation of $$\sigma_j = w_j \sigma$$. That means This allows us
 to write:
 
 $$\begin{eqnarray}
@@ -633,7 +632,7 @@ $$\begin{eqnarray}
 &=& \sum_{i} \frac{3\sigma_i^4}{w_i^4} + \sum_{i,j; i\neq j} \frac{\sigma_i^2 \sigma_j^2}{w_i^2 w_j^2} 
 = 3\sigma^4 \,\sum_{i} 1+ \sigma^4 \sum_{i,j; i\neq j} 1 
 = 3 N_y\sigma^4 + \sigma^4 (N_y^2 - N_y) \\
- &=& 2 N_y \sigma^4 + N_y^2 \sigma^4 \\
+ &=& 2 N_y \sigma^4 + N_y^2 \sigma^4, \\
 \end{eqnarray}$$
 
 where we have used the facts that:
@@ -642,8 +641,27 @@ where we have used the facts that:
 is the product of the expected values,
 * the second [central moment](https://en.wikipedia.org/wiki/Normal_distribution#Moments)
 of a Gaussian is its variance and the fourth central moment is three times the variance.
+The latter argument allows us to calculate the second term:
 
-## B.2 Calculating $$[I_{PS}]_{k1}$$
+$$\begin{eqnarray}
+E\left[\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2}\right] &=&\sum_j \frac{E[(y_j-f_j(\boldsymbol{p}))^2]}{w_j^2} \\ 
+&=& \sum_j \frac{w_j^2\sigma^2}{w_j^2} = N_y \sigma^2.\\ 
+\end{eqnarray}$$
+
+Since $$E[1]=1$$, we can put everyting togeter to obtain
+
+$$I_{\sigma\sigma}=\frac{2 N_y+N_y^2-2N_y^2+N_y^2}{\sigma^2}=2\frac{N_y}{\sigma^2}.$$
+
+
+## B.2 Calculating $$[v_{PS}]_{k1}$$
+
+The elements of the column vector $$\boldsymbol{v}_{PS}$$ are calculated as:
+
+$$\begin{eqnarray}
+[\boldsymbol{v}_{PS}]_k &=& E\left[ \left(-\frac{N_y}{\sigma}+\frac{1}{\sigma^3}\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2} \right)\cdot \left(\frac{1}{\sigma^2}\sum_j \frac{y_j-f_j(\boldsymbol{p})}{w_j^2}\cdot\frac{\partial f_j}{\partial p_k}(\boldsymbol{p}) \right) \right] \\
+ &=& -\frac{N_y}{\sigma^3}\sum_j \frac{E[y_j-f_j(\boldsymbol{p})]}{w_j^2}\cdot\frac{\partial f_j}{\partial p_k}(\boldsymbol{p})  \\
+ &\;& + \frac{1}{\sigma^5}\sum_{i,j} !!!!!!!!!!!!!TODO!!!!!!!!!!!!!!!
+\end{eqnarray}$$
 
 ## B.3 Calculating $$[I_{PP}]_{kl}$$
 
