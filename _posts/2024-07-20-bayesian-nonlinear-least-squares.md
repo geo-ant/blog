@@ -614,6 +614,34 @@ Now let's first calculate the elements of the matrices starting with the single
 scalar entry $$I_{\sigma\sigma}$$.
 
 ## B.1 Calculating $$I_{\sigma\sigma}$$
+$$\begin{eqnarray}
+I_{\sigma\sigma} &=& E\left[ \left( \frac{-N_y\sigma^2+\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2}}{\sigma^3} \right)^2 \right]\\
+ &=& \frac{1}{\sigma^6} E \left[ \sum_{i,j} \frac{(y_i-f_i(\boldsymbol{p}))^2 (y_j-f_j(\boldsymbol{p}))^2}{w_i^2 w_j^2}  \right] - \frac{2 N_y}{\sigma^4} E\left[\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2}\right]+\frac{N_y^2}{\sigma^2} E[1] 
+ &=&
+\end{eqnarray}$$
+
+The key to calculate that the expectected values inside the sums are, is to
+understand that the $$y_j$$ are independent random variables with Gaussian
+distributions centered around a mean value $$\mu_j = f_j(\boldsymbol{p})$$
+and with a standard deviation of $$\sigma_j = w_j \sigma$$. This allows us
+to write:
+
+$$\begin{eqnarray}
+&E& \left[ \sum_{i,j} \frac{(y_i-f_i(\boldsymbol{p}))^2 (y_j-f_j(\boldsymbol{p}))^2}{w_i^2 w_j^2}  \right] = \sum_{i,j} \frac{E\left[(y_i-f_i(\boldsymbol{p}))^2 (y_j-f_j(\boldsymbol{p}))^2\right]}{w_i^2 w_j^2} \\
+&=& \sum_{i,j; i=j} \frac{E\left[(y_i-f_i(\boldsymbol{p}))^2 (y_j-f_j(\boldsymbol{p}))^2\right]}{w_i^2 w_j^2} + \sum_{i,j; i\neq j} \frac{E\left[(y_i-f_i(\boldsymbol{p}))^2 (y_j-f_j(\boldsymbol{p}))^2\right]}{w_i^2 w_j^2} \\
+&=& \sum_{i} \frac{E\left[(y_i-f_i(\boldsymbol{p}))^4\right]}{w_i^4} + \sum_{i,j; i\neq j} \frac{E\left[(y_i-f_i(\boldsymbol{p}))^2\right] E\left[(y_j-f_j(\boldsymbol{p}))^2\right]}{w_i^2 w_j^2} \\
+&=& \sum_{i} \frac{3\sigma_i^4}{w_i^4} + \sum_{i,j; i\neq j} \frac{\sigma_i^2 \sigma_j^2}{w_i^2 w_j^2} 
+= 3\sigma^4 \,\sum_{i} 1+ \sigma^4 \sum_{i,j; i\neq j} 1 
+= 3 N_y\sigma^4 + \sigma^4 (N_y^2 - N_y) \\
+ &=& 2 N_y \sigma^4 + N_y^2 \sigma^4 \\
+\end{eqnarray}$$
+
+where we have used the facts that:
+
+* the expected value of the product of statistically independent random variables
+is the product of the expected values,
+* the second [central moment](https://en.wikipedia.org/wiki/Normal_distribution#Moments)
+of a Gaussian is its variance and the fourth central moment is three times the variance.
 
 ## B.2 Calculating $$[I_{PS}]_{k1}$$
 
@@ -628,6 +656,6 @@ scalar entry $$I_{\sigma\sigma}$$.
 [^log-likelihood]: Maximizing the posterior is the same as minimizing the negative logarithm of the posterior $$L(p)=-\log\,P(p\vert y)$$, which leads us again to the least squares minimization expression at the start of the article.
 [^gsl-weights]: Note that they use a slightly different definition for the weight matrix. The meaning is equivalent, but they don't square the weight matrix with the residual, so that it appears differently in the formulae.
 [^prop-uncertainty]: The formula for propagation of uncertainty is also derived under the approximation of linearity of the transformation.
-[^exercise-reader]: Finally I have an opportunity to be the one writing it.
+[^exercise-reader]: Finally, I have an opportunity to be the one writing that sentence.
 [^ignorance]: Priors conveying ignorance are actually surprisingly tricky. We'll see another one of those that has a vastly different functional form later.
 [^conf-bands]: Credible intervals are not (quite) the same as [confidence bands](https://en.wikipedia.org/wiki/Confidence_and_prediction_bands). The former are a Bayesian concept, while the latter are a frequentist concept. Both serve a conceptually similar purpose.
