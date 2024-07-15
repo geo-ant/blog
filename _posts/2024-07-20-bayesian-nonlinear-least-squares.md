@@ -378,9 +378,9 @@ covariance matrix, but I'll say it in a dedicated section further below. Next,
 let's see how the choice of prior influences our estimation of the covariance
 matrix of the best fit parameters.
 
-## 4.2 Jeffrey's Prior
+## 4.2 Jeffreys' Prior
 
-[Jeffrey's prior](https://en.wikipedia.org/wiki/Jeffreys_prior) is another commonly
+[Jeffreys' prior](https://en.wikipedia.org/wiki/Jeffreys_prior) is another commonly
 used prior distribution that conveys gross ignorance about the scale of unknown
 parameters (Gel13, sections 2.8, 3.2).
 
@@ -556,10 +556,11 @@ $$
 
 Now  $$\eqref{hessian-uniform}$$ follows trivially.
 
-## B. Calculating Jeffrey's Prior
+## B. Calculating Jeffreys' Prior
 
-To calculate [Jeffrey's prior](https://en.wikipedia.org/wiki/Jeffreys_prior), we
-first have to calculate the Fisher information matrix. For a given likelihood
+To calculate [Jeffreys' prior](https://en.wikipedia.org/wiki/Jeffreys_prior) for
+the likelihood in $$\eqref{posterior-rel-sigma-r2}$$, we
+have to calculate the Fisher information matrix. For a given likelihood
 $$P(\boldsymbol{y}|\boldsymbol{\theta})$$, where $$\boldsymbol{\theta}$$
 are the parameters, the elements of the [Fisher information matrix](https://en.wikipedia.org/wiki/Fisher_information#Matrix_form)
 $$\boldsymbol{I}(\boldsymbol{\theta}$$ are given as:
@@ -623,7 +624,7 @@ The key to calculate that the expectected values inside the sums are, is to
 understand that the $$y_j-f_j(\boldsymbol{p})$$ are independent variables, with Gaussian
 distributions centered around a mean value $$\mu_j = 0$$
 and with a standard deviation of $$\sigma_j = w_j \sigma$$. That means This allows us
-to write:
+to write the first term of the sum:
 
 $$\begin{eqnarray}
 &E& \left[ \sum_{i,j} \frac{(y_i-f_i(\boldsymbol{p}))^2 (y_j-f_j(\boldsymbol{p}))^2}{w_i^2 w_j^2}  \right] = \sum_{i,j} \frac{E\left[(y_i-f_i(\boldsymbol{p}))^2 (y_j-f_j(\boldsymbol{p}))^2\right]}{w_i^2 w_j^2} \\
@@ -640,8 +641,11 @@ where we have used the facts that:
 * the expected value of the product of statistically independent random variables
 is the product of the expected values,
 * the second [central moment](https://en.wikipedia.org/wiki/Normal_distribution#Moments)
-of a Gaussian is its variance and the fourth central moment is three times the variance.
-The latter argument allows us to calculate the second term:
+of a Gaussian is its variance $$E[(y_j-f_j(\boldsymbol{p})^2]=\sigma_j^2=w_j^2\sigma^2$$.
+* the fourth central moment is $$E[(y_j-f_j(\boldsymbol{p})^4]=3\sigma_j^2=3 w_j^2\sigma^2$$
+
+We also use this to calculate those arguments to calculate the next term in
+the sum for $$I_{\sigma\sigma}$$:
 
 $$\begin{eqnarray}
 E\left[\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2}\right] &=&\sum_j \frac{E[(y_j-f_j(\boldsymbol{p}))^2]}{w_j^2} \\ 
@@ -660,13 +664,73 @@ The elements of the column vector $$\boldsymbol{v}_{PS}$$ are calculated as:
 $$\begin{eqnarray}
 [\boldsymbol{v}_{PS}]_k &=& E\left[ \left(-\frac{N_y}{\sigma}+\frac{1}{\sigma^3}\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2} \right)\cdot \left(\frac{1}{\sigma^2}\sum_j \frac{y_j-f_j(\boldsymbol{p})}{w_j^2}\cdot\frac{\partial f_j}{\partial p_k}(\boldsymbol{p}) \right) \right] \\
  &=& -\frac{N_y}{\sigma^3}\sum_j \frac{E[y_j-f_j(\boldsymbol{p})]}{w_j^2}\cdot\frac{\partial f_j}{\partial p_k}(\boldsymbol{p})  \\
- &\;& + \frac{1}{\sigma^5}\sum_{i,j} !!!!!!!!!!!!!TODO!!!!!!!!!!!!!!!
+ &\;& + \frac{1}{\sigma^5}\sum_{i,j} \frac{E[(y_j-f_j(\boldsymbol{p}))^2 \cdot (y_i-f_i)]}{w_i^2 w_j^2} \\
+ &=& 0 + \frac{1}{\sigma^5}\sum_{i,j;i=j} \frac{E[(y_j-f_j(\boldsymbol{p}))^2 \cdot (y_i-f_i)]}{w_i^2 w_j^2} + \frac{1}{\sigma^5}\sum_{i,j;i\neq j} \frac{E[(y_j-f_j(\boldsymbol{p}))^2 \cdot (y_i-f_i)]}{w_i^2 w_j^2} \\
+ &=& 0 + \frac{1}{\sigma^5}\sum_{j} \frac{E[(y_j-f_j(\boldsymbol{p}))^3]}{w_i^2 w_j^2} + \frac{1}{\sigma^5}\sum_{i,j;i\neq j} \frac{E[(y_j-f_j(\boldsymbol{p}))^2 \cdot (y_i-f_i)]}{w_i^2 w_j^2} \\
+ &=& 0 + 0 + \frac{1}{\sigma^5}\sum_{i,j;i\neq j} \frac{E[(y_j-f_j(\boldsymbol{p}))^2 \cdot (y_i-f_i)]}{w_i^2 w_j^2} \\
+ &=& 0 + 0 + \frac{1}{\sigma^5}\sum_{i,j;i\neq j} \frac{E[(y_j-f_j(\boldsymbol{p}))^2] \cdot E[(y_i-f_i)]}{w_i^2 w_j^2} \\
+ &=& 0 + 0 + 0 = 0,
 \end{eqnarray}$$
+
+where we again have used the rule about the expected value of independent
+random variables and the facts that the expected value $$E[y_j-f_j(\boldsymbol{p})]=0$$,
+and the third central moment of a Gaussian is $$E[(y_j-f_j(\boldsymbol{p}))^3]=0$$.
+
+This result already implies that the Fisher information matrix has a block-diagonal
+structure.
 
 ## B.3 Calculating $$[I_{PP}]_{kl}$$
 
+Now for the final piece of the Fisher information matrix:
 
-!!!!!!!!!!!!!! todo
+$$\begin{eqnarray}
+[\boldsymbol{I}_{PP}(\boldsymbol{p},\sigma)]_{kl} &=& E\left[\left(\frac{1}{\sigma^2}\sum_j \frac{y_j-f_j(\boldsymbol{p})}{w_j^2}\frac{\partial f_j(\boldsymbol{p})}{\partial p_k}\right)\cdot\left(\frac{1}{\sigma^2}\sum_i \frac{y_i-f_i(\boldsymbol{p})}{w_j^2}\frac{\partial f_i(\boldsymbol{p})}{\partial p_l}\right)\right] \\
+ &=& \frac{1}{\sigma^4} \sum_{i,j} \frac{\partial f_j(\boldsymbol{p})}{\partial p_k}\frac{\partial f_i(\boldsymbol{p})}{\partial p_l} \frac{1}{w_i^2 w_j^2} E[(y_j-f_j(\boldsymbol{p}))(y_i-f_i(\boldsymbol{p}))]
+\end{eqnarray}$$
+
+We recognize the $$E[(y_j-f_j(\boldsymbol{p}))(y_i-f_i(\boldsymbol{p}))]=\sigma_{ij}$$ as the
+covariance of $$y_i$$, $$y_j$$. Since we assume statistical independence, we can
+write this as
+
+$$\sigma_{ij} = \left\{
+\begin{matrix} \sigma_j^2 &; j = i \\
+               0 &; j \neq i .\\
+\end{matrix} \right. $$
+
+And since we know $$\sigma_j = w_j \sigma$$, it follows that
+
+$$\begin{eqnarray}
+[\boldsymbol{I}_{PP}(\boldsymbol{p},\sigma)]_{kl} &=& \frac{1}{\sigma^2} \sum_{j} \frac{\partial f_j(\boldsymbol{p})}{\partial p_k}\frac{1}{w_j^2} \frac{\partial f_i(\boldsymbol{p})}{\partial p_l} \\
+ &=& \frac{1}{\sigma^2} \left[ \boldsymbol{J}_f^T(\boldsymbol{p}) (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f(\boldsymbol{p}) \right]_{kl}
+\end{eqnarray}$$
+
+where $$\boldsymbol{J}_f$$ is the Jacobian of $$f$$ and $$\boldsymbol{W}$$ is the
+weight matrix as defined in eq. $$\eqref{relative-weights-matrix}$$.
+
+## Jeffreys' Prior from the Fisher Information Matrix
+
+Now, putting it all together, our Fisher information matrix looks like this:
+
+$$\boldsymbol{I}(\boldsymbol{p},\sigma) =
+\frac{1}{\sigma^2}
+\left(
+\begin{matrix}
+ \boldsymbol{J}_f^T(\boldsymbol{p}) (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f(\boldsymbol{p}) & \boldsymbol{0} \\
+ \boldsymbol{0} &  2 N_y\\
+\end{matrix}
+\right)$$
+
+Jeffreys' prior is calculated as the square root of the determinant of the Fisher
+information matrix. Using the rules for the determinants of [scaled matrices](https://en.wikipedia.org/wiki/Determinant#Immediate_consequences)
+and for [block diagonal matrices](https://en.wikipedia.org/wiki/Determinant#Block_matrices),
+we can calculate it as:
+
+$$\begin{eqnarray}
+P(\boldsymbol{p},\sigma) &\propto& \sqrt{\text{det}\boldsymbol{I}(\boldsymbol{p},\sigma)}\\
+ &\propto& \frac{1}{\sigma^{N_p+1}} \sqrt{\text{det}\boldsymbol{J}_f^T(\boldsymbol{p}) (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f(\boldsymbol{p})},
+\end{eqnarray}$$ 
+
+where we have dropped all factors that do not depend on $$\boldsymbol{p}$$ or $$\sigma$$.
 
 # Endnotes
 [^a-posteriori]: Maximizing the likelihood is the equivalent to maximizing the posterior probability, given uniform priors.
