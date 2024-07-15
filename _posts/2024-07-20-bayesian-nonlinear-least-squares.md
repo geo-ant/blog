@@ -382,7 +382,49 @@ matrix of the best fit parameters.
 
 [Jeffreys' prior](https://en.wikipedia.org/wiki/Jeffreys_prior) is another commonly
 used prior distribution that conveys gross ignorance about the scale of unknown
-parameters (Gel13, sections 2.8, 3.2).
+parameters (Gel13, sections 2.8, 3.2). After performing the necessary calculations,
+which are tedious and therefore relegated to Appendix B, we obtain this prior
+as:
+
+$$
+P(\boldsymbol{p},\sigma) \propto \frac{1}{\sigma^{N_p+1}} \sqrt{\text{det}\boldsymbol{J}_f^T(\boldsymbol{p}) (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f(\boldsymbol{p})} \label{jeffreys-prior}\tag{4.13},
+$$
+
+where $$\boldsymbol{J}_f$$ is the Jacobian of $$f$$ and $$\boldsymbol{W}$$ is the
+weight matrix as defined in eq. $$\eqref{relative-weights-matrix}$$. To obtain the
+posterior, we can again [use Wolfram Alpha](https://www.wolframalpha.com/input?i=int%281%2Fsigma%5E%28N%2BM%2B1%29*exp%28-1%2F%282*sigma%5E2%29*+r%5E2%29%29):
+
+$$
+P(\boldsymbol{p}|\boldsymbol{y}) \propto  \sqrt{\text{det}\boldsymbol{J}_f^T(\boldsymbol{p}) (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f(\boldsymbol{p})} \cdot (\lVert\boldsymbol{r}_w(\boldsymbol{p})\rVert^2)^{-\frac{N+M}{2}}. \label{posterior-jeffreys}\tag{4.14}
+$$
+
+Strictly speaking that is all we can say about the posterior, since the first
+factor also depends on $$\boldsymbol{p}$$. However, there are a few assumptions we
+can make to approximate the posterior. 
+
+The second factor in eq. $$\eqref{posterior-jeffreys}$$ will typically be a very sharp
+peak around the least squares estimate $$\boldsymbol{p}^\dagger$$.
+At least for a sufficienly large number of data points. Notice that 
+$$\boldsymbol{J}_f^T (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f$$
+is approximately $$\boldsymbol{W}^2 \boldsymbol{H}_f$$, due to the diagonal structure
+of $$\boldsymbol{W}$$, where $$\boldsymbol{H}_f$$ is the Hessian of $$f$$. It is 
+reasonable to assume that for most well-behaved functions, the determinant of the
+Hessian won't exhibit a behavior that substantially alters the shape of the posterior.
+This is consistent with the fact that Jeffreys's prior is a _noninformative_ prior,
+which means that it should not greatly alter the value of the _maximum a posteriori_
+estimate, compared to the value of the maximum likelihood estimate (Gel13, sections 2.8, 3.2).
+Since the second term is likely a narrow peak around $$\boldsymbol{p}^\dagger$$,
+we can approximate the value $$\boldsymbol{J}_f^T (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f$$
+by its value at $$\boldsymbol{p}^\dagger$$, which makes it a constant. This finally
+leads us to an approximation of the posterior around $$\boldsymbol{p}^\dagger$$
+as:
+
+$$
+P(\boldsymbol{p}|\boldsymbol{y}) \approx K'' \cdot (\lVert\boldsymbol{r}_w(\boldsymbol{p})\rVert^2)^{-\frac{N+M}{2}}, \label{posterior-jeffreys-approx}\tag{4.15}
+$$
+
+where all constants of proportionality were absorbed into $$K''$$.
+
 
 !!!
 As I mentioned before,
