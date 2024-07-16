@@ -282,7 +282,7 @@ $$\sigma_j = w_j \, \sigma, \label{relative-scaling} \tag{4.1} $$
 where $$\sigma\in\mathbb{R}$$ is unknown, but the relative scaling $$w_j$$ _is_ known. We'll
 see that the naming of $$w_j$$ is not an accident, because if we set
 
-$$\boldsymbol{W} = \text{diag}(w_1,\dots,w_{N_y}) \label{relative-weights-matrix}\tag{4.2}, $$
+$$\boldsymbol{W} = \text{diag}(1/w_1,\dots,1/w_{N_y}) \label{relative-weights-matrix}\tag{4.2}, $$
 
 then we can rewrite the posterior as:
 
@@ -387,7 +387,7 @@ which are tedious and therefore relegated to Appendix B, we obtain this prior
 as:
 
 $$
-P(\boldsymbol{p},\sigma) \propto \frac{1}{\sigma^{N_p+1}} \sqrt{\text{det}\boldsymbol{J}_f^T(\boldsymbol{p}) (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f(\boldsymbol{p})} \label{jeffreys-prior}\tag{4.13},
+P(\boldsymbol{p},\sigma) \propto \frac{1}{\sigma^{N_p+1}} \sqrt{\text{det}\boldsymbol{J}_f^T(\boldsymbol{p}) \boldsymbol{W}^T \boldsymbol{W} \boldsymbol{J}_f(\boldsymbol{p})} \label{jeffreys-prior}\tag{4.13},
 $$
 
 where $$\boldsymbol{J}_f$$ is the Jacobian of $$f$$ and $$\boldsymbol{W}$$ is the
@@ -395,7 +395,7 @@ weight matrix as defined in eq. $$\eqref{relative-weights-matrix}$$. To obtain t
 posterior, we can again [use Wolfram Alpha](https://www.wolframalpha.com/input?i=int%281%2Fsigma%5E%28N%2BM%2B1%29*exp%28-1%2F%282*sigma%5E2%29*+r%5E2%29%29):
 
 $$
-P(\boldsymbol{p}|\boldsymbol{y}) \propto  \sqrt{\text{det}\boldsymbol{J}_f^T(\boldsymbol{p}) (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f(\boldsymbol{p})} \cdot (\lVert\boldsymbol{r}_w(\boldsymbol{p})\rVert^2)^{-\frac{N+M}{2}}. \label{posterior-jeffreys}\tag{4.14}
+P(\boldsymbol{p}|\boldsymbol{y}) \propto  \sqrt{\text{det}\boldsymbol{J}_f^T(\boldsymbol{p}) \boldsymbol{W}^T \boldsymbol{W} \boldsymbol{J}_f(\boldsymbol{p})} \cdot (\lVert\boldsymbol{r}_w(\boldsymbol{p})\rVert^2)^{-\frac{N+M}{2}}. \label{posterior-jeffreys}\tag{4.14}
 $$
 
 Strictly speaking that is all we can say about the posterior, since the first
@@ -415,22 +415,139 @@ which means that it should not greatly alter the value of the _maximum a posteri
 estimate, compared to the value of the maximum likelihood estimate (Gel13, sections 2.8, 3.2).
 Since the second term is likely a narrow peak around $$\boldsymbol{p}^\dagger$$,
 we can approximate the value $$\boldsymbol{J}_f^T (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f$$
-by its value at $$\boldsymbol{p}^\dagger$$, which makes it a constant. This finally
+by its value at $$\boldsymbol{p}^\dagger$$, a constant. This finally
 leads us to an approximation of the posterior around $$\boldsymbol{p}^\dagger$$
 as:
 
 $$
-P(\boldsymbol{p}|\boldsymbol{y}) \approx K'' \cdot (\lVert\boldsymbol{r}_w(\boldsymbol{p})\rVert^2)^{-\frac{N+M}{2}}, \label{posterior-jeffreys-approx}\tag{4.15}
+P(\boldsymbol{p}|\boldsymbol{y}) \approx K^\dagger \cdot (\lVert\boldsymbol{r}_w(\boldsymbol{p})\rVert^2)^{-\frac{N+M}{2}}, \label{posterior-jeffreys-approx}\tag{4.15}
 $$
 
-where all constants of proportionality were absorbed into $$K''$$.
+where we've absorbed all constants of proportionality into $$K^\dagger$$. Now,
+using Laplace's Approximation again, we can approximate the posterior as a normal
+distribution with the following covariance matrix:
+
+$$\boldsymbol{C}_{p^\dagger} \approx \frac{\lVert \boldsymbol{r}(\boldsymbol{p^\dagger})\rVert^2}{N_y+N_p} (\boldsymbol{J}^T_{r_w}(\boldsymbol{p}^\dagger) \boldsymbol{J}_{r_w}(\boldsymbol{p}^\dagger))^{-1}. \label{cov-jeffreys}\tag{4.15}$$
+
+Calculating the Hessian works analogous to the calculations in Appendix A. We'll
+summarize and discuss the results so far in the next section.
 
 
-!!!
-As I mentioned before,
+# 5. Summary: Posteriors, Best Parameters, and Covariances
 
-# 5. !!!!!!!!!!! summary section relating lsqr to bayesian coeff via a table or something
-# !!! prefactor sigma-dash and weight matrix for different assumptions
+Okay, now let's take a step back and see how our results can be summarized and
+examine how our results are linked to the least squares fitting approach from
+our introductory section. We have approximated all our posteriors in the form 
+of Normal distributions
+
+$$P(\boldsymbol{p}|\boldsymbol{y}) \approx K' \cdot \exp\left(-\frac{1}{2} (\boldsymbol{p}-\boldsymbol{p}^\star)^T\, \boldsymbol{C}_{p^\dagger}^{-1} (\boldsymbol{p}-\boldsymbol{p}^\star) \right),\label{posterior-approximation-generalized}\tag{5.1}$$
+
+with appropriate constants $$K'$$. The _maximum a posteriori_ estimate for all
+cases was given as the minimizer of the sum of squared residuals eq. $$\eqref{lsqr-fitting}$$:
+
+$$ \boldsymbol{p}^\dagger = \arg\min_{\boldsymbol{p}} \frac{1}{2} \lVert W \left(\boldsymbol{y} - \boldsymbol{f}(\boldsymbol{p})\right) \rVert^2 \tag{5.2},$$
+
+where the choice of the weight matrix $$\boldsymbol{W} \in \mathbb{R}^{N_y \times N_y}$$
+depends on our choice of prior. We have also calculated the covariance matrices
+for the best fit parameters $$\boldsymbol{p}^\dagger$$, which were different for
+different priors. However, all of them can be generalized as
+
+$$\boldsymbol{C}_{p^\dagger} \approx \hat{\sigma}^2 \, (\boldsymbol{J}^T_{r_w}(\boldsymbol{p}^\dagger) \boldsymbol{J}_{r_w}(\boldsymbol{p}^\dagger))^{-1} = \hat{\sigma}^2 \, (\boldsymbol{J}_f^T(\boldsymbol{p}^\dagger) \; \boldsymbol{W}^T\boldsymbol{W} \;\boldsymbol{J}_f(\boldsymbol{p}^\dagger)) , \label{cov-sigmat-hat}\tag{5.3}$$
+
+with a scalar $$\hat{\sigma}^2 \in \mathbb{R}$$ depending on our choice of prior. As before,
+$$\boldsymbol{J}_{r_w}$$ is the Jacobian of $$\boldsymbol{r}_w$$ and
+$$\boldsymbol{J}_{f}=-\boldsymbol{J}_{r_w}$$ is the Jacobian of the model function
+$$\boldsymbol{f}(\boldsymbol{p})$$. The following table shows how the weight
+matrix and the factor $$\hat{\sigma}^2$$ are related to our choice of prior:
+
+<table>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            caption-side: bottom; /* Position the caption at the bottom */
+        }
+        caption {
+            text-align: left;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+	<tbody>
+		<tr>
+			<th><b>Prior Knowledge of Std Devs.</b></th>
+			<th>$$\hat{\sigma}^2$$</th>
+			<th>$$\boldsymbol{W}$$</th>
+			<th><b>Remarks</b></th>
+		</tr>
+		<tr>
+			<td>Known</td>
+			<td>\(1\)</td>
+			<td>\(\text{diag}(1/\sigma_1,\dots,1/\sigma_{N_y})\)</td>
+			<td>\(\sigma_j\): known standard deviation at index \(j\)</td>
+		</tr>
+		<tr>
+			<td>Only Know Relative Scaling <br> (Uniform Prior)</td>
+			<td>\(\frac{\lVert \boldsymbol{r}(\boldsymbol{p^\dagger})\rVert^2}{N_y-1}\)</td>
+			<td rowspan="2">\(\text{diag}(1/w_1,\dots,1/w_{N_y})\)</td>
+			<td rowspan="2">Absolute magnitude of standard deviations is unknown, but we know \(\sigma_j = w_j \sigma\), with \(w_j\) known and \(\sigma\) unknown.</td>
+		</tr>
+		<tr>
+			<td>Only Know Relative Scaling <br> (Jeffreys' Prior)</td>
+			<td>\(\frac{\lVert \boldsymbol{r}(\boldsymbol{p^\dagger})\rVert^2}{N_y+N_p}\)</td>
+		</tr>
+	</tbody>
+  <caption>Table 1: Influence of the choice of prior on the results of least squares fitting.</caption>
+</table>
+
+Since all of our posterior distributions are given as Normal distributions (at
+least approximately), the covariance matrices allow us to give credible intervals
+for our best fit parameters[^covpar]. While our choice of prior does not influence the best
+fit parameters themselves, we can see that it does influence the credible intervals
+around them.
+
+## 5.2 Discussing the Covariance and Comparison to Frequentist Results
+
+Although this is already a long article, I want to briefly discuss the values
+for $$\hat{\sigma}^2$$ for unknown standard deviations. For uniform priors,
+the value of $$\hat{\sigma}^2$$ is the well-known
+[estimator of sample variance](https://en.wikipedia.org/wiki/Unbiased_estimation_of_standard_deviation)
+around the best fit parameters. The result for the Jeffreys's prior is interesting
+because it looks very similar, but the denominator is $$N_y+N_p$$ instead of
+$$N_y-1$$. For typical least squares problems where $$N_p \ll N_y$$, this won't
+make much of a difference, but it's still interesting to see that, in principle,
+our confidence increases with the number of model parameters. However, it's important
+to note that in all our our derivations we assumed that the model was indeed the
+correct one that actually generates the data. So this result doesn't say that using
+models with more parameters to fit unknown data is better than using models with
+fewer parameters.
+
+If you've used least squares fitting libraries, you might have come across
+the same formula for the covariance matrix, with the difference that 
+$$\hat{\sigma}^2=\lVert \boldsymbol{r}(\boldsymbol{p^\dagger})\rVert^2/(N_y-N_p)$$,
+where $$N_y - N_p$$ is typically called the _degrees of freedom_ of the fit. This
+formula has always sense to me intuitively (maybe because I'd seen it so often),
+but I have never seen a derivation. I assume those are Frequentist results, but
+I honestly don't know and I've never seen them derive. 
+Again, for $$N_p \ll N_y$$ the differences are probably neglegible.
+However, I feel it's important to understand which assumptions those
+formulas imply, becaue it allows me to understand what those confidence intervals
+actually mean: For example [Ceres Solver](http://ceres-solver.org/nnls_covariance.html) 
+gives the same formulas that I gave for known standard derivations, while the
+[GNU scientific library](https://www.gnu.org/software/gsl/doc/html/nls.html#covariance-matrix-of-best-fit-parameters) (GSL)
+gives the frequentist $$\hat{\sigma}^2$$.
+
+Initially I had assumed that either Jeffreys' prior or the uniform prior will
+give me the $$\hat{\sigma}^2$$ that GSL uses and I was surprised neither of them did.
+I'm pretty confident we can construct a prior that gives us that expression,
+maybe using a conjugate prior (which would be an Inverse-Gamma) for $$\sigma$$ with
+carefully chosen parameters and a uniform prior for $$\boldsymbol{p}$$. However, I don't know how I can
+argue that this is a good prior other than that it produces the results I expected,
+which might or might not be a good argument, because I don't know why I expected
+those results in the first place.
 
 # 6. Credible Intervals for the Best Fit Model
 
@@ -743,7 +860,7 @@ And since we know $$\sigma_j = w_j \sigma$$, it follows that
 
 $$\begin{eqnarray}
 [\boldsymbol{I}_{PP}(\boldsymbol{p},\sigma)]_{kl} &=& \frac{1}{\sigma^2} \sum_{j} \frac{\partial f_j(\boldsymbol{p})}{\partial p_k}\frac{1}{w_j^2} \frac{\partial f_i(\boldsymbol{p})}{\partial p_l} \\
- &=& \frac{1}{\sigma^2} \left[ \boldsymbol{J}_f^T(\boldsymbol{p}) (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f(\boldsymbol{p}) \right]_{kl}
+ &=& \frac{1}{\sigma^2} \left[ \boldsymbol{J}_f^T(\boldsymbol{p}) \boldsymbol{W}^T \boldsymbol{W} \boldsymbol{J}_f(\boldsymbol{p}) \right]_{kl}
 \end{eqnarray}$$
 
 where $$\boldsymbol{J}_f$$ is the Jacobian of $$f$$ and $$\boldsymbol{W}$$ is the
@@ -757,7 +874,7 @@ $$\boldsymbol{I}(\boldsymbol{p},\sigma) =
 \frac{1}{\sigma^2}
 \left(
 \begin{matrix}
- \boldsymbol{J}_f^T(\boldsymbol{p}) (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f(\boldsymbol{p}) & \boldsymbol{0} \\
+ \boldsymbol{J}_f^T(\boldsymbol{p}) \boldsymbol{W}^T \boldsymbol{W} \boldsymbol{J}_f(\boldsymbol{p}) & \boldsymbol{0} \\
  \boldsymbol{0} &  2 N_y\\
 \end{matrix}
 \right)$$
@@ -769,7 +886,7 @@ we can calculate it as:
 
 $$\begin{eqnarray}
 P(\boldsymbol{p},\sigma) &\propto& \sqrt{\text{det}\boldsymbol{I}(\boldsymbol{p},\sigma)}\\
- &\propto& \frac{1}{\sigma^{N_p+1}} \sqrt{\text{det}\boldsymbol{J}_f^T(\boldsymbol{p}) (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f(\boldsymbol{p})},
+ &\propto& \frac{1}{\sigma^{N_p+1}} \sqrt{\text{det}\boldsymbol{J}_f^T(\boldsymbol{p}) \boldsymbol{W}^T \boldsymbol{W} \boldsymbol{J}_f(\boldsymbol{p})},
 \end{eqnarray}$$ 
 
 where we have dropped all factors that do not depend on $$\boldsymbol{p}$$ or $$\sigma$$.
@@ -783,3 +900,4 @@ where we have dropped all factors that do not depend on $$\boldsymbol{p}$$ or $$
 [^exercise-reader]: Finally, I have an opportunity to be the one writing that sentence.
 [^ignorance]: Priors conveying ignorance are actually surprisingly tricky. We'll see another one of those that has a vastly different functional form later.
 [^conf-bands]: Credible intervals are not (quite) the same as [confidence bands](https://en.wikipedia.org/wiki/Confidence_and_prediction_bands). The former are a Bayesian concept, while the latter are a frequentist concept. Both serve a conceptually similar purpose.
+[^covpar]: Since the variances of the parameters are on the diagonal of the covariance matrix.
