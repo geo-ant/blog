@@ -551,80 +551,83 @@ those results in the first place.
 
 # 6. Credible Intervals for the Best Fit Model
 
-Let's take a step back and look at what we have done above: we have related
-how the uncertainties in $$\boldsymbol{y}$$ [propagate to the uncertainties](https://en.wikipedia.org/wiki/Propagation_of_uncertainty)
-in $$\boldsymbol{p}^\dagger$$. The covariance matrix of the best fit parameters 
+Before we embark on this final step, let's look at what we have done above,
+when we gave expressions for the covariance matrix: we have related
+how the uncertainties in our observations $$\boldsymbol{y}$$
+propagate to the uncertainties of our best fit parameters 
+$$\boldsymbol{p}^\dagger$$. The covariance matrix of the best fit parameters 
 allows us to give confidence intervals of the parameters via their standard deviations,
-since posterior distributions for the parameters were approximately normal.
+since posterior distributions for the parameters were approximately Normal.
 
-Now we will do the same thing again, in a way. We are now interested what the uncertainties in $$\boldsymbol{p}^\dagger$$ tell
-us about the uncertainties of the best-fit solution $$\boldsymbol{f}(\boldsymbol{p})$$.
-The information we are most interested in, are the standard deviations for each
-element $$f_j$$. If we know those, we can give intervals around each $$f_j$$, which
-together make up the confidence band around the best fit solution.
+Now we will do the same thing again, in a way. We'll find a way to approximate the
+posterior for our best fit solution $$\boldsymbol{f}^\dagger = \boldsymbol{f}(\boldsymbol{p^\dagger})$$
+as a Normal distribution. Then, we will calculate the covariance matrix,
+which gives us the standard deviations, for the elements of $$\boldsymbol{f}^\dagger$$.
+If we know those, we can give credible intervals around the elements of our best
+fit solution, which together make up the credible band.
 
 We treat $$\boldsymbol{z}=\boldsymbol{f}(\boldsymbol{p})$$ as a new variable
-and we are interested in the probability distribution of $$\boldsymbol{z}$$,
-which we can obtain from the posterior probability distribution of $$\boldsymbol{p}$$
+and we are interested in the probability distribution of $$\boldsymbol{z}$$.
+We can obtain it from the posterior probability distribution of $$\boldsymbol{p}$$
 by performing a [change of variables](https://en.wikipedia.org/wiki/Probability_density_function#Function_of_random_variables_and_change_of_variables_in_the_probability_density_function),
 where I am following the notation of Sivia and Skilling (Siv06):
 
 $$
-P(\boldsymbol{z}|\boldsymbol{y}) = P(\boldsymbol{p}=\boldsymbol{f}^{-1}(\boldsymbol{z})|\boldsymbol{y})\cdot \text{det} \frac{d\boldsymbol p}{d \boldsymbol{z}} \label{change-of-var}\tag{13},
+P(\boldsymbol{z}|\boldsymbol{y}) = P(\boldsymbol{p}=\boldsymbol{f}^{-1}(\boldsymbol{z})|\boldsymbol{y})\cdot \text{det} \frac{d\boldsymbol p}{d \boldsymbol{z}} \label{change-of-var}\tag{6.1},
 $$
 
-where the factor on the right hand side is the determinant of the Jacobian of $$\boldsymbol{p}$$
-with respect to $$z$$. To get a grip on this expression we approximate $$\boldsymbol{y}$$
+where the second factor on the right hand side is the determinant of the Jacobian of $$\boldsymbol{p}$$
+with respect to $$z$$. To get a grip on this expression, we approximate $$\boldsymbol{y}$$
 around the best fit parameters by a first order Taylor series:
 
-$$\boldsymbol{z} = \boldsymbol{f}(\boldsymbol{p}) \approx \boldsymbol{f}(\boldsymbol{p}^\dagger) + \boldsymbol{J}_f(\boldsymbol{p}^\dagger)\,(\boldsymbol{p}-\boldsymbol{p}^\dagger),$$
+$$\boldsymbol{z} = \boldsymbol{f}(\boldsymbol{p}) \approx \boldsymbol{f}(\boldsymbol{p}^\dagger) + \boldsymbol{J}_f(\boldsymbol{p}^\dagger)\,(\boldsymbol{p}-\boldsymbol{p}^\dagger), \tag{6.2}$$
 
 where $$\boldsymbol{J}_f(\boldsymbol{p}^\dagger)$$ is the Jacobian of $$\boldsymbol{f}(\boldsymbol{p})$$
 evaluated at $$\boldsymbol{p}^\dagger$$. Note, that there is nothing about $$\boldsymbol{p}^\dagger$$
-that would make this approximation particularly well-suited, in contrast to
-the approximation in eq. $$\eqref{taylor-approx-g}$$.
-We just use it because it is analytically convenient. This allows us to write
+that would make this approximation particularly well-suited and we
+use it because it is analytically convenient[^approx-f]. This allows us to write
 
-$$ \boldsymbol{p} = \boldsymbol{f}^{-1}(\boldsymbol{z}) \approx \boldsymbol{J}_f^{-1}(\boldsymbol{p}^\dagger) (\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger))+\boldsymbol{p}^\dagger$$
+$$ \boldsymbol{p} = \boldsymbol{f}^{-1}(\boldsymbol{z}) \approx \boldsymbol{J}_f^{-1}(\boldsymbol{p}^\dagger) (\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger))+\boldsymbol{p}^\dagger \label{p-of-z} \tag{6.3}$$
 
-If we go ahead and plug
-this approximation and eq. $$\eqref{posterior-p-approximation}$$ into eq. $$\eqref{change-of-var}$$, the determinant becomes
-a constant and we can write:
+Now we use eq. $$\eqref{p-of-z}$$ and our approximation for the posterior eq. 
+$$\eqref{posterior-approximation-generalized}$$ and plug it into eq. $$\eqref{change-of-var}$$.
+Note, that have to choose the covariance matrix $$\boldsymbol{C}_{p^\dagger}$$ that corresponds
+to our prior assumptions, but the general functional form of the posterior is
+always the same. This leads us to:
 
 $$\begin{eqnarray}
-P(\boldsymbol{z}|\boldsymbol{y}) &\approx& K'\cdot \exp\left(-\frac{1}{2} (\boldsymbol{J_f}^{-1}(\boldsymbol{p}^\dagger)(\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger)))^T\, \boldsymbol{H}_g(\boldsymbol{p}^\dagger) (\boldsymbol{J_f}^{-1}(\boldsymbol{p}^\dagger)(\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger))) \right) \\
-  &=&  K'\cdot \exp\left(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger))^T\, (\boldsymbol{J_f}^T)^{-1}(\boldsymbol{p}^\dagger)\boldsymbol{H}_g(\boldsymbol{p}^\dagger) \boldsymbol{J_f}^{-1}(\boldsymbol{p}^\dagger)(\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger)) \right) \\
-  &=&  K'\cdot \exp\left(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger))^T\, (\boldsymbol{J_f}^T)^{-1}(\boldsymbol{p}^\dagger) \boldsymbol{C}_{p^\dagger}^{-1} \boldsymbol{J_f}^{-1}(\boldsymbol{p}^\dagger)(\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger)) \right) \\
-  &=&  K'\cdot \exp\left(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger))^T\, (\boldsymbol{J_f}(\boldsymbol{p}^\dagger) \boldsymbol{C}_{p^\dagger} \boldsymbol{J_f}^{T}(\boldsymbol{p}^\dagger))^{-1} (\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger)) \right) \\
-  &=&  K'\cdot \exp\left(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger))^T\, \boldsymbol{C}_f^{-1} (\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger)) \right) ,
+P(\boldsymbol{z}|\boldsymbol{y}) &\approx& K''\cdot \exp\left(-\frac{1}{2} (\boldsymbol{J_f}^{-1}(\boldsymbol{p}^\dagger)(\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger)))^T\, \boldsymbol{C}_{p^\dagger}^{-1} (\boldsymbol{J_f}^{-1}(\boldsymbol{p}^\dagger)(\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger))) \right) \\
+  &=&  K''\cdot \exp\left(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger))^T\, (\boldsymbol{J_f}^T)^{-1}(\boldsymbol{p}^\dagger) \boldsymbol{C}_{p^\dagger}^{-1} \boldsymbol{J_f}^{-1}(\boldsymbol{p}^\dagger)(\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger)) \right) \\
+  &=&  K''\cdot \exp\left(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger))^T\, (\boldsymbol{J_f}(\boldsymbol{p}^\dagger) \boldsymbol{C}_{p^\dagger} \boldsymbol{J_f}^{T}(\boldsymbol{p}^\dagger))^{-1} (\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger)) \right) \\
 \end{eqnarray}$$
 
-where we have absorbed all constant factors into $$K'$$. We can see that this is
-again a [multivariate normal](https://en.wikipedia.org/wiki/Multivariate_normal_distribution)
-with a covariance matrix of $$\boldsymbol{C}_f$$. That means that we can calculate
-the covariance of the model values at the best fit parameters under this approximation
-as:
+where we have absorbed all constant factors into $$K''$$. We can see that this is
+again a [multivariate normal](https://en.wikipedia.org/wiki/Multivariate_normal_distribution),
+with a covariance matrix $$\boldsymbol{C}_{f^\dagger}$$ given by
 
-$$\boldsymbol{C}_f = \boldsymbol{J_f}(\boldsymbol{p}^\dagger) \boldsymbol{C}_{p^\dagger} \boldsymbol{J_f}^{T}(\boldsymbol{p}^\dagger) \label{cov-f}\tag{14}.$$
+$$\boldsymbol{C}_{f^\dagger} = \boldsymbol{J_f}(\boldsymbol{p}^\dagger) \boldsymbol{C}_{p^\dagger} \boldsymbol{J_f}^{T}(\boldsymbol{p}^\dagger) \label{cov-f}\tag{6.4}.$$
 
 In essence, we have derived the law of [Propagation of Uncertainty](https://en.wikipedia.org/wiki/Propagation_of_uncertainty)
-for our special case[^prop-uncertainty]. The well-known formula for propagation of uncertainty
-is also derived under the approximation of linearity of the transformation.
+for our special case[^prop-uncertainty]. Eq. $$\eqref{cov-f}$$ is the desired covariance
+of our best fit model function values.
 
 ## From Covariance Matrix to Credible Intervals
 
 So now that we have the covariance matrix, how do we use it to construct
 [credible intervals](https://en.wikipedia.org/wiki/Credible_interval#Contrasts_with_confidence_interval)
-around the best fit function[^conf-bands]? Luckily we already know everything we need.
+around the best fit function? Luckily we already know everything we need. It's worth
+mentioning that confidence intervals are 
+[not the same](https://en.wikipedia.org/wiki/Credible_interval#Contrasts_with_confidence_interval)
+as Bayesian credible intervals, although they serve a conceptually similar purpose.
 
-We have approximated the elements of $$\boldsymbol{f}(\boldsymbol{p^\dagger})$$ values as
-normally distributed with a covariance matrix of $$\boldsymbol{C}_f$$. That means
-that the variance for each entry $$f_j$$ of $$\boldsymbol{f}$$ is on index $$j$$
-of the diagonal of $$\boldsymbol{C}_f$$. Let's express this in vector notation:
+We have approximated our best fit solution $$\boldsymbol{f}^\dagger= \boldsymbol{f}(\boldsymbol{p^\dagger})$$ 
+as normally distributed with a covariance matrix of $$\boldsymbol{C}_{f^\dagger}$$. That means
+that the variance for each entry $$f_j^\dagger$$ of $$\boldsymbol{f}^\dagger$$ is on index $$j$$
+of the diagonal of $$\boldsymbol{C}_{f^\dagger}$$. Let's express this in vector notation:
 
-$$(\sigma_{f_1}^2,\dots,\sigma^2_{f_{N_y}})^T = \text{diag} (\boldsymbol{C}_f). \label{variance-vector}\tag{15}$$
+$$(\sigma_{f_1}^2,\dots,\sigma^2_{f_{N_y}})^T = \text{diag} (\boldsymbol{C}_{f^\dagger}). \label{variance-vector}\tag{15}$$
 
-It would be numerically wasteful to calculate the whole matrix $$\boldsymbol{C}_f$$
+It would be numerically wasteful to calculate the whole matrix $$\boldsymbol{C}_{f^\dagger}$$
 just to then immediately discard everything except the diagonal elements. There
 is a better way. To see this, we write the Jacobian as a collection using row-vectors:
 
@@ -641,14 +644,17 @@ where $$\boldsymbol{j}_i^T$$ is the $$i$$-th _row_ of the Jacobian of $$\boldsym
 best fit parameters. Now we can write the variance for each element of $$\boldsymbol{f}$$
 as
 
-$$\sigma_{f_i}^2 = \boldsymbol{j}_i^T \boldsymbol{C}_f \boldsymbol{j}_i, \label{efficient-sigma-f}\tag{16}$$
+$$\sigma_{f_i}^2 = \boldsymbol{j}_i^T \boldsymbol{C}_{f^\dagger} \boldsymbol{j}_i, \label{efficient-sigma-f}\tag{16}$$
 
-where, again $$\boldsymbol{j}_i^T$$ is a _row_ vector representing a row of the Jacobian.
+where, again $$\boldsymbol{j}_i^T$$ is a _row_ vector representing a _row_ of the Jacobian.
 Wolberg arrives at the same formula using a slightly different approach (Wol06, section 2.5).
 Using this way of calculating the variances saves a significant amount of computations
 and should be preferred to calculating the complete matrix product. The credible
 intervals for a given probability can now be obtained using the quantile function
-of the normal distribution. 
+of the normal distribution. If we define a vector $$\boldsymbol{s}$$
+containing the standard deviations (not the variances), meaning
+
+$$[\boldsymbol{s}]_i = \boldsymbol{j}_i^T \boldsymbol{C}_{f^\dagger} \boldsymbol{j}_i$$
 
 !!!!!!!!TODO gaussian quantiles credible band radius
 !!!!!!!!!!!!!!
@@ -663,11 +669,11 @@ function, but unfortunately no rationale is provided for that.
 
 I know article was a _tour de force_ through the method of nonlinear least squares
 fitting from the ground up. I hope that seeing it like this helps others (as it helped
-me) to demystify and understand the method itself, but especially the statistical analysis
-of the parameters and the best fit model. This part is often overlooked. If your usecase
-is not covered by this article, I hope that you'll find the tools here to modify
-the calculations according to your needs. And finally, if you find errors please
-let me know via mail or by commenting below.
+me) to demystify and understand the method and especially the statistical analysis
+of the parameters and the best fit model. The latter part is often overlooked. 
+If your usecase is not covered by this article, I hope that you'll find the tools
+here to modify the calculations according to your needs. And finally, if you find
+errors please reach out via mail or by commenting below.
 
 # References
 (Noc06) J Nocedal & SJ Wright: "Numerical Optimization", Springer, 2nd ed, 2006
@@ -901,3 +907,4 @@ where we have dropped all factors that do not depend on $$\boldsymbol{p}$$ or $$
 [^ignorance]: Priors conveying ignorance are actually surprisingly tricky. We'll see another one of those that has a vastly different functional form later.
 [^conf-bands]: Credible intervals are not (quite) the same as [confidence bands](https://en.wikipedia.org/wiki/Confidence_and_prediction_bands). The former are a Bayesian concept, while the latter are a frequentist concept. Both serve a conceptually similar purpose.
 [^covpar]: Since the variances of the parameters are on the diagonal of the covariance matrix.
+[^approx-f]: Maybe there is an argument here, if we argue that $$P(\boldsymbol{p}\vert \boldsymbol{y})$$ is reasonably sharply peaked around $$\boldsymbol{p}^\dagger$$, but I'm not sure.
