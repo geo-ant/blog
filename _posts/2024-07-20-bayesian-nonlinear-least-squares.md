@@ -19,7 +19,19 @@ comments_id:
 math: true
 ---
 
-!!!!!!!!!! REDO INTRODUCTION
+In this article we'll derive the well known formulas (and some not so well known
+ones) for nonlinear least squares fitting from a Bayesian perspective from scratch.
+We'll be using only elementary linear algebra and elementary calculus. It turns
+out this is a valuable exercise, because it allows us to clearly state our
+assumptions about the problem and imbue unambigous meaning every aspect of
+the least squares fitting process.
+
+I went into this rabbit hole when trying to understand why two well-respected
+optimization libraries, namely [the GSL](https://www.gnu.org/software/gsl/doc/html/nls.html#covariance-matrix-of-best-fit-parameters)
+and Google's [Ceres Solver](http://ceres-solver.org/nnls_covariance.html)
+give two slightly different results for the covariance matrices of the best
+fit parameters. It turns out both are correct, but they imply slightly 
+different assumptions about our prior knowledge of the problem.
 
 # 1. Nonlinear Least Squares Fitting
 
@@ -509,7 +521,7 @@ for our best fit parameters[^covpar]. While our choice of prior does not influen
 fit parameters themselves, we can see that it does influence the credible intervals
 around them.
 
-## 5.2 Discussing the Covariance and Comparison to Frequentist Results
+## 5.2 Discussing the Covariance and Comparison to Prior Art
 
 Although this is already a long article, I want to briefly discuss the values
 for $$\hat{\sigma}^2$$ for unknown standard deviations. For uniform priors,
@@ -531,10 +543,11 @@ $$\hat{\sigma}^2=\lVert \boldsymbol{r}(\boldsymbol{p^\dagger})\rVert^2/(N_y-N_p)
 where $$N_y - N_p$$ is typically called the _degrees of freedom_ of the fit. This
 formula has always sense to me intuitively (maybe because I'd seen it so often),
 but I have never seen a derivation. I assume those are Frequentist results, but
-I honestly don't know and I've never seen them derive. 
+I honestly don't know and I've never seen them derived. They might also be Bayesian
+results obtained with different priors or different approximations.
 Again, for $$N_p \ll N_y$$ the differences are probably neglegible.
 However, I feel it's important to understand which assumptions those
-formulas imply, becaue it allows me to understand what those confidence intervals
+formulas imply, becaue it allows us to understand what those confidence intervals
 actually mean: For example [Ceres Solver](http://ceres-solver.org/nnls_covariance.html) 
 gives the same formulas that I gave for known standard derivations, while the
 [GNU scientific library](https://www.gnu.org/software/gsl/doc/html/nls.html#covariance-matrix-of-best-fit-parameters) (GSL)
@@ -625,7 +638,7 @@ as normally distributed with a covariance matrix of $$\boldsymbol{C}_{f^\dagger}
 that the variance for each entry $$f_j^\dagger$$ of $$\boldsymbol{f}^\dagger$$ is on index $$j$$
 of the diagonal of $$\boldsymbol{C}_{f^\dagger}$$. Let's express this in vector notation:
 
-$$(\sigma_{f_1}^2,\dots,\sigma^2_{f_{N_y}})^T = \text{diag} (\boldsymbol{C}_{f^\dagger}). \label{variance-vector}\tag{15}$$
+$$(\sigma_{f_1}^2,\dots,\sigma^2_{f_{N_y}})^T = \text{diag} (\boldsymbol{C}_{f^\dagger}). \label{variance-vector}\tag{6.5}$$
 
 It would be numerically wasteful to calculate the whole matrix $$\boldsymbol{C}_{f^\dagger}$$
 just to then immediately discard everything except the diagonal elements. There
@@ -644,26 +657,29 @@ where $$\boldsymbol{j}_i^T$$ is the $$i$$-th _row_ of the Jacobian of $$\boldsym
 best fit parameters. Now we can write the variance for each element of $$\boldsymbol{f}$$
 as
 
-$$\sigma_{f_i}^2 = \boldsymbol{j}_i^T \boldsymbol{C}_{f^\dagger} \boldsymbol{j}_i, \label{efficient-sigma-f}\tag{16}$$
+$$\sigma_{f_i}^2 = \boldsymbol{j}_i^T \boldsymbol{C}_{f^\dagger} \boldsymbol{j}_i, \label{efficient-sigma-f}\tag{6.6}$$
 
 where, again $$\boldsymbol{j}_i^T$$ is a _row_ vector representing a _row_ of the Jacobian.
 Wolberg arrives at the same formula using a slightly different approach (Wol06, section 2.5).
 Using this way of calculating the variances saves a significant amount of computations
 and should be preferred to calculating the complete matrix product. The credible
 intervals for a given probability can now be obtained using the quantile function
-of the normal distribution. If we define a vector $$\boldsymbol{s}$$
-containing the standard deviations (not the variances), meaning
+of the normal distribution. So for each element $$f_i^\dagger$$ of the best fit,
+we know that the value falls in the following range with a probability of $$p=1-\alpha \in (0,1)$$:
 
-$$[\boldsymbol{s}]_i = \boldsymbol{j}_i^T \boldsymbol{C}_{f^\dagger} \boldsymbol{j}_i$$
+$$[f_i^\dagger-\Phi^{-1}(1-\alpha) \,\sigma_{f_i} \;,\; f_i^\dagger+\Phi^{-1}(1-\alpha) \,\sigma_{f_i}] \tag{6.7}$$  
 
-!!!!!!!!TODO gaussian quantiles credible band radius
-!!!!!!!!!!!!!!
+where $$\Phi^-1$$ is the [quantile function of the normal distribution](https://en.wikipedia.org/wiki/Normal_distribution#Quantile_function).
+Using this, we can calculate this interval for each of the elements of the best fit, which
+will give us a credible band around the best fit model.
 
-As a final note to this already very long article, we note that Wolberg gives
+As a final note to this already very long article, let's note that Wolberg gives
 an almost identical expression for the confidence bands around the best fit
 parameters (Wol06, section 2.6). The only difference is that he uses the 
 quantile function of Student's t-distribution instead of the Gaussian quantile
-function, but unfortunately no rationale is provided for that.
+function, but unfortunately no rationale is provided for that. I can only speculate
+that this is either caused by the fact that he states that his expressions are
+for _confidence bands_, which are a Frequentist thing.
 
 # Conclusion
 
