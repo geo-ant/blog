@@ -2,7 +2,7 @@
 layout: post
 tags: least-squares algorithm math bayesian
 #categories: []
-date: 2024-07-20
+date: 2024-07-18
 #excerpt: ''
 #image: 'BASEURL/assets/blog/img/.png'
 #description:
