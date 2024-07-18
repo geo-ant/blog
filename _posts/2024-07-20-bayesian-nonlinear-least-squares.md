@@ -19,23 +19,23 @@ comments_id:
 math: true
 ---
 
-In this article we'll derive the well known formulas (and some not so well known
-ones) for nonlinear least squares fitting from a Bayesian perspective from scratch.
+In this article, we'll derive from scratch the well known formulas --and some not so well known
+ones-- for nonlinear least squares fitting from a Bayesian perspective.
 We'll be using only elementary linear algebra and elementary calculus. It turns
-out this is a valuable exercise, because it allows us to clearly state our
-assumptions about the problem and imbue unambigous meaning every aspect of
+out, that this is a valuable exercise, because it allows us to clearly state our
+assumptions about the problem and assign unambigous meaning to all components of
 the least squares fitting process.
 
 I went into this rabbit hole when trying to understand why two well-respected
 optimization libraries, namely [the GSL](https://www.gnu.org/software/gsl/doc/html/nls.html#covariance-matrix-of-best-fit-parameters)
 and Google's [Ceres Solver](http://ceres-solver.org/nnls_covariance.html)
 give two slightly different results for the covariance matrices of the best
-fit parameters. It turns out both are correct, but they imply slightly 
-different assumptions about our prior knowledge of the problem.
+fit parameters. As it turns out, both are correct, but they imply slightly 
+different states of prior knowledge about the problem.
 
 # 1. Nonlinear Least Squares Fitting
 
-Assume we have a vector of observations $$\boldsymbol{y} \in \mathbb{R}^{N_y}$$
+Assume we have a vector of $$N_y$$ observations $$\boldsymbol{y} \in \mathbb{R}^{N_y}$$
 that we want to "fit" with a _model function_
 $$\boldsymbol{f}(\boldsymbol{p}) \in \mathbb{R}^{N_y}$$ that depends on $$N_p$$
 parameters $$\boldsymbol{p} \in \mathbb{R}^{N_p}$$. Then, the process of least
@@ -64,20 +64,20 @@ g(\boldsymbol{p}) &:=& \frac{1}{2} \boldsymbol{r}_w^T(\boldsymbol{p}) \boldsymbo
 \end{eqnarray}$$
 
 Note, that the objective function is a quadratic form with the matrix
-$$\boldsymbol{W}^T\boldsymbol{W}$$. Sometimes the objective function
+$$\boldsymbol{W}^T\boldsymbol{W}$$. Sometimes, the objective function
 is written as $$\boldsymbol{r}^T \boldsymbol{W'} \boldsymbol{r}$$ or
 $$\boldsymbol{r}^T \boldsymbol{S^{-1}} \boldsymbol{r}$$. All forms are equivalent,
 but it does influence how exactly the elements of the weighting matrix appear
 in the later equations. This determines their precise meaning. One can always transform
 one representation into another, but the important thing is to pick one and 
-apply it consistently. For the purposes of this article, we stick with the objective function as
-stated above.
+apply it consistently. For the purposes of this article, let's stick with the
+objective function as stated above.
 
-Our ultimate goal here is answer the following questions: why do we minimize
+Our ultimate goal here is to answer the following questions: why do we minimize
 the sum of squares, as opposed to e.g. the sum of absolutes or 4th powers?
 What exactly do the weights represent? What are the statistical
-properties (such as estimated variance) of the best fit parameters? What are the
-confidence bands (or _credible intervals_ to be more precise) of the best model
+properties of the best fit parameters? What is the
+confidence band (or _credible interval_ to be more precise) of the best model
 after the fit? We'll try and answer this by building nonlinear least squares from the ground up.
 
 ## 1.1 Helpful Identities
@@ -92,7 +92,7 @@ $$
 
 where $$\boldsymbol{J}_{r_w}(\boldsymbol{p})$$ is the Jacobian Matrix of 
 the weighted residuals $$\boldsymbol{r}_w(\boldsymbol{p})$$.
-Often the Jacobian is only denoted by a simple $$\boldsymbol{J}$$, but for this post
+Often, the Jacobian is only denoted by a simple $$\boldsymbol{J}$$, but for this post
 it pays to be precise, because there is also the Jacobian $$\boldsymbol{J}_f$$ of 
 the model function $$\boldsymbol{f}(\boldsymbol{p})$$, which is related to $$\boldsymbol{J}_{r_w}$$
 by 
@@ -115,18 +115,22 @@ let's now jump into the Bayesian perspective.
 
 The fundamental assumption that will bring us to nonlinear least squares is
 that the data can be modeled by a normal distribution. Why is that? One way
-to think of it, is that the measured data is the sum of a _true_ underlying value
+to think of it, is that each observation is the sum of a _true_ underlying value
 with additive zero mean Gaussian noise.
 
-$$Y = Y_{true} + N,$$
+$$Y_j = Y_{j,\text{true}} + N_j,$$
 
-where the noise is normally distributed $$N \sim \mathcal{N}(0,\sigma)$$. If we
-assume the true value is one exact value, we can model its distribution as a delta
+where the noise $$N \sim \mathcal{N}(0,\sigma_j)$$ is normally distributed with
+zero mean. If we assume the true value is one exact value, we can model its distribution as a delta
 peak. Thus, the sum of the true value and the noise will follow a normal
 distribution centered around the true value. In our case, we don't know the
-true value, but instead we model it by the function $$\boldsymbol{f}(\boldsymbol{p})$$.
-Thus, if the parameters $$\boldsymbol{p}$$ are given, the likelihood of observing data $$\boldsymbol{y}$$ is
-given as a [multivariate Normal distribution](https://en.wikipedia.org/wiki/Multivariate_normal_distribution)
+true value, but we assume it can be modeled by $$\boldsymbol{f}(\boldsymbol{p})$$,
+for an unknown set of parameters $$\boldsymbol{p}$$. 
+Let me reiterate what that means: we assume that there is a value of $$\boldsymbol{p}$$ such that for this value,
+the model $$\boldsymbol{f}(\boldsymbol{p})$$ actually produces the true underlying values.
+
+Under these assumptions, if the parameters $$\boldsymbol{p}$$ are given, the likelihood of observing data $$\boldsymbol{y}$$ is
+given as a [multivariate normal distribution](https://en.wikipedia.org/wiki/Multivariate_normal_distribution)
 with mean $$\boldsymbol{f}(\boldsymbol{p})$$ and covariance matrix $$\Sigma \in \mathbb{R}^{N_y\times N_y}$$. 
 The covariance matrix informs us about the observed variance (and covariance) _in the observed data_. For
 example, on the $$j$$-th position on the diagonal it has the _variance_ $$\sigma_j^2$$
@@ -152,7 +156,7 @@ as the product:
 
 $$P(\boldsymbol{y}|\boldsymbol{p},\{\sigma_j\}) = \prod_j P(y_j|\boldsymbol{p},\sigma_j) \label{likelihood} \tag{2.3}$$
 
-with $$\boldsymbol{r}$$ as in eq. $$\eqref{residuals}$$. From a Bayesian point of view, we are interested
+From a Bayesian point of view, we are interested
 in the posterior distribution that describes the probability density of $$\boldsymbol{p}$$
 given our observations $$\boldsymbol{y}$$. Bayes Theorem brings us a step closer towards
 this: 
@@ -160,24 +164,13 @@ this:
 $$P(\boldsymbol{p},\{\sigma_j\}|\boldsymbol{y}) = \frac{P(\boldsymbol{y}|\boldsymbol{p},\{\sigma_j\})\cdot P(\boldsymbol{p},\{\sigma_j\})}{P(\boldsymbol{y})}.\label{joint-posterior}\tag{2.4}$$
 
 This is actually the joint posterior probability for the parameters $$\boldsymbol{p}$$ _and_
-the standard deviations $$\{\sigma_j\}$$. Now let's make another assumption, which
-is that the standard deviations $$\{\sigma_j\}$$ are also statistically independent.
-This implies
-
-$$P(\boldsymbol{p}, \{\sigma_j\}) = \prod_j P(\boldsymbol{p}, \sigma_j),$$
-
-which, together with eq. $$\eqref{likelihood}$$ allows us to write:
-
-$$P(\boldsymbol{p},\{\sigma_j\}|\boldsymbol{y}) \propto \prod_j P(y_j|\boldsymbol{p},\sigma_j)\cdot P(\boldsymbol{p},\sigma_j), $$
-
-where we have omitted constants that don't depend on the parameters or the standard
-deviations, such as the marginal probability $$P(\boldsymbol{y})$$. Annoyingly,
-this posterior still contains the standard deviations. What's nice is, that
+the standard deviations $$\{\sigma_j\}$$. 
+Annoyingly, this posterior still contains the standard deviations. What's nice is, that
 we can [marginalize out](https://en.wikipedia.org/wiki/Marginal_distribution)
 the dependency on the standard deviations in the posterior by integration:
 
 $$
-P(\boldsymbol{p}|\boldsymbol{y}) \propto \int  \prod_j P(y_j|\boldsymbol{p},\sigma_j)\cdot P(\boldsymbol{p},\sigma_j) \;\text{d}\{\sigma_j\}\label{posterior}\tag{2.5}, \\
+P(\boldsymbol{p}|\boldsymbol{y}) \propto \int  \left(\prod_j P(y_j|\boldsymbol{p},\sigma_j)\right)\cdot P(\boldsymbol{p},\{\sigma_j\}) \;\text{d}\{\sigma_j\}\label{posterior}\tag{2.5}, \\
 $$
 
 where the integral is multidimensinal over all $$\sigma_j$$. This is finally 
@@ -185,12 +178,12 @@ the posterior distribution for the parameters that we are looking for.
 It allows us for example to find the maximum _a posteriori_ estimate for the parameters.
 There is just one problem: to actually find an expression for that, we need to
 solve the integral. And to do that we have to make some assumptions about
-the _prior_ probability distributions $$P(\boldsymbol{p},\sigma_j)$$. 
+the _prior_ probability distributions $$P(\boldsymbol{p},\{\sigma_j\})$$. 
 
 In the next sections,
 we'll think through the implications of different priors
 and we'll relate them to the least squares problem eq. $$\eqref{lsqr-fitting}$$.
-We'll see how different assumptions end up giving us the same estimate for the best
+We'll see, how different assumptions end up giving us the same estimate for the best
 parameters, but that there are differences in the associated uncertainties.
 Let's start with the simplest case first.
 
@@ -200,7 +193,7 @@ If, for some reason, we _know_ the standard deviations $$\{\sigma_j\}$$, then
 things get very simple. First, let's rewrite the joint prior distribution 
 as 
 
-$$P(\boldsymbol{p}|\boldsymbol{y}) P(\boldsymbol{p},\sigma_j) = P(\boldsymbol{p}|\sigma_j)\,P(\sigma_j) = P(\boldsymbol{p})\,P(\sigma_j).$$
+$$ P(\boldsymbol{p},\{\sigma_j\}) = P(\boldsymbol{p}|\sigma_j)\,P(\{\sigma_j\}) = P(\boldsymbol{p})\,\prod_j P(\sigma_j).$$
 
 Here, we have used that $$\boldsymbol{p}$$ and $$\sigma_j$$ are statistically
 independent in our case. Since we know all the standard deviations, the
@@ -209,8 +202,8 @@ posterior eq. $$\eqref{posterior}$$ becomes:
 
 $$P(\boldsymbol{p}|\boldsymbol{y}) \propto \prod_j P(y_j|\boldsymbol{p},\sigma_j)\cdot P(\boldsymbol{p}), \tag{3.1}$$
 
-where all the $$\sigma_j$$ are known constants. Now, we assume a uniform (or _flat_) prior
-for the parameters:
+where all the $$\sigma_j$$ are known constants. Now, we further assume 
+a uniform (or _flat_) prior for the parameters:
 
 $$P(\boldsymbol{p}) = \text{const.} \tag{3.2}$$
 
@@ -234,7 +227,7 @@ the weights must be a diagonal matrix as in eq. $$\eqref{weights-known-sigma}$$.
 We will now derive an approximation for the covariance matrix $$\boldsymbol{C}_{p^\dagger}$$
 of the best fit parameters. This matrix is of interest e.g. because on the diagonal 
 it contains the variances of the elements of the parameter vector. If we know
-those, we can give estimates of probable ranges for the parameters. We can
+those, we can give estimates of credible intervals for the parameters. We can
 also use the covariance matrix to calculate [correlations](https://en.wikipedia.org/wiki/Correlation#Correlation_matrices)
 between the parameters. Let's start by examining the posterior probability
 for the parameters.
@@ -269,7 +262,8 @@ $$P(\boldsymbol{p}|\boldsymbol{y}) \approx K \cdot \exp\left(-\frac{1}{2} (\bold
 where $$K\in\mathbb{R}$$ is a constant of integration that also absorbs the constant
 first term in $$\eqref{taylor-approx-g}$$. It acts as the normalization. This
 turns out to be the a [multivariate Gaussian distribution](https://en.wikipedia.org/wiki/Multivariate_normal_distribution)
-with expected value $$\boldsymbol{p}^\dagger$$ and covariance matrix $$\boldsymbol{H}_g^{-1}(\boldsymbol{p}^\dagger)$$.
+with expected value $$\boldsymbol{p}^\dagger$$ and covariance matrix 
+$$\boldsymbol{C}_{p^\dagger}=\boldsymbol{H}_g^{-1}(\boldsymbol{p}^\dagger)$$.
 
 $$\boldsymbol{C}_{p^\dagger} = \boldsymbol{H}_g^{-1}(\boldsymbol{p}^\dagger) \approx \left( \boldsymbol{J}_{r_w}^T (\boldsymbol{p}^\dagger) \boldsymbol{J}_{r_w}(\boldsymbol{p}^\dagger)\right)^{-1} = (\boldsymbol{J}_f^T(\boldsymbol{p}^\dagger) \; \boldsymbol{W}^T\boldsymbol{W} \;\boldsymbol{J}_f(\boldsymbol{p}^\dagger))^{-1}, \label{covariance-matrix-known-weights} \tag{3.9}$$
 
@@ -287,12 +281,12 @@ turn to cases where we don't know the standard deviations.
 Okay, the section heading is a mouthful, but it's important to be precise. We'll examine
 a special case of unknown standard deviations, which is as follows: Assume that
 the exact standard deviations are unknown, but that we (again, _for some reason_) 
-know a relative scaling between them, formally:
+know a relative between them, formally:
 
 $$\sigma_j = w_j \, \sigma, \label{relative-scaling} \tag{4.1} $$
 
 where $$\sigma\in\mathbb{R}$$ is unknown, but the relative scaling $$w_j$$ _is_ known. We'll
-see that the naming of $$w_j$$ is not an accident, because if we set
+see, that the naming of $$w_j$$ is not an accident, because if we set
 
 $$\boldsymbol{W} = \text{diag}(1/w_1,\dots,1/w_{N_y}) \label{relative-weights-matrix}\tag{4.2}, $$
 
@@ -329,22 +323,22 @@ estimate $$\boldsymbol{p}^\dagger$$ as given in the introduction in eq. $$\eqref
 ### 4.1.2 Laplace's Approximation
 
 Now, we'll employ a common step in Bayesian analysis to make the posterior
-probability more tractable by approximating it as a Gaussian. This is an approximation that can,
+probability more tractable: we'll approximate it as a Gaussian. This approximation can,
 in principle, be applied to all posterior probabilities with varying degrees of
 accuracy. It's called [Laplace's Approximation](https://en.wikipedia.org/wiki/Laplace%27s_approximation)
 and we will quickly go through it step by step, independent of our specific
-posterior. We'll get back to eq. $$\eqref{posterior-uniform-prior}$$
+posterior. We'll get back to eq. $$\eqref{posterior-uniform-prior}$$ later.
 To start, we define the negative log-posterior as 
 
 $$L(\boldsymbol{p}) = -\log P(\boldsymbol{p}|\boldsymbol{y}). \label{log-posterior}\tag{4.6}$$
 
 Maximizing the posterior probability with respect to the parameters is obviously
 the same as minimizing the negative log-posterior. Let's denote the parameter that
-minimizes $$L$$ with $$\boldsymbol{p}^\star$$. Note that in our case 
+minimizes $$L$$ with $$\boldsymbol{p}^\star$$. Note that in our particular case 
 $$\boldsymbol{p}^\star=\boldsymbol{p}^\dagger$$ is just the least squares estimate
-as defined in eq. $$\eqref{lsqr-fitting}$$. 
+as defined in eq. $$\eqref{lsqr-fitting}$$, but in general
 
-$$\boldsymbol{p}^\star = \arg \min_{\boldsymbol{p}} L(\boldsymbol{p})$$ 
+$$\boldsymbol{p}^\star = \arg \min_{\boldsymbol{p}} L(\boldsymbol{p}).$$ 
 
 Now, just like we did [in this section](/blog/2024/bayesian-nonlinear-least-squares/#31-the-covariance-matrix-for-the-best-fit-parameters),
 we can approximate $$L(\boldsymbol{p})$$ by a second order Taylor expansion around
@@ -367,7 +361,7 @@ $$\boldsymbol{C}_{p^\star} = \boldsymbol{H}_L^{-1}(\boldsymbol{p}^\star). \label
 That means we can estimate the covariance of the best fit parameters under this
 approximation as the inverse of the Hessian of $$L$$ at the best fit parameters.
 
-### 4.1.3 Covariance of the Best Fit Parameters
+### 4.1.3 Covariance of the Best Fit Parameters for a Uniform Prior
 
 To find the covariance matrix for the best fit parameters given our prior, we
 have to calculate $$L(\boldsymbol{p})$$ and its Hessian at the best fit parameters.
@@ -377,14 +371,14 @@ $$L(\boldsymbol{p}) = -\log P(\boldsymbol{p}|\boldsymbol{y}) = \frac{N_y-1}{2} \
 After some calculations (which I have relegated to Appendix A), we see that
 we can approximate the Hessian as
 
-$$\boldsymbol{H}_L(\boldsymbol{p}^\dagger)\approx \frac{2}{\lVert \boldsymbol{r}(\boldsymbol{p}) \rVert^2}\boldsymbol{J}^T_{r_w}(\boldsymbol{p}^\dagger) \boldsymbol{J}_{r_w}(\boldsymbol{p}^\dagger) \label{hessian-uniform}\tag{4.11},$$
+$$\boldsymbol{H}_L(\boldsymbol{p}^\dagger)\approx \frac{N_y-1}{\lVert \boldsymbol{r}(\boldsymbol{p}) \rVert^2}\boldsymbol{J}^T_{r_w}(\boldsymbol{p}^\dagger) \boldsymbol{J}_{r_w}(\boldsymbol{p}^\dagger) \label{hessian-uniform}\tag{4.11},$$
 
 which finally leads us to an approximation of the covariance matrix of the best fit
 parameters as
 
 $$\boldsymbol{C}_{p^\dagger} \approx \frac{\lVert \boldsymbol{r}(\boldsymbol{p^\dagger})\rVert^2}{N_y-1} (\boldsymbol{J}^T_{r_w}(\boldsymbol{p}^\dagger) \boldsymbol{J}_{r_w}(\boldsymbol{p}^\dagger))^{-1}. \label{cov-uniform}\tag{4.12}$$
 
-It's important to note that this covariance matrix holds only for the assumptions
+Note, that this particular expression for the covariance matrix holds only for the assumptions
 made in section 4.1 up to here. I'll have more to say about the exact form of the
 covariance matrix, but I'll say it in a dedicated section further below. Next,
 let's see how the choice of prior influences our estimation of the covariance
@@ -407,16 +401,16 @@ weight matrix as defined in eq. $$\eqref{relative-weights-matrix}$$. To obtain t
 posterior, we can again [use Wolfram Alpha](https://www.wolframalpha.com/input?i=int%281%2Fsigma%5E%28N%2BM%2B1%29*exp%28-1%2F%282*sigma%5E2%29*+r%5E2%29%29):
 
 $$
-P(\boldsymbol{p}|\boldsymbol{y}) \propto  \sqrt{\text{det}\boldsymbol{J}_f^T(\boldsymbol{p}) \boldsymbol{W}^T \boldsymbol{W} \boldsymbol{J}_f(\boldsymbol{p})} \cdot (\lVert\boldsymbol{r}_w(\boldsymbol{p})\rVert^2)^{-\frac{N+M}{2}}. \label{posterior-jeffreys}\tag{4.14}
+P(\boldsymbol{p}|\boldsymbol{y}) \propto  \sqrt{\text{det}\boldsymbol{J}_f^T(\boldsymbol{p}) \boldsymbol{W}^T \boldsymbol{W} \boldsymbol{J}_f(\boldsymbol{p})} \cdot (\lVert\boldsymbol{r}_w(\boldsymbol{p})\rVert^2)^{-\frac{N_y+N_p}{2}}. \label{posterior-jeffreys}\tag{4.14}
 $$
 
 Strictly speaking that is all we can say about the posterior, since the first
 factor also depends on $$\boldsymbol{p}$$. However, there are a few assumptions we
 can make to approximate the posterior. 
 
-The second factor in eq. $$\eqref{posterior-jeffreys}$$ will typically be a very sharp
+The second factor $$(\lVert\boldsymbol{r}_w(\boldsymbol{p})\rVert^2)^{-\frac{N_y+N_p}{2}}$$ in eq. $$\eqref{posterior-jeffreys}$$ will typically be a very sharp
 peak around the least squares estimate $$\boldsymbol{p}^\dagger$$.
-At least for a sufficienly large number of data points. Notice that 
+At least for a sufficienly large number of data points. Notice, that 
 $$\boldsymbol{J}_f^T (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f$$
 is approximately $$\boldsymbol{W}^2 \boldsymbol{H}_f$$, due to the diagonal structure
 of $$\boldsymbol{W}$$, where $$\boldsymbol{H}_f$$ is the Hessian of $$f$$. It is 
@@ -425,14 +419,14 @@ Hessian won't exhibit a behavior that substantially alters the shape of the post
 This is consistent with the fact that Jeffreys's prior is a _noninformative_ prior,
 which means that it should not greatly alter the value of the _maximum a posteriori_
 estimate, compared to the value of the maximum likelihood estimate (Gel13, sections 2.8, 3.2).
-Since the second term is likely a narrow peak around $$\boldsymbol{p}^\dagger$$,
+Since the second factor is likely a narrow peak around $$\boldsymbol{p}^\dagger$$,
 we can approximate the value $$\boldsymbol{J}_f^T (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f$$
 by its value at $$\boldsymbol{p}^\dagger$$, a constant. This finally
 leads us to an approximation of the posterior around $$\boldsymbol{p}^\dagger$$
 as:
 
 $$
-P(\boldsymbol{p}|\boldsymbol{y}) \approx K^\dagger \cdot (\lVert\boldsymbol{r}_w(\boldsymbol{p})\rVert^2)^{-\frac{N+M}{2}}, \label{posterior-jeffreys-approx}\tag{4.15}
+P(\boldsymbol{p}|\boldsymbol{y}) \approx K^\dagger \cdot (\lVert\boldsymbol{r}_w(\boldsymbol{p})\rVert^2)^{-\frac{N_y+N_p}{2}}, \label{posterior-jeffreys-approx}\tag{4.15}
 $$
 
 where we've absorbed all constants of proportionality into $$K^\dagger$$. Now,
@@ -450,9 +444,9 @@ summarize and discuss the results so far in the next section.
 Okay, now let's take a step back and see how our results can be summarized and
 examine how our results are linked to the least squares fitting approach from
 our introductory section. We have approximated all our posteriors in the form 
-of Normal distributions
+of normal distributions
 
-$$P(\boldsymbol{p}|\boldsymbol{y}) \approx K' \cdot \exp\left(-\frac{1}{2} (\boldsymbol{p}-\boldsymbol{p}^\star)^T\, \boldsymbol{C}_{p^\dagger}^{-1} (\boldsymbol{p}-\boldsymbol{p}^\star) \right),\label{posterior-approximation-generalized}\tag{5.1}$$
+$$P(\boldsymbol{p}|\boldsymbol{y}) \approx K' \cdot \exp\left(-\frac{1}{2} (\boldsymbol{p}-\boldsymbol{p}^\dagger)^T\, \boldsymbol{C}_{p^\dagger}^{-1} (\boldsymbol{p}-\boldsymbol{p}^\dagger) \right),\label{posterior-approximation-generalized}\tag{5.1}$$
 
 with appropriate constants $$K'$$. The _maximum a posteriori_ estimate for all
 cases was given as the minimizer of the sum of squared residuals eq. $$\eqref{lsqr-fitting}$$:
@@ -461,16 +455,16 @@ $$ \boldsymbol{p}^\dagger = \arg\min_{\boldsymbol{p}} \frac{1}{2} \lVert W \left
 
 where the choice of the weight matrix $$\boldsymbol{W} \in \mathbb{R}^{N_y \times N_y}$$
 depends on our choice of prior. We have also calculated the covariance matrices
-for the best fit parameters $$\boldsymbol{p}^\dagger$$, which were different for
-different priors. However, all of them can be generalized as
+for the best fit parameters $$\boldsymbol{p}^\dagger$$, which depended on our
+choice of prior. However, all of them can be generalized as
 
 $$\boldsymbol{C}_{p^\dagger} \approx \hat{\sigma}^2 \, (\boldsymbol{J}^T_{r_w}(\boldsymbol{p}^\dagger) \boldsymbol{J}_{r_w}(\boldsymbol{p}^\dagger))^{-1} = \hat{\sigma}^2 \, (\boldsymbol{J}_f^T(\boldsymbol{p}^\dagger) \; \boldsymbol{W}^T\boldsymbol{W} \;\boldsymbol{J}_f(\boldsymbol{p}^\dagger)) , \label{cov-sigmat-hat}\tag{5.3}$$
 
 with a scalar $$\hat{\sigma}^2 \in \mathbb{R}$$ depending on our choice of prior. As before,
 $$\boldsymbol{J}_{r_w}$$ is the Jacobian of $$\boldsymbol{r}_w$$ and
-$$\boldsymbol{J}_{f}=-\boldsymbol{J}_{r_w}$$ is the Jacobian of the model function
+$$\boldsymbol{J}_{f}$$ is the Jacobian of the model function
 $$\boldsymbol{f}(\boldsymbol{p})$$. The following table shows how the weight
-matrix and the factor $$\hat{\sigma}^2$$ are related to our choice of prior:
+matrix and the factor $$\hat{\sigma}^2$$ are related to priors:
 
 <table>
     <style>
@@ -496,26 +490,26 @@ matrix and the factor $$\hat{\sigma}^2$$ are related to our choice of prior:
 			<th><b>Remarks</b></th>
 		</tr>
 		<tr>
-			<td>Known</td>
+			<td>Known <br> (w/ Uniform prior for \(\boldsymbol{p}\))</td>
 			<td>\(1\)</td>
 			<td>\(\text{diag}(1/\sigma_1,\dots,1/\sigma_{N_y})\)</td>
 			<td>\(\sigma_j\): known standard deviation at index \(j\)</td>
 		</tr>
 		<tr>
-			<td>Only Know Relative Scaling <br> (Uniform Prior)</td>
+			<td>Known Relative Scaling <br> (Uniform Prior for \(\boldsymbol{p},\sigma\))</td>
 			<td>\(\frac{\lVert \boldsymbol{r}(\boldsymbol{p^\dagger})\rVert^2}{N_y-1}\)</td>
 			<td rowspan="2">\(\text{diag}(1/w_1,\dots,1/w_{N_y})\)</td>
 			<td rowspan="2">Absolute magnitude of standard deviations is unknown, but we know \(\sigma_j = w_j \sigma\), with \(w_j\) known and \(\sigma\) unknown.</td>
 		</tr>
 		<tr>
-			<td>Only Know Relative Scaling <br> (Jeffreys' Prior)</td>
+			<td>Known Relative Scaling <br> (Jeffreys' Prior for \(\boldsymbol{p},\sigma\))</td>
 			<td>\(\frac{\lVert \boldsymbol{r}(\boldsymbol{p^\dagger})\rVert^2}{N_y+N_p}\)</td>
 		</tr>
 	</tbody>
-  <caption>Table 1: Influence of the choice of prior on the results of least squares fitting.</caption>
+  <caption>Table 1: Influence of the choice of prior on the weights and the covariance matrix.</caption>
 </table>
 
-Since all of our posterior distributions are given as Normal distributions (at
+Since all of our posterior distributions are given as normal distributions (at
 least approximately), the covariance matrices allow us to give credible intervals
 for our best fit parameters[^covpar]. While our choice of prior does not influence the best
 fit parameters themselves, we can see that it does influence the credible intervals
@@ -529,37 +523,35 @@ the value of $$\hat{\sigma}^2$$ is the well-known
 [estimator of sample variance](https://en.wikipedia.org/wiki/Unbiased_estimation_of_standard_deviation)
 around the best fit parameters. The result for the Jeffreys's prior is interesting
 because it looks very similar, but the denominator is $$N_y+N_p$$ instead of
-$$N_y-1$$. For typical least squares problems where $$N_p \ll N_y$$, this won't
-make much of a difference, but it's still interesting to see that, in principle,
-our confidence increases with the number of model parameters. However, it's important
-to note that in all our our derivations we assumed that the model was indeed the
-correct one that actually generates the data. So this result doesn't say that using
+$$N_y-1$$. This is noteworthy, but for typical least squares problems where $$N_p \ll N_y$$, this won't
+make much of a difference. However, it's important
+to restate, that all our our derivations assumed that the model was indeed the
+correct one that generates the true data. Thus, this result doesn't imply that using
 models with more parameters to fit unknown data is better than using models with
 fewer parameters.
 
 If you've used least squares fitting libraries, you might have come across
-the same formula for the covariance matrix, with the difference that 
+a strikingly similar formula for the covariance matrix, with the difference that 
 $$\hat{\sigma}^2=\lVert \boldsymbol{r}(\boldsymbol{p^\dagger})\rVert^2/(N_y-N_p)$$,
 where $$N_y - N_p$$ is typically called the _degrees of freedom_ of the fit. This
-formula has always sense to me intuitively (maybe because I'd seen it so often),
-but I have never seen a derivation. I assume those are Frequentist results, but
-I honestly don't know and I've never seen them derived. They might also be Bayesian
-results obtained with different priors or different approximations.
+formula has always sense to me, probably because I'd seen it so often,
+but I have never seen it derived. I assume it's a Frequentist result, but
+I honestly don't know. It might just as well be a Bayesian
+result, obtained with different priors or different approximations.
 Again, for $$N_p \ll N_y$$ the differences are probably neglegible.
-However, I feel it's important to understand which assumptions those
-formulas imply, becaue it allows us to understand what those confidence intervals
-actually mean: For example [Ceres Solver](http://ceres-solver.org/nnls_covariance.html) 
-gives the same formulas that I gave for known standard derivations, while the
+However, I feel it's valuable to understand, which assumptions those
+formulas imply: for example, [Ceres Solver](http://ceres-solver.org/nnls_covariance.html) 
+gives the same formulas that we derived for known standard derivations, while the
 [GNU scientific library](https://www.gnu.org/software/gsl/doc/html/nls.html#covariance-matrix-of-best-fit-parameters) (GSL)
-gives the frequentist $$\hat{\sigma}^2$$.
+gives the (suspected) frequentist $$\hat{\sigma}^2$$.
 
-Initially I had assumed that either Jeffreys' prior or the uniform prior will
+Initially, I had assumed that either Jeffreys' prior or the uniform prior will
 give me the $$\hat{\sigma}^2$$ that GSL uses and I was surprised neither of them did.
 I'm pretty confident we can construct a prior that gives us that expression,
-maybe using a conjugate prior (which would be an Inverse-Gamma) for $$\sigma$$ with
+maybe using a conjugate prior (which would be an Inverse-Gamma) for $$\sigma$$, with
 carefully chosen parameters and a uniform prior for $$\boldsymbol{p}$$. However, I don't know how I can
-argue that this is a good prior other than that it produces the results I expected,
-which might or might not be a good argument, because I don't know why I expected
+argue that this is a good prior, other than that it produces the results I expected.
+That might or might not be a good argument, because I don't know why I expected
 those results in the first place.
 
 # 6. Credible Intervals for the Best Fit Model
@@ -570,11 +562,11 @@ how the uncertainties in our observations $$\boldsymbol{y}$$
 propagate to the uncertainties of our best fit parameters 
 $$\boldsymbol{p}^\dagger$$. The covariance matrix of the best fit parameters 
 allows us to give confidence intervals of the parameters via their standard deviations,
-since posterior distributions for the parameters were approximately Normal.
+since posterior distributions for the parameters were approximately normal.
 
 Now we will do the same thing again, in a way. We'll find a way to approximate the
 posterior for our best fit solution $$\boldsymbol{f}^\dagger = \boldsymbol{f}(\boldsymbol{p^\dagger})$$
-as a Normal distribution. Then, we will calculate the covariance matrix,
+as a normal distribution. Then, we will calculate the covariance matrix,
 which gives us the standard deviations, for the elements of $$\boldsymbol{f}^\dagger$$.
 If we know those, we can give credible intervals around the elements of our best
 fit solution, which together make up the credible band.
@@ -590,7 +582,7 @@ P(\boldsymbol{z}|\boldsymbol{y}) = P(\boldsymbol{p}=\boldsymbol{f}^{-1}(\boldsym
 $$
 
 where the second factor on the right hand side is the determinant of the Jacobian of $$\boldsymbol{p}$$
-with respect to $$z$$. To get a grip on this expression, we approximate $$\boldsymbol{y}$$
+with respect to $$\boldsymbol{z}$$. To get a grip on this expression, we approximate $$\boldsymbol{y}$$
 around the best fit parameters by a first order Taylor series:
 
 $$\boldsymbol{z} = \boldsymbol{f}(\boldsymbol{p}) \approx \boldsymbol{f}(\boldsymbol{p}^\dagger) + \boldsymbol{J}_f(\boldsymbol{p}^\dagger)\,(\boldsymbol{p}-\boldsymbol{p}^\dagger), \tag{6.2}$$
@@ -614,8 +606,8 @@ P(\boldsymbol{z}|\boldsymbol{y}) &\approx& K''\cdot \exp\left(-\frac{1}{2} (\bol
   &=&  K''\cdot \exp\left(-\frac{1}{2} (\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger))^T\, (\boldsymbol{J_f}(\boldsymbol{p}^\dagger) \boldsymbol{C}_{p^\dagger} \boldsymbol{J_f}^{T}(\boldsymbol{p}^\dagger))^{-1} (\boldsymbol{z}-\boldsymbol{f}(\boldsymbol{p}^\dagger)) \right) \\
 \end{eqnarray}$$
 
-where we have absorbed all constant factors into $$K''$$. We can see that this is
-again a [multivariate normal](https://en.wikipedia.org/wiki/Multivariate_normal_distribution),
+where we have absorbed all constant factors into $$K''$$. Yet again, this is
+a [multivariate normal](https://en.wikipedia.org/wiki/Multivariate_normal_distribution),
 with a covariance matrix $$\boldsymbol{C}_{f^\dagger}$$ given by
 
 $$\boldsymbol{C}_{f^\dagger} = \boldsymbol{J_f}(\boldsymbol{p}^\dagger) \boldsymbol{C}_{p^\dagger} \boldsymbol{J_f}^{T}(\boldsymbol{p}^\dagger) \label{cov-f}\tag{6.4}.$$
@@ -624,12 +616,12 @@ In essence, we have derived the law of [Propagation of Uncertainty](https://en.w
 for our special case[^prop-uncertainty]. Eq. $$\eqref{cov-f}$$ is the desired covariance
 of our best fit model function values.
 
-## From Covariance Matrix to Credible Intervals
+## 6.1 From Covariance Matrix to Credible Intervals
 
 So now that we have the covariance matrix, how do we use it to construct
 [credible intervals](https://en.wikipedia.org/wiki/Credible_interval#Contrasts_with_confidence_interval)
 around the best fit function? Luckily we already know everything we need. It's worth
-mentioning that confidence intervals are 
+mentioning, that confidence intervals are 
 [not the same](https://en.wikipedia.org/wiki/Credible_interval#Contrasts_with_confidence_interval)
 as Bayesian credible intervals, although they serve a conceptually similar purpose.
 
@@ -667,7 +659,7 @@ intervals for a given probability can now be obtained using the quantile functio
 of the normal distribution. So for each element $$f_i^\dagger$$ of the best fit,
 we know that the value falls in the following range with a probability of $$p=1-\alpha \in (0,1)$$:
 
-$$[f_i^\dagger-\Phi^{-1}(1-\alpha) \,\sigma_{f_i} \;,\; f_i^\dagger+\Phi^{-1}(1-\alpha) \,\sigma_{f_i}] \tag{6.7}$$  
+$$f_i^\dagger \pm \Phi^{-1}(1-\alpha) \,\sigma_{f_i}  \tag{6.7}$$  
 
 where $$\Phi^-1$$ is the [quantile function of the normal distribution](https://en.wikipedia.org/wiki/Normal_distribution#Quantile_function).
 Using this, we can calculate this interval for each of the elements of the best fit, which
@@ -678,8 +670,8 @@ an almost identical expression for the confidence bands around the best fit
 parameters (Wol06, section 2.6). The only difference is that he uses the 
 quantile function of Student's t-distribution instead of the Gaussian quantile
 function, but unfortunately no rationale is provided for that. I can only speculate
-that this is either caused by the fact that he states that his expressions are
-for _confidence bands_, which are a Frequentist thing.
+that this is due to his expressions being _confidence bands_. Those are a Frequentist concept
+and they don't typically align with Bayesian credible intervals.
 
 # Conclusion
 
@@ -708,7 +700,7 @@ errors please reach out via mail or by commenting below.
 
 To derive eq. $$\eqref{hessian-uniform}$$ we need to calculate the Hessian of 
 $$\log \lVert \boldsymbol{r}(\boldsymbol{p}) \rVert^2$$. Let's do the calculation
-element wise by repeatedly applying the chain rule. 
+element-wise by repeatedly applying the chain rule. 
 
 $$\begin{eqnarray}
 \boldsymbol{H}\{\log \lVert \boldsymbol{r}(\boldsymbol{p}) \rVert^2\}_{kl} &=& \frac{\partial^2}{\partial p_k \partial p_l}\log\lVert \boldsymbol{r}(\boldsymbol{p}) \rVert^2 \\
@@ -722,7 +714,7 @@ which implies that $$\nabla \log\lVert\boldsymbol{r}(\boldsymbol{p}) \rVert^2=\b
 which implies $$\nabla \lVert\boldsymbol{r}(\boldsymbol{p}) \rVert^2=\boldsymbol{0}$$,
 which implies $$\frac{\partial}{\partial p_l} \lVert\boldsymbol{r}(\boldsymbol{p}) \rVert^2=0$$
 for all indices $$l$$. That makes the first term in the equation vanish, so that
-we can write the hessian of the log transformed sum of squares as:
+we can write the Hessian of the log transformed sum of squares as:
 
 $$
 \boldsymbol{H}\{\log \lVert \boldsymbol{r}(\boldsymbol{p}) \rVert^2\}(\boldsymbol{p}^\dagger) = \frac{1}{\lVert\boldsymbol{r}(\boldsymbol{p}) \rVert^2}\boldsymbol{H}\{\lVert \boldsymbol{r}(\boldsymbol{p}) \rVert^2\}(\boldsymbol{p}^\dagger)
@@ -749,9 +741,9 @@ $$\boldsymbol{I}(\boldsymbol{\theta}$$ are given as:
 $$[\boldsymbol{I}(\boldsymbol{\theta})]_{kl} = E\left[ \left. \left(\frac{\partial}{\partial \theta_k}\log P(\boldsymbol{y}|\boldsymbol{\theta}) \right)\left(\frac{\partial}{\partial \theta_l}\log P(\boldsymbol{y}|\boldsymbol{\theta}) \right) \right| \boldsymbol{\theta}\right],$$
 
 where $$E[ \boldsymbol{\phi}(\boldsymbol{y})\vert\boldsymbol{\theta}]=\int \boldsymbol{\phi}(\boldsymbol{y}) P(\boldsymbol{y}|\boldsymbol{\theta}) \text{d}\boldsymbol{y}$$ denotes the expected value 
-of $$\boldsymbol{\phi}(\boldsymbol{y})$$. Note that this is a volume integral over
-$$\boldsymbol{y}$$, but we won't actually have to calculate it like this in the
-following derivations. For the following sections we'll abbreviate $$E[\boldsymbol{\phi}(\boldsymbol{y})\vert\boldsymbol{\theta}]$$
+of $$\boldsymbol{\phi}(\boldsymbol{y})$$. This is a volume integral over
+$$\boldsymbol{y}$$, but we won't actually have to explicitly perform the integration in the
+following derivations. For the following sections, we'll abbreviate $$E[\boldsymbol{\phi}(\boldsymbol{y})\vert\boldsymbol{\theta}]$$
 as $$E[\boldsymbol{\phi}(\boldsymbol{y})]$$ purely for notational convenience.
 
 In our case, the parameter vector $$\boldsymbol{\theta}$$ consists of the elements 
@@ -769,7 +761,7 @@ $$I(\boldsymbol{p},\sigma) = \left(\begin{matrix} \boldsymbol{I}_{PP}(\boldsymbo
 \end{matrix}\right)\in \mathbb{R}^{N_p+1 \;\times\; N_p+1}$$
 
 with the square matrix $$\boldsymbol{I}_{PP} \in \mathbb{R}^{N_p \times N_p}$$, 
-the column vector $$\boldsymbol{v}_{PS} \in \mathbb{R}^{N_p\times}$$, and the
+the column vector $$\boldsymbol{v}_{PS} \in \mathbb{R}^{N_p}$$, and the
 scalar entry $$I_{\sigma\sigma} \in \mathbb{R}$$. The elements of the matrices are as follows:
 
 $$\begin{eqnarray}
@@ -792,8 +784,8 @@ $$\begin{eqnarray}
 \frac{\partial \mathcal{L}}{\partial p_k} (\boldsymbol{p},\sigma) &=& \frac{1}{\sigma^2}\sum_j \frac{y_j-f_j(\boldsymbol{p})}{w_j^2}\cdot\frac{\partial f_j}{\partial p_k}(\boldsymbol{p}).
 \end{eqnarray}$$
 
-Now let's first calculate the elements of the matrices starting with the single
-scalar entry $$I_{\sigma\sigma}$$.
+Now let's calculate the elements of the matrix, starting with the 
+scalar $$I_{\sigma\sigma}$$.
 
 ## B.1 Calculating $$I_{\sigma\sigma}$$
 $$\begin{eqnarray}
@@ -801,10 +793,10 @@ I_{\sigma\sigma} &=& E\left[ \left( \frac{-N_y\sigma^2+\sum_j \frac{(y_j-f_j(\bo
  &=& \frac{1}{\sigma^6} E \left[ \sum_{i,j} \frac{(y_i-f_i(\boldsymbol{p}))^2 (y_j-f_j(\boldsymbol{p}))^2}{w_i^2 w_j^2}  \right] - \frac{2 N_y}{\sigma^4} E\left[\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2}\right]+\frac{N_y^2}{\sigma^2} E[1] .
 \end{eqnarray}$$
 
-The key to calculate that the expectected values inside the sums are, is to
+The key to calculate the expectected values inside the sums are, is to
 understand that the $$y_j-f_j(\boldsymbol{p})$$ are independent variables, with Gaussian
 distributions centered around a mean value $$\mu_j = 0$$
-and with a standard deviation of $$\sigma_j = w_j \sigma$$. That means This allows us
+and with a standard deviation of $$\sigma_j = w_j \sigma$$. This allows us
 to write the first term of the sum:
 
 $$\begin{eqnarray}
@@ -825,8 +817,7 @@ is the product of the expected values,
 of a Gaussian is its variance $$E[(y_j-f_j(\boldsymbol{p})^2]=\sigma_j^2=w_j^2\sigma^2$$.
 * the fourth central moment is $$E[(y_j-f_j(\boldsymbol{p})^4]=3\sigma_j^2=3 w_j^2\sigma^2$$
 
-We also use this to calculate those arguments to calculate the next term in
-the sum for $$I_{\sigma\sigma}$$:
+We also use this to calculate the next term in the sum for $$I_{\sigma\sigma}$$:
 
 $$\begin{eqnarray}
 E\left[\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2}\right] &=&\sum_j \frac{E[(y_j-f_j(\boldsymbol{p}))^2]}{w_j^2} \\ 
@@ -835,7 +826,7 @@ E\left[\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2}\right] &=&\sum_j \frac{E
 
 Since $$E[1]=1$$, we can put everyting togeter to obtain
 
-$$I_{\sigma\sigma}=\frac{2 N_y+N_y^2-2N_y^2+N_y^2}{\sigma^2}=2\frac{N_y}{\sigma^2}.$$
+$$I_{\sigma\sigma}=\frac{2 N_y+N_y^2-2N_y^2+N_y^2}{\sigma^2}=\frac{2 N_y}{\sigma^2}.$$
 
 
 ## B.2 Calculating $$[v_{PS}]_{k1}$$
@@ -844,8 +835,7 @@ The elements of the column vector $$\boldsymbol{v}_{PS}$$ are calculated as:
 
 $$\begin{eqnarray}
 [\boldsymbol{v}_{PS}]_k &=& E\left[ \left(-\frac{N_y}{\sigma}+\frac{1}{\sigma^3}\sum_j \frac{(y_j-f_j(\boldsymbol{p}))^2}{w_j^2} \right)\cdot \left(\frac{1}{\sigma^2}\sum_j \frac{y_j-f_j(\boldsymbol{p})}{w_j^2}\cdot\frac{\partial f_j}{\partial p_k}(\boldsymbol{p}) \right) \right] \\
- &=& -\frac{N_y}{\sigma^3}\sum_j \frac{E[y_j-f_j(\boldsymbol{p})]}{w_j^2}\cdot\frac{\partial f_j}{\partial p_k}(\boldsymbol{p})  \\
- &\;& + \frac{1}{\sigma^5}\sum_{i,j} \frac{E[(y_j-f_j(\boldsymbol{p}))^2 \cdot (y_i-f_i)]}{w_i^2 w_j^2} \\
+ &=& -\frac{N_y}{\sigma^3}\sum_j \frac{E[y_j-f_j(\boldsymbol{p})]}{w_j^2}\cdot\frac{\partial f_j}{\partial p_k}(\boldsymbol{p}) + \frac{1}{\sigma^5}\sum_{i,j} \frac{E[(y_j-f_j(\boldsymbol{p}))^2 \cdot (y_i-f_i)]}{w_i^2 w_j^2} \\
  &=& 0 + \frac{1}{\sigma^5}\sum_{i,j;i=j} \frac{E[(y_j-f_j(\boldsymbol{p}))^2 \cdot (y_i-f_i)]}{w_i^2 w_j^2} + \frac{1}{\sigma^5}\sum_{i,j;i\neq j} \frac{E[(y_j-f_j(\boldsymbol{p}))^2 \cdot (y_i-f_i)]}{w_i^2 w_j^2} \\
  &=& 0 + \frac{1}{\sigma^5}\sum_{j} \frac{E[(y_j-f_j(\boldsymbol{p}))^3]}{w_i^2 w_j^2} + \frac{1}{\sigma^5}\sum_{i,j;i\neq j} \frac{E[(y_j-f_j(\boldsymbol{p}))^2 \cdot (y_i-f_i)]}{w_i^2 w_j^2} \\
  &=& 0 + 0 + \frac{1}{\sigma^5}\sum_{i,j;i\neq j} \frac{E[(y_j-f_j(\boldsymbol{p}))^2 \cdot (y_i-f_i)]}{w_i^2 w_j^2} \\
@@ -854,11 +844,8 @@ $$\begin{eqnarray}
 \end{eqnarray}$$
 
 where we again have used the rule about the expected value of independent
-random variables and the facts that the expected value $$E[y_j-f_j(\boldsymbol{p})]=0$$,
+random variables and the facts that $$E[y_j-f_j(\boldsymbol{p})]=0$$,
 and the third central moment of a Gaussian is $$E[(y_j-f_j(\boldsymbol{p}))^3]=0$$.
-
-This result already implies that the Fisher information matrix has a block-diagonal
-structure.
 
 ## B.3 Calculating $$[I_{PP}]_{kl}$$
 
@@ -890,7 +877,8 @@ weight matrix as defined in eq. $$\eqref{relative-weights-matrix}$$.
 
 ## Jeffreys' Prior from the Fisher Information Matrix
 
-Now, putting it all together, our Fisher information matrix looks like this:
+Now, putting it all together, our Fisher information matrix is a block-diagonal
+matrix like this:
 
 $$\boldsymbol{I}(\boldsymbol{p},\sigma) =
 \frac{1}{\sigma^2}
@@ -917,7 +905,7 @@ where we have dropped all factors that do not depend on $$\boldsymbol{p}$$ or $$
 [^a-posteriori]: Maximizing the likelihood is the equivalent to maximizing the posterior probability, given uniform priors.
 [^uniform-prior]: Some problems arise when thinking in depth about the meaning of uniform priors. Those don't have a lot of practical importance, but are interesting nonetheless. They are discussed e.g. in Sivia's brilliant [Data Analysis - A Bayesian Tutorial](https://global.oup.com/academic/product/data-analysis-9780198568322https://global.oup.com/academic/product/data-analysis-9780198568322).
 [^log-likelihood]: Maximizing the posterior is the same as minimizing the negative logarithm of the posterior $$L(p)=-\log\,P(p\vert y)$$, which leads us again to the least squares minimization expression at the start of the article.
-[^gsl-weights]: Note that they use a slightly different definition for the weight matrix. The meaning is equivalent, but they don't square the weight matrix with the residual, so that it appears differently in the formulae.
+[^gsl-weights]: Note that they use a slightly different definition for the weight matrix. The meaning is equivalent, but they don't square the weight matrix with the residual, so that it appears differently in the formulas.
 [^prop-uncertainty]: The formula for propagation of uncertainty is also derived under the approximation of linearity of the transformation.
 [^exercise-reader]: Finally, I have an opportunity to be the one writing that sentence.
 [^ignorance]: Priors conveying ignorance are actually surprisingly tricky. We'll see another one of those that has a vastly different functional form later.
