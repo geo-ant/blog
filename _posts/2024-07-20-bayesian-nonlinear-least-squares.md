@@ -45,7 +45,7 @@ $$\boldsymbol{p}^\dagger$$, formally:
 
 $$ \boldsymbol{p}^\dagger = \arg\min_{\boldsymbol{p}} \frac{1}{2} \lVert W \left(\boldsymbol{y} - \boldsymbol{f}(\boldsymbol{p})\right) \rVert^2 \label{lsqr-fitting}\tag{1.1},$$
 
-where$$\lVert\cdot\rVert$$ is the $$\ell 2$$ norm of a vector and $$\boldsymbol{W} \in \mathbb{R}^{N_y \times N_y}$$ is a matrix
+where $$\lVert\cdot\rVert$$ is the $$\ell 2$$ norm of a vector and $$\boldsymbol{W} \in \mathbb{R}^{N_y \times N_y}$$ is a matrix
 of weights. We'll spend much more time on what those weights mean in
 the following sections. For now, let's introduce some helpful abbreviations
 and rewrite the equation above:
@@ -58,7 +58,6 @@ we can write in terms of the (weighted) residuals:
 $$\begin{eqnarray} 
 g(\boldsymbol{p}) &:=& \frac{1}{2} \boldsymbol{r}_w^T(\boldsymbol{p}) \boldsymbol{r_w}(\boldsymbol{p}), \label{objective-function} \tag{1.3}\\
   &=& \frac{1}{2} \boldsymbol{r}^T(\boldsymbol{p}) (\boldsymbol{W}^T \boldsymbol{W}) \boldsymbol{r}(\boldsymbol{p}) \\
-  &=& \frac{1}{2} \sum_j (y_j - f_j(\boldsymbol{p}))^2 \\
 \boldsymbol{r}(\boldsymbol{p}) &:=& \boldsymbol{y}-\boldsymbol{f}(\boldsymbol{p}) \label{residuals}\tag{1.4} \\
 \boldsymbol{r}_w(\boldsymbol{p}) &:=& \boldsymbol{W} \boldsymbol{r}(\boldsymbol{p}) \label{weighted-residuals}\tag{1.5}
 \end{eqnarray}$$
@@ -77,7 +76,7 @@ Our ultimate goal here is to answer the following questions: why do we minimize
 the sum of squares, as opposed to e.g. the sum of absolutes or 4th powers?
 What exactly do the weights represent? What are the statistical
 properties of the best fit parameters? What is the
-confidence band (or _credible interval_ to be more precise) of the best model
+confidence band (or _credible interval_ to be more precise) around the best model
 after the fit? We'll try and answer this by building nonlinear least squares from the ground up.
 
 ## 1.1 Helpful Identities
@@ -109,7 +108,7 @@ $$\begin{eqnarray}
 
 The approximation is very commonly used in least squares fitting and we will
 also employ it in this article. With those bits of housekeeping out of the way,
-let's now jump into the Bayesian perspective.
+let's now dive into the Bayesian perspective.
 
 # 2. Bayesian Perspective on Least Squares
 
@@ -175,30 +174,30 @@ $$
 
 where the integral is multidimensinal over all $$\sigma_j$$. This is finally 
 the posterior distribution for the parameters that we are looking for.
-It allows us for example to find the maximum _a posteriori_ estimate for the parameters.
+It allows us, for example, to find the maximum _a posteriori_ estimate for the parameters.
 There is just one problem: to actually find an expression for that, we need to
 solve the integral. And to do that we have to make some assumptions about
-the _prior_ probability distributions $$P(\boldsymbol{p},\{\sigma_j\})$$. 
+the _prior_ probability distribution $$P(\boldsymbol{p},\{\sigma_j\})$$. 
 
 In the next sections,
-we'll think through the implications of different priors
+we'll work through the implications of different priors
 and we'll relate them to the least squares problem eq. $$\eqref{lsqr-fitting}$$.
 We'll see, how different assumptions end up giving us the same estimate for the best
-parameters, but that there are differences in the associated uncertainties.
+(i.e. the most probable) parameters, but that there are differences in the associated uncertainties.
 Let's start with the simplest case first.
 
 # 3. Nonlinear Least Squares with Known Standard Deviations
 
 If, for some reason, we _know_ the standard deviations $$\{\sigma_j\}$$, then
-things get very simple. First, let's rewrite the joint prior distribution 
+things become decently simple. First, let's rewrite the joint prior distribution 
 as 
 
 $$ P(\boldsymbol{p},\{\sigma_j\}) = P(\boldsymbol{p}|\sigma_j)\,P(\{\sigma_j\}) = P(\boldsymbol{p})\,\prod_j P(\sigma_j).$$
 
 Here, we have used that $$\boldsymbol{p}$$ and $$\sigma_j$$ are statistically
 independent in our case. Since we know all the standard deviations, the
-probability densities $$P(\sigma_j)$$ become delta-functions, such that the
-posterior eq. $$\eqref{posterior}$$ becomes:
+probability densities $$P(\sigma_j)$$ are delta-functions centered around
+the known values, such that the posterior eq. $$\eqref{posterior}$$ becomes:
 
 $$P(\boldsymbol{p}|\boldsymbol{y}) \propto \prod_j P(y_j|\boldsymbol{p},\sigma_j)\cdot P(\boldsymbol{p}), \tag{3.1}$$
 
@@ -260,8 +259,8 @@ around the best fit parameters:
 $$P(\boldsymbol{p}|\boldsymbol{y}) \approx K \cdot \exp\left(-\frac{1}{2} (\boldsymbol{p}-\boldsymbol{p}^\dagger)^T\, \boldsymbol{H}_g(\boldsymbol{p}^\dagger) (\boldsymbol{p}-\boldsymbol{p}^\dagger)\right), \label{posterior-p-approximation}\tag{3.7}$$
 
 where $$K\in\mathbb{R}$$ is a constant of integration that also absorbs the constant
-first term in $$\eqref{taylor-approx-g}$$. It acts as the normalization. This
-turns out to be the a [multivariate Gaussian distribution](https://en.wikipedia.org/wiki/Multivariate_normal_distribution)
+first term in $$\eqref{taylor-approx-g}$$. This turns out to be the a 
+[multivariate Gaussian distribution](https://en.wikipedia.org/wiki/Multivariate_normal_distribution)
 with expected value $$\boldsymbol{p}^\dagger$$ and covariance matrix 
 $$\boldsymbol{C}_{p^\dagger}=\boldsymbol{H}_g^{-1}(\boldsymbol{p}^\dagger)$$.
 
@@ -272,8 +271,7 @@ and thus $$\boldsymbol{J}_{r_w} = -\boldsymbol{W}\boldsymbol{J}_f$$. We
 have used the common approximation for the Hessian of $$g$$ as given in eq. $$\eqref{hessian-g-approx}$$.
 Note, that eq. $$\eqref{covariance-matrix-known-weights}$$ is the covariance for _known standard deviations_, where the weights
 must be chosen as specified in $$\eqref{weights-known-sigma}$$.
-
-This concludes our analysis for the case of known standard deviations. Let's now
+This concludes our analysis for the case of known standard deviations for now. Let's 
 turn to cases where we don't know the standard deviations.
 
 # 4. Nonlinear Least Squares with Unknown Standard Deviations with a Known Relative Scaling
@@ -281,7 +279,7 @@ turn to cases where we don't know the standard deviations.
 Okay, the section heading is a mouthful, but it's important to be precise. We'll examine
 a special case of unknown standard deviations, which is as follows: Assume that
 the exact standard deviations are unknown, but that we (again, _for some reason_) 
-know a relative between them, formally:
+know a scaling between them, formally:
 
 $$\sigma_j = w_j \, \sigma, \label{relative-scaling} \tag{4.1} $$
 
@@ -421,7 +419,7 @@ which means that it should not greatly alter the value of the _maximum a posteri
 estimate, compared to the value of the maximum likelihood estimate (Gel13, sections 2.8, 3.2).
 Since the second factor is likely a narrow peak around $$\boldsymbol{p}^\dagger$$,
 we can approximate the value $$\boldsymbol{J}_f^T (\boldsymbol{W}^T \boldsymbol{W})^{-1} \boldsymbol{J}_f$$
-by its value at $$\boldsymbol{p}^\dagger$$, a constant. This finally
+by its value at $$\boldsymbol{p}^\dagger$$, which is a constant. This finally
 leads us to an approximation of the posterior around $$\boldsymbol{p}^\dagger$$
 as:
 
@@ -455,7 +453,7 @@ $$ \boldsymbol{p}^\dagger = \arg\min_{\boldsymbol{p}} \frac{1}{2} \lVert W \left
 
 where the choice of the weight matrix $$\boldsymbol{W} \in \mathbb{R}^{N_y \times N_y}$$
 depends on our choice of prior. We have also calculated the covariance matrices
-for the best fit parameters $$\boldsymbol{p}^\dagger$$, which depended on our
+for the best fit parameters $$\boldsymbol{p}^\dagger$$, which also depend on our
 choice of prior. However, all of them can be generalized as
 
 $$\boldsymbol{C}_{p^\dagger} \approx \hat{\sigma}^2 \, (\boldsymbol{J}^T_{r_w}(\boldsymbol{p}^\dagger) \boldsymbol{J}_{r_w}(\boldsymbol{p}^\dagger))^{-1} = \hat{\sigma}^2 \, (\boldsymbol{J}_f^T(\boldsymbol{p}^\dagger) \; \boldsymbol{W}^T\boldsymbol{W} \;\boldsymbol{J}_f(\boldsymbol{p}^\dagger)) , \label{cov-sigmat-hat}\tag{5.3}$$
@@ -525,8 +523,8 @@ around the best fit parameters. The result for the Jeffreys's prior is interesti
 because it looks very similar, but the denominator is $$N_y+N_p$$ instead of
 $$N_y-1$$. This is noteworthy, but for typical least squares problems where $$N_p \ll N_y$$, this won't
 make much of a difference. However, it's important
-to restate, that all our our derivations assumed that the model was indeed the
-correct one that generates the true data. Thus, this result doesn't imply that using
+to restate, that all our derivations assumed that the model is indeed the
+correct one. Thus, this result doesn't imply that using
 models with more parameters to fit unknown data is better than using models with
 fewer parameters.
 
@@ -534,7 +532,7 @@ If you've used least squares fitting libraries, you might have come across
 a strikingly similar formula for the covariance matrix, with the difference that 
 $$\hat{\sigma}^2=\lVert \boldsymbol{r}(\boldsymbol{p^\dagger})\rVert^2/(N_y-N_p)$$,
 where $$N_y - N_p$$ is typically called the _degrees of freedom_ of the fit. This
-formula has always sense to me, probably because I'd seen it so often,
+formula has always seemed reasonable to me, probably because I've gotten used to it,
 but I have never seen it derived. I assume it's a Frequentist result, but
 I honestly don't know. It might just as well be a Bayesian
 result, obtained with different priors or different approximations.
@@ -562,13 +560,13 @@ how the uncertainties in our observations $$\boldsymbol{y}$$
 propagate to the uncertainties of our best fit parameters 
 $$\boldsymbol{p}^\dagger$$. The covariance matrix of the best fit parameters 
 allows us to give confidence intervals of the parameters via their standard deviations,
-since posterior distributions for the parameters were approximately normal.
+since the posterior distributions for the parameters were approximately normal.
 
-Now we will do the same thing again, in a way. We'll find a way to approximate the
+Now, we will do the same thing again, in a way. We'll find a way to approximate the
 posterior for our best fit solution $$\boldsymbol{f}^\dagger = \boldsymbol{f}(\boldsymbol{p^\dagger})$$
 as a normal distribution. Then, we will calculate the covariance matrix,
 which gives us the standard deviations, for the elements of $$\boldsymbol{f}^\dagger$$.
-If we know those, we can give credible intervals around the elements of our best
+If we know those, we can give credible intervals around the entries of our best
 fit solution, which together make up the credible band.
 
 We treat $$\boldsymbol{z}=\boldsymbol{f}(\boldsymbol{p})$$ as a new variable
@@ -620,10 +618,7 @@ of our best fit model function values.
 
 So now that we have the covariance matrix, how do we use it to construct
 [credible intervals](https://en.wikipedia.org/wiki/Credible_interval#Contrasts_with_confidence_interval)
-around the best fit function? Luckily we already know everything we need. It's worth
-mentioning, that confidence intervals are 
-[not the same](https://en.wikipedia.org/wiki/Credible_interval#Contrasts_with_confidence_interval)
-as Bayesian credible intervals, although they serve a conceptually similar purpose.
+around the best fit function? Luckily we already know everything we need. 
 
 We have approximated our best fit solution $$\boldsymbol{f}^\dagger= \boldsymbol{f}(\boldsymbol{p^\dagger})$$ 
 as normally distributed with a covariance matrix of $$\boldsymbol{C}_{f^\dagger}$$. That means
@@ -657,9 +652,9 @@ Using this way of calculating the variances saves a significant amount of comput
 and should be preferred to calculating the complete matrix product. The credible
 intervals for a given probability can now be obtained using the quantile function
 of the normal distribution. So for each element $$f_i^\dagger$$ of the best fit,
-we know that the value falls in the following range with a probability of $$p=1-\alpha \in (0,1)$$:
+we know that the value falls in the following range with a probability of $$\rho \in (0,1)$$:
 
-$$f_i^\dagger \pm \Phi^{-1}(1-\alpha) \,\sigma_{f_i}  \tag{6.7}$$  
+$$f_i^\dagger \pm \Phi^{-1}(\rho) \,\sigma_{f_i}  \tag{6.7}$$  
 
 where $$\Phi^-1$$ is the [quantile function of the normal distribution](https://en.wikipedia.org/wiki/Normal_distribution#Quantile_function).
 Using this, we can calculate this interval for each of the elements of the best fit, which
@@ -671,7 +666,8 @@ parameters (Wol06, section 2.6). The only difference is that he uses the
 quantile function of Student's t-distribution instead of the Gaussian quantile
 function, but unfortunately no rationale is provided for that. I can only speculate
 that this is due to his expressions being _confidence bands_. Those are a Frequentist concept
-and they don't typically align with Bayesian credible intervals.
+and they [don't typically align](https://en.wikipedia.org/wiki/Credible_interval#Contrasts_with_confidence_interval)
+with Bayesian credible intervals, although they serve a similar conceptual purpose. 
 
 # Conclusion
 
