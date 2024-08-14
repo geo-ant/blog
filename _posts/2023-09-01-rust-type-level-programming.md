@@ -142,8 +142,8 @@ struct TrueType;
 struct FalseType;
 
 trait BoolType {}
-impl BoolType for TrueType;
-impl BoolType for FalseType;
+impl BoolType for TrueType {}
+impl BoolType for FalseType {}
 ```
 
 Strictly speaking, the whole `BoolType` trait is not necessary but I feel it makes the
