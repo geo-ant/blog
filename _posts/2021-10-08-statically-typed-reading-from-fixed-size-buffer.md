@@ -26,7 +26,7 @@ This feels reasonably intuitive to me. Since we know the size of the buffer at c
 
 # Pseudocode
 Let's use a little bit of (C++ _inspired_, but definitely not C++) pseudocode:
-```rust
+```
 fn copy_from_buffer<...Ts, size_t N>(bytes[N]) -> tuple<Ts...> {
     size_t offset = 0;
     tuple<Ts...> copied_values{};

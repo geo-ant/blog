@@ -33,22 +33,22 @@ $$\phi_1=\phi_1(t,\mu,\nu)$$ and $$\phi_1=\phi_2(t,\nu)$$ in Rust like so [^type
 
 ```rust
 fn phi1(t: &Vector, mu : Scalar, nu: Scalar) -> Vector {
-    /**calculations**/
+    // calculations
 }
 fn phi2(t: &Vector, nu : Scalar) -> Vector {
-    /**calculations**/
+    // calculations
 }
 ```
 We have to provide the partial derivatives for each function. For our example that would be $$\partial/\partial_\mu \phi_1$$, $$\partial/\partial_\nu \phi_1$$, and $$\partial/\partial_\nu \phi_2$$. We could implement those like so:
 ```rust
 fn phi1_dmu(t: &Vector, mu : Scalar, nu: Scalar) -> Vector {
-    /**calculations**/
+    // calculations
 }
 fn phi1_dnu(t: &Vector, mu : Scalar, nu: Scalar) -> Vector {
-    /**calculations**/
+    // calculations
 }
 fn phi2_dnu(t: &Vector, nu : Scalar) -> Vector {
-    /**calculations**/
+    // calculations
 }
 ```
 Now we can build our model function set with these base functions and their derivatives. We do that by using the `SeparableModelBuilder` like so
@@ -72,7 +72,7 @@ This interface design might not look like much, but I like it a lot for two main
 fn phi1_dmu(t: &Vector, alpha : &Vector) -> Vector {
     let mu = alpha[0];
     let nu = alpha[1];
-    /**calculations**/
+    // calculations
 }
 ```
 The variadic interface helps e.g. when *adding* another parameter to our function, because the number of string arguments will not match the number of nonlinear parameters in the function signature. This could not have been checked when passing `alpha` as a vector. 
