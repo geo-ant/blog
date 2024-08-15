@@ -20,8 +20,8 @@ html {
 
 body {
 	background: $backgroundColor;
-  font-family:  $Serif;
-  font-size: 22px;
+  font-family:  $Body;
+  font-size: 18px;
   line-height: 1.4;
   color: $foregroundColor;
   font-kerning: auto;
@@ -134,6 +134,9 @@ ul ul, ol ul {
 }
 
 em, i {
+  font-family: $Emphasis;
+  font-size: 1.1em;
+  font-weight: Thin;
   font-style: italic;
 }
 
