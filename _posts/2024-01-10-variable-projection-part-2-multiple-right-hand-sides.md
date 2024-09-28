@@ -3,6 +3,7 @@ layout: post
 tags: least-squares image-processing algorithm math varpro
 #categories: []
 date: 2024-01-10
+last_updated: 2024-08-28
 #excerpt: ''
 #image: 'BASEURL/assets/blog/img/.png'
 #description:
@@ -326,7 +327,7 @@ that both the residual vector and the Jacobian matrix will have $$m\cdot S$$ row
 which can become quite large for big datasets. In their paper, Warren _et al._
 report an approach termed _partitioned variable projection_ that implements
 a modified version of the LM solver, which does not require to store the full
-Jacobian (Warren2023).
+Jacobian (Warren2013).
 
 # References
 
