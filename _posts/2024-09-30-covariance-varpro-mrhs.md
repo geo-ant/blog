@@ -23,14 +23,15 @@ In this article, I explore how to efficiently calculate the covariance matrix
 of the best fit parameters for global fitting problems that use the
 variable projection (VarPro) algorithm. It's a very niche topic, but I do need it for
 my open source library so I might as well write it down. It might be helpful
-for people looking to dive into VarPro or extend their knowledge of it.
+for people looking to gain a deeper understanding of the math behind VarPro.
 
 # VarPro Minimization: Recap
 
 In the [previous article](/blog/2024/variable-projection-part-2-multiple-right-hand-sides/)
 in our VarPro series on this blog, we saw that we can express Variable Projection
-with multiple right hand sides using either a more matrix oriented approach or a more
-vector oriented approach. Both approaches are equivalent. But this time, it is 
+with multiple right hand sides using a couple of equivalent approaches. We can,
+for example, either use a more matrix oriented approach or a more
+vector oriented approach to the same effect. But this time, it is 
 the vector oriented approach that makes it a bit easier for me to tackle the 
 problem at hand.
 
