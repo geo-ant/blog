@@ -15,7 +15,7 @@ og_image:
 #
 #
 # make sure comments are enabled
-comments_id:
+comments_id: 71
 math: true
 ---
 
