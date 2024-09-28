@@ -182,7 +182,7 @@ down to. I could have written `x: 0` instead of `x: Default::default()` but this
 allows us to see that we could pretty much implement any struct's default constructor 
 just by calling the the default constructor of its member fields, provided the members 
 are default constructible. That's a lot of boilerplate isn't it? And that is why 
-we could have stuck the line `#[derive(Default)` just above our rectangle definition
+we could have stuck the line `#[derive(Default)]` just above our rectangle definition
 to let the compiler handle the boilerplate for us like so:
 
 ```rust
