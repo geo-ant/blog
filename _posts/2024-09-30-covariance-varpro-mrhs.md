@@ -67,10 +67,10 @@ $$
 
 Then, we write the weighted residual of the $$k$$-th dataset as
 
-$$\boldsymbol{r}_{w,k}(\boldsymbol{p}) = \boldsymbol{W} (\boldsymbol{y}_n - \boldsymbol{f}_k(\boldsymbol{p})), \label{rwk-def}\tag{3}$$
+$$\boldsymbol{r}_{w,k}(\boldsymbol{p}) = \boldsymbol{W} (\boldsymbol{y}_k - \boldsymbol{f}_k(\boldsymbol{p})), \label{rwk-def}\tag{3}$$
 
 where the weight matrix $$\boldsymbol{W}\in \mathbb{R}^{N_y\times N_y}$$ is
-shared across all $$k$$. Now, we introduce three more concatenated vectors:
+shared across all $$k$$. Now, we introduce three more stacked vectors:
 for the dataset, for the function values, and for the weighted residuals,
 respectively:
 
@@ -135,7 +135,7 @@ following calculations will be true regardless how the residuals are actually ca
 # Jacobian of the Residuals
 
 The first step when calculating the covariance matrix is to calculate the Jacobian
-matrix $$\boldsymbol{J}_{r_w}$$ of the weighted residuals. First, we express it
+matrix $$\boldsymbol{J}_{r_w}$$ of the weighted residuals. Let's express it
 in terms of the Jacobian matrix $$\boldsymbol{J}_{f}$$ of $$\boldsymbol{f}$$:
 
 $$\boldsymbol{J}_{r_w}(\boldsymbol{p}) := \frac{\partial \boldsymbol{r}_w}{\partial \boldsymbol{p}} (\boldsymbol{p})= -\widetilde{\boldsymbol{W}}\boldsymbol{J}_{f}(\boldsymbol{p})\in \mathbb{R}^{(N_s\cdot N_y) \times N_p}, \label{j-rw-def}\tag{8}$$
@@ -252,13 +252,14 @@ $$
 
 # The Covariance Matrix of the Best Fit Parameters
 
-> *Remark on Notation*
+> <span style="font-variant:small-caps;">Remark on Notation</span>
 > 
 > From now on, we'll see a couple of long-ish expressions involving parametrized
 > matrices. I'll omit the parameters in the matrices inside the expression
-> and just stick them in once at the end. So instead of $$\boldsymbol{X}(\boldsymbol{p})\boldsymbol{Y}(\boldsymbol{p})$$,
+> and just append them once at the end. So instead of $$\boldsymbol{X}(\boldsymbol{p})\boldsymbol{Y}(\boldsymbol{p})$$,
 > I'll just write $$\boldsymbol{X}\boldsymbol{Y}(\boldsymbol{p})$$. I'll do this
-> for all expressions involving matrix products (and inverses).
+> for all expressions involving matrix products, even including transposes
+> and inverses.
 
 
 For the following calculations, it's helpful to rewrite eq. $$\eqref{jac-rw}$$ by introducing the
@@ -315,15 +316,16 @@ $$\begin{eqnarray}
 & & (\boldsymbol{W}\boldsymbol{\Phi})^T \boldsymbol{W}\boldsymbol{\Phi}(\boldsymbol{\alpha}^\dagger)   & (\boldsymbol{W}\boldsymbol{\Phi})^T W\boldsymbol{B}_{N_s}(\boldsymbol{\alpha}^\dagger) \\
 (W\boldsymbol{B}_1)^T \boldsymbol{W}\boldsymbol{\Phi}(\boldsymbol{\alpha}^\dagger)  & \dots & (W\boldsymbol{B}_{N_s})^T \boldsymbol{W}\boldsymbol{\Phi}(\boldsymbol{\alpha}^\dagger) & \sum_{k=1}^{N_s}(W\boldsymbol{B}_{k})^T W\boldsymbol{B}_{k}(\boldsymbol{\alpha}^\dagger) \\
 \end{matrix} \label{jtj-full} \tag{21}
-\right] 
+\right], 
 \end{eqnarray}$$
 
+where $$\boldsymbol{\alpha}^\dagger$$ are the best-fit nonlinear parameters.
 We could be tempted to invert eq. $$\eqref{jtj-full}$$ directly to get to the covariance matrix
 in eq. $$\eqref{cov-jrw}$$. But keep in mind that it's an $$N_p \times N_p$$ matrix,
 where $$N_p = N_s \cdot N_c + N_\alpha$$.
 That's not a big deal if we only have a tiny number of right hand sides and 
 linear coefficients. If, however, the number of linear coefficients $$N_c$$
-gets even moderately large, say $$\mathcal{O}(10)$$, and / or the
+becomes large, say $$\mathcal{O}(10)$$, and / or the
 number of right hand sides $$N_s$$ becomes huge, 
 say $$\mathcal{O}(10^5)$$, then this matrix quickly reaches billions or even
 trillions of elements. That's why it makes sense to exploit the special structure
