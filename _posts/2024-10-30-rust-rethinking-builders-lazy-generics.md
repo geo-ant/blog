@@ -15,7 +15,7 @@ og_image: rethinking-builders.png
 #
 #
 # make sure comments are enabled
-comments_id: 
+comments_id: 73
 math: false
 ---
 
