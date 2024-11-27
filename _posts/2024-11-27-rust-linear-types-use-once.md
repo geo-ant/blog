@@ -122,8 +122,10 @@ Unfortunately, the `UseOnce<T>` is not as useful or powerful as it might seem
 at first sight. Firstly, since the compiler error is enforced by the `Drop` implementation, we
 can just [`mem::forget`](https://doc.rust-lang.org/std/mem/fn.forget.html) the instance
 and not actually consume it. I don't feel this is a giant problem because it's
-still very explicit and arguably counts as a sort of consumption. But
-it's worth noting.
+still very explicit and arguably counts as a sort of consumption. However,
+there's a [more fundamental problem](https://www.reddit.com/r/rust/comments/1h0zcku/comment/lzaggnp/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+with linear types in Rust as pointed out by `u/Shnatsel` in the reddit thread
+for this post.
 
 Secondly, the API allows us to "exfiltrate" the inner value of the `UseOnce<T>` instance
 by just calling `consume` with the identity function. That's a consequence
@@ -135,7 +137,7 @@ the inner value. However, reasonable people may disagree.
 Thirdly, as was [pointed out](https://www.reddit.com/r/rust/comments/1gzmwcb/comment/lyyqvec/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
 by `u/SkiFire13` in the [reddit thread](https://www.reddit.com/r/rust/comments/1gzmwcb/undroppable_types/),
 this trick relies on the compiler's ability to reason 
-_without optimizations_ that the type will not be dropped. Thus,
+_without optimizations_ that the type will not be dropped[^unspecified]. Thus,
 simply sticking a function call between the creation and consumption of the instance
 will make this code fail[^panic]:
 
@@ -148,6 +150,7 @@ fn main() {
     let _result = instance.consume(|v| v + 1);
 }
 ```
+
 This code does not compile despite the value being consumed. You can see how
 this severely limits the applicability of `UseOnce`. There is an even more cursed
 remedy for that, which is using the idea of the [prevent_drop](https://github.com/mickvangelderen/prevent_drop)
@@ -159,3 +162,4 @@ this case but it also makes the error even uglier[^linker].
 [^title]: Unless you are quoting the title of this article which explicitly says linear types... I feel stupid now.
 [^linker]: Plus it introduces the can of worms of how to know that a symbol name is never going to be actually linked. There are ways around that, but I don't feel they'll be pretty.
 [^panic]: If you want to find out why, it's explained in the comment thread.
+[^unspecified]: To add insult to injury, this implementation relies on [unspecified behavior](https://www.reddit.com/r/rust/comments/1gzmwcb/comment/lyzj7yi/) of the compiler. This won't cause runtime UB though, to my understanding. So the worst thing that can happen is that this neat trick stops compiling alltogether. Thanks to `u/dydhaw` for [mentioning this](https://www.reddit.com/r/rust/comments/1h0zcku/comment/lz7xox5/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button).
