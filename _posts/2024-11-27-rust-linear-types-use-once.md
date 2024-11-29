@@ -164,7 +164,7 @@ where
 }
 ```
 
-[Playground Link](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=6dbc2d2be57320b696e3f91c5ee5621e).
+[Playground Link](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=18cab23d9f56c50bfbae024f863233a7).
 Calling any of these functions will still consume the instance of `UseOnce<T>`,
 but the functions only expose access to the inner value by shared or mutable
 reference, respectively. The borrow checker prohibits simply passing the reference
