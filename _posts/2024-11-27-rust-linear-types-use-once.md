@@ -3,6 +3,7 @@ layout: post
 tags: rust metaprogramming generics
 #categories: []
 date: 2024-11-27
+last_updated: 2024-11-29
 #excerpt: ''
 #image: 'BASEURL/assets/blog/img/.png'
 #description:
@@ -114,7 +115,9 @@ note: the above error was encountered while instantiating `fn <UseOnce<i32> as s
 For more information about this error, try `rustc --explain E0080`.
 ```
 
-Not exactly pretty but it does the trick.
+Not exactly pretty but it does the trick. Note, that the compile error
+is [not triggered](https://www.reddit.com/r/rust/comments/1h0zcku/comment/lzexqsz/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+by simply running `cargo check`, but we need to run `cargo build`.
 
 # Why It's Cursed
 
@@ -125,17 +128,51 @@ and not actually consume it. I don't feel this is a giant problem because it's
 still very explicit and arguably counts as a sort of consumption. However,
 there's a [more fundamental problem](https://www.reddit.com/r/rust/comments/1h0zcku/comment/lzaggnp/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
 with linear types in Rust as pointed out by `u/Shnatsel` in the reddit thread
-for this post.
+for this post. Note also that I am using the term _linear types_ somewhat loosely and incorrectly,
+please see [this comment thread](https://www.reddit.com/r/rust/comments/1h0zcku/comment/lz7xox5/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button).
 
-Secondly, the API allows us to "exfiltrate" the inner value of the `UseOnce<T>` instance
-by just calling `consume` with the identity function. That's a consequence
-of providing an API that accepts functions with non-unit return values.
-I also don't consider this much of a problem, because we can argue that
-we want the `UseOnce<T>` instance itself to be consumed exactly once, not necessary
-the inner value. However, reasonable people may disagree.
+Secondly, the presented API allows us to "exfiltrate" the inner value of the `UseOnce<T>` instance
+by just calling `consume` with the identity function. To address this, we can
+replace the implementation of `consume` by two functions like so:
 
-Thirdly, as was [pointed out](https://www.reddit.com/r/rust/comments/1gzmwcb/comment/lyyqvec/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
-by `u/SkiFire13` in the [reddit thread](https://www.reddit.com/r/rust/comments/1gzmwcb/undroppable_types/),
+```rust
+pub fn consume<F, R>(self, f: F) -> R
+where
+    F: FnOnce(&T) -> R,
+{
+    let mut this = ManuallyDrop::new(self);
+    let mut val = MaybeUninit::uninit();
+    std::mem::swap(&mut this.0, &mut val);
+    unsafe {
+        let val = val.assume_init();
+        f(&val)
+    }
+}
+
+pub fn consume_mut<F, R>(self, f: F) -> R
+where
+    F: FnOnce(Pin<&mut T>) -> R,
+{
+    let mut this = ManuallyDrop::new(self);
+    let mut val = MaybeUninit::uninit();
+    std::mem::swap(&mut this.0, &mut val);
+    unsafe {
+        let mut val = val.assume_init();
+        let pinned = Pin::new_unchecked(&mut val);
+        f(pinned)
+    }
+}
+```
+
+[Playground Link](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=6dbc2d2be57320b696e3f91c5ee5621e).
+Calling any of these functions will still consume the instance of `UseOnce<T>`,
+but the functions only expose access to the inner value by shared or mutable
+reference, respectively. The borrow checker prohibits simply passing the reference
+to the outside. Note that we have used the infamous `Pin` in the `consume_mut`
+function to express that the inner value must not be moved out of this reference[^unsafe]
+
+Thirdly, as was [pointed out](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=02cc5096672900f10fb190595c6361ff)
+by `u/SkiFire13` in the [original reddit thread](https://www.reddit.com/r/rust/comments/1gzmwcb/undroppable_types/),
 this trick relies on the compiler's ability to reason 
 _without optimizations_ that the type will not be dropped[^unspecified]. Thus,
 simply sticking a function call between the creation and consumption of the instance
@@ -163,3 +200,4 @@ this case but it also makes the error even uglier[^linker].
 [^linker]: Plus it introduces the can of worms of how to know that a symbol name is never going to be actually linked. There are ways around that, but I don't feel they'll be pretty.
 [^panic]: If you want to find out why, it's explained in the comment thread.
 [^unspecified]: To add insult to injury, this implementation relies on [unspecified behavior](https://www.reddit.com/r/rust/comments/1gzmwcb/comment/lyzj7yi/) of the compiler. This won't cause runtime UB though, to my understanding. So the worst thing that can happen is that this neat trick stops compiling alltogether. Thanks to `u/dydhaw` for [mentioning this](https://www.reddit.com/r/rust/comments/1h0zcku/comment/lz7xox5/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button).
+[^unsafe]: It's still possible to use unsafe code that violates the semantic restrictions of `Pin` to do that, though.
