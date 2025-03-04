@@ -5,9 +5,11 @@
 // IMPORTS
 //
 
-@import "reset";
-@import "fonts";
-@import "variables";
+@use "reset" as *;
+@use "fonts" as *;
+@use "variables" as *;
+@use "highlights" as *;
+@use "svg-icons" as *;
 // Syntax highlighting @import is at the bottom of this file
 
 /**************/
@@ -389,8 +391,29 @@ footer {
   }
 }
 
-// Settled on moving the import of syntax highlighting to the bottom of the CSS
-// ... Otherwise it really bloats up the top of the CSS file and makes it difficult to find the start
-@import "highlights";
-@import "svg-icons";
-@import "tags";
+// this is for the post title on the front page
+.post-title-above-tags {
+  margin-bottom: 0;
+  font-family: $Gothic;
+  font-size: 95%;
+  font-weight: normal;
+}
+
+.post-tag {
+  display: inline-block;
+  background: lightslategray;
+  padding: 0 .5rem;
+  border-radius: 4px;
+  color: black;
+  font-size: 70%;
+  &:before {
+    content: "\f02b";
+    font-family: FontAwesome;
+    padding-right: .4em;
+  }
+  &:hover {
+    text-decoration: none;
+    background: darkgray;
+    color: white;
+  }
+}
