@@ -19,7 +19,9 @@ comments_id:
 math: true
 ---
 
-TODO INTRO
+This article continues the series on the Variable Projection algorithm and
+explains how rewrite the problem using QR decomposition, rather than the more
+expensive singular value decomposition (SVD).
 
 # Context
 
@@ -52,7 +54,7 @@ $$\boldsymbol{f}$$, which depends on the parameters $$\boldsymbol{c}$$ linearly
 and on the parameters $$\boldsymbol{\alpha}$$ nonlinearly as
 
 $$
-\boldsymbol{f}(\boldsymbol{c},\boldsymbol{\alpha}) = \boldsymbol{\Phi}(\boldsymbol{\alpha})\boldsymbol{c},
+\boldsymbol{f}(\boldsymbol{c},\boldsymbol{\alpha}) = \boldsymbol{\Phi}(\boldsymbol{\alpha})\boldsymbol{c}, \label{f} \tag{1}
 $$
 
 where we call $$\boldsymbol{\Phi}(\boldsymbol{\alpha}) \in \mathbb{R}^{m \times n}$$,
@@ -63,19 +65,33 @@ and the weighted matrix of observations $$\boldsymbol{Y}_w = \boldsymbol{W Y}$$.
 After some math --described in detail in the previous articles-- we end
 up with this functional to minimize, which only depends on $$\boldsymbol{\alpha}$$:
 
-$$\mathcal{F}(\boldsymbol{\alpha}) = \Vert \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \boldsymbol{Y}_w \Vert_2^2,$$
+$$\mathcal{F}(\boldsymbol{\alpha}) = \Vert \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \boldsymbol{Y}_w \Vert_F^2, \label{functional} \tag{2}$$
 
-TODO!!!!!!!!!! WEIGHTED MINIMIZATION
-!!! mention that we are leaving out the dependency on \alpha for notational simplicity.
-!!! it's always there.
+where $$\mathcal{F}(\boldsymbol{\alpha})$$ is the sum of squared residuals we
+want to minimize and $$\lVert . \rVert_F^2$$ is the
+[Frobenius Norm](https://mathworld.wolfram.com/FrobeniusNorm.html).
+$$\boldsymbol{F}(\boldsymbol{\alpha})$$ is also called the *projection functional* and the matrix
+$$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} \in \mathbb{R}^{m \times m}$$ is the
+*projection onto the orthogonal complement of the range of* $$\boldsymbol{\Phi}_w(\boldsymbol{\alpha})$$.
+For this article, I have used the formulation of VarPro that can account for
+multiple [right hand sides](/blog/2024/variable-projection-part-2-multiple-right-hand-sides/),
+but the whole article is also applicable to VarPro with a
+[single right hand side](/blog/2024/variable-projection-part-2-multiple-right-hand-sides/).
+In that case the matrix $$Y_w$$ becomes the observation *vector* $$\boldsymbol{y}_w$$
+and the matrix norm $$\lVert . \rVert_F^2$$ becomes the
+[euclidean norm](https://en.wikipedia.org/wiki/Euclidean_space#Euclidean_norm)
+$$\lVert . \rVert_2^2$$.
 
-We can use the QR-decomposition (with column pivoting) of the matrix $$\boldsymbol{\Phi}_w$$
+In the previous articles, we have used the singular value decomposition of
+$$\boldsymbol{\Phi}_w(\boldsymbol{\alpha})$$ to rewrite the functional.
+Now, we use the QR-decomposition --with column pivoting-- of the matrix $$\boldsymbol{\Phi}_w$$
 as follows[^kaufmann-qr]. I'll leave out the dependency on $$\boldsymbol{\alpha}$$
 for notational simplicity from now on, but all matrices in the following equation
-have a dependency on the nonlinear parameters $$\boldsymbol{\alpha}$$:
+have a dependency on the vector of nonlinear parameters $$\boldsymbol{\alpha}$$.
+The column-pivoted QR decomposition of $$\boldsymbol{\Phi}_w$$ exists so that:
 
 $$
-\boldsymbol{\Phi}_w\boldsymbol{\Pi} = \boldsymbol{Q} \boldsymbol{R},
+\boldsymbol{\Phi}_w\boldsymbol{\Pi} = \boldsymbol{Q} \boldsymbol{R} \label{qr} \tag{3},
 $$
 
 where $$\boldsymbol{\Pi}\in \mathbb{R}^{n\times n}$$ is a permutation matrix
@@ -90,7 +106,7 @@ $$
 \hline
 \boldsymbol{0} & \boldsymbol{0} \\
 \end{array}
-\right] \in \mathbb{R}^{m \times n},
+\right] \in \mathbb{R}^{m \times n}, \label{r} \tag{4}
 $$
 
 where $$\boldsymbol{R_1} \in \mathbb{R}^{r \times r}$$ is a nonsingular upper
@@ -104,53 +120,115 @@ $$
 \begin{array}{c|c}
 \boldsymbol{Q}_1 & \boldsymbol{Q}_2
 \end{array}
-\right],
+\right], \label{q} \tag {5}
 $$
 
 where $$\boldsymbol{Q}_1 \in \mathbb{R}^{m \times r}$$ is the submatrix of the
 first $$r$$ columns, and $$\boldsymbol{Q}_2 \in \mathbb{R}^{m \times (m-r)}$$
-contains the rest.
- 
-
-!!!!!!!!
-
-
+contains the rest. Kaufmann gives us expressions for the pseudoinverse
+$$\boldsymbol{\Phi}_w^\dagger$$ of $$\boldsymbol{\Phi}_w$$ and for the projection
+matrix using the QR decomposition (Kau75):
 
 $$
-\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} = 
-\boldsymbol{Q}
-\left[
-\begin{array}{c|c}
-\boldsymbol{0} & \boldsymbol{0} \\
-\hline
-\boldsymbol{0} & \boldsymbol{I}_{m-r} \\
-\end{array}
-\right]
-\boldsymbol{Q}^T
+\begin{eqnarray}
+  \boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})} &=& 
+  \boldsymbol{Q}
+  \left[
+  \begin{array}{c|c}
+  \boldsymbol{0} & \boldsymbol{0} \\
+  \hline
+  \boldsymbol{0} & \boldsymbol{I}_{m-r} \\
+  \end{array}
+  \right]
+  \boldsymbol{Q}^T
+  =\boldsymbol{Q}
+  \left[
+  \begin{array}{c}
+  \boldsymbol{0} \\
+  \hline
+  \boldsymbol{Q}_2^T \\
+  \end{array}
+  \right]
+  \label{p-qiq}
+  \tag {6}\\[10pt]
+  \boldsymbol{\Phi_w}^\dagger &=& 
+  \boldsymbol{P}
+  \left[
+  \begin{array}{c|c}
+  \boldsymbol{R_1}^-1 & \boldsymbol{0} \\
+  \hline
+  \boldsymbol{0} & \boldsymbol{0} \\
+  \end{array}
+  \right]
+  \boldsymbol{Q}^T. \label{phi-dagger} \tag {7}
+\end{eqnarray}
 $$
 
+Plugging $$\eqref{p-qiq}$$ into $$\eqref{functional}$$ lets us write
+
+
+$$\mathcal{F}(\boldsymbol{\alpha}) = \left\Vert \boldsymbol{Q}
+  \left[
+  \begin{array}{c}
+  \boldsymbol{0} \\
+  \hline
+  \boldsymbol{Q}_2^T \\
+  \end{array}
+  \right]
+  \boldsymbol{Y}_w \right\Vert_F^2=
+  \left\Vert 
+  \left[
+  \begin{array}{c}
+  \boldsymbol{0} \\
+  \hline
+  \boldsymbol{Q}_2^T \\
+  \end{array}
+  \right]
+  \boldsymbol{Y}_w \right\Vert_F^2 
+  =\left\Vert 
+  \boldsymbol{Q}_2^T 
+  \boldsymbol{Y}_w \right\Vert_F^2.
+  \label{functional-q} \tag{8}
+$$
+
+For the first step, we have used the fact that we can just drop $$\boldsymbol{Q}$$
+due to the invariance of the norm under orthogonal transformations[^norm-ortho].
+The functional we want to minimize is thus
 
 $$
-\boldsymbol{\Phi_w}^\dagger = 
-\boldsymbol{P}
-\left[
-\begin{array}{c|c}
-\boldsymbol{R_1}^-1 & \boldsymbol{0} \\
-\hline
-\boldsymbol{0} & \boldsymbol{0} \\
-\end{array}
-\right]
-\boldsymbol{Q}^T
+\mathcal{F}(\boldsymbol{\alpha}) =\left\Vert 
+\boldsymbol{Q}_2^T(\boldsymbol{\alpha})
+\boldsymbol{Y}_w \right\Vert_F^2.
+\label{functional-q2} \tag{9}
 $$
 
+To use off-the-shelf minimization algorithms, like Levenverg-Marquardt, we
+have to calculate the Jacobian matrix. I have given expressions for that
+in the linked articles for single and multiple right hand sides. Instead of
+the partial derivatives for $$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}$$,
+we now need an expression for the partial derivatives of $$\boldsymbol{Q}_2(\boldsymbol{\alpha})$$.
+Luckily, Kaufmann gives an approximation for this expression:
 
 $$
 \frac{\partial \boldsymbol{Q}_2^T}{\boldsymbol{\alpha}_k} \approx -\boldsymbol{Q}_2^T\frac{\partial \boldsymbol{\Phi_w}}{\boldsymbol{\alpha}_k} \boldsymbol{\Phi_w}^\dagger
 $$
 
 There is a typo in the Kaufmann paper for the final form of this equation, which
-leaves out the minus ($$-$$). The previous formulae and the derivation in (Bae23) make
-it clear that this is an oversight.
+leaves out the preceding minus ($$-$$). The previous formulae in (Kau75), and the derivation
+in (Bae23) make it obvious that this is an oversight.
+
+# Conclusion
+
+This is all we need to make VarPro work with column-pivoted QR decompositions
+instead of SVD. Using the QR decomposition with column-pivoting will work even
+if the matrix $$\boldsymbol{\Phi}_w(\boldsymbol{\alpha})$$ becomes singular
+or near-singular while iterating for a solution. If it's safe to assume that this
+won't be the case _for all iterations_, then we can use the QR decomposition
+without column pivoting. This should be even faster to compute and it's 
+what (Bae23) and (Mul08) do. This leads to the same formulae as presented
+above with the difference that there is no permutation matrix
+($$\boldsymbol{\Pi}=\boldsymbol{I}$$) and $$r = \text{rank}(\boldsymbol{\Phi}_w) = n$$,
+which implies $$\boldsymbol{Q}_2 \in \mathbb{R}^{m \times (m-n)}$$.
 
 # References and Further Reading
 
@@ -174,4 +252,5 @@ SIAM J. Numer. Anal. **1973, 10, 413–432**. [DOI link](https://doi.org/10.1137
 
 [^fitting]: VarPro isn't strictly for function fitting only, since it's a way of rewriting _separable_ nonlinear least squares minimization problems. It's just widely employed for model fitting, which is also what I am using it for.
 [^kaufmann-qr]: Note that Kaufmann uses slightly different --but equivalent-- convention for the QR decomposition than this article and (Bae23). This must be taken into account when reading comparing the equations across publications.Specifically, Kaufmann gives the decomposition as $$Q\Phi P = R$$, whereas (Bae23) and I use the more common $$\Phi P = QR$$ convention. That's not a big deal. It just means, that for Kaufmann $$Q$$ means $$Q^T$$ in this article and vice versa.
-[^bae-qr]: While Kaufmann uses QR decomposition with column-pivoting, Bärligea uses QR decomposition without pivoting. There are some slight changes in the formulas to watch out for. Further, the QR decomposition with column-pivoting will be more stable when the function matrix is singular or nearly singular, albeit at a somewhat higher computational cost.
+[^bae-qr]: While Kaufmann uses QR decomposition with column-pivoting, Bärligea uses QR decomposition without pivoting. There are some slight changes in the formulae to watch out for. Further, the QR decomposition with column-pivoting will be more stable when the function matrix is singular or nearly singular, albeit at a somewhat higher computational cost.
+[^norm-ortho]: Hooray for ~~margin~~ endnote proofs: the squared Frobenius norm of a matrix $$\boldsymbol{A}$$ can be written as $$\Vert \boldsymbol{A}\Vert_F^2=\text{trace}(\boldsymbol{A}^T A)$$. With that, it's trivial to show that $$\Vert \boldsymbol{QA}\Vert_F^2=\Vert \boldsymbol{A}\Vert_F^2$$, if $$\boldsymbol{Q}$$ is orthogonal, since $$\boldsymbol{Q Q}^T = \boldsymbol{Q}^T \boldsymbol{Q} = I$$. In the single right hand side case, we would have the euclidean norm of a vector instead of the Frobenius norm. The euclidean norm of a vector is also invariant under orthogonal transformation, i.e. $$\Vert \boldsymbol{Q x}\Vert_2^2 = \Vert \boldsymbol{x}\Vert_2^2$$ for all orthogonal matrices $$\boldsymbol{Q}$$ and all vectors $$\boldsymbol{x}$$.  
