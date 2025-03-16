@@ -11,7 +11,7 @@ title: 'Solving Variable Projection with QR Decomposition'
 #
 #
 # Make sure this image is correct !!!
-og_image: 
+og_image: vapro-with-qr.png
 #
 #
 # make sure comments are enabled
