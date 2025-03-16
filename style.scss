@@ -5,6 +5,8 @@
 // IMPORTS
 //
 
+// once we get sass deprecation warnings, we'll change
+// `@import ...` to `@use ... as *`;
 @import "reset";
 @import "fonts";
 @import "variables";
