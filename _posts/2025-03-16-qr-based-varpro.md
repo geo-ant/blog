@@ -15,7 +15,7 @@ og_image: vapro-with-qr.png
 #
 #
 # make sure comments are enabled
-comments_id: 
+comments_id: 82
 math: true
 ---
 
@@ -39,10 +39,10 @@ knowledge of the first two linked articles, and I'll be using the same notation.
 
 The core computations in my library use the SVD matrix decomposition. While this makes
 the algorithm very robust, it also comes with a speed penalty for problems that
-don't actually require this degree of robustness. There is a known way to speed up
+don't actually require this degree of robustness. There is a well-known way to speed up
 the calculations by using the QR decomposition and some mathematical sleights
 of hand. In fact, that approach is used in many other implementations
-and it's the original idea of Linda Kaufmann in (Kau75). This article explains
+and it's the original idea of Linda Kaufmann, published in (Kau75). This article explains
 that approach. See also (Bae23) for a great recap as well as some cool extensions
 to global fitting[^bae-qr].
 
@@ -109,7 +109,7 @@ $$
 $$
 
 where $$\boldsymbol{R_1} \in \mathbb{R}^{r \times r}$$ is a nonsingular upper triangular
-matrix with $$r = \text{rank} \boldsymbol{\Phi}_w$$. The matrix $$\boldsymbol{R}_2$$
+matrix with $$r = \text{rank} \boldsymbol{\Phi}_w$$. The matrix $$\boldsymbol{R}_2 \in \mathbb{R}^{r \times (n-r)}$$
 contains values that we won't need for the rest of this article[^r2-fullrank]. It is useful
 to divide $$\boldsymbol{Q}$$ into two sub-matrices as well like so:
 
@@ -220,11 +220,11 @@ To use off-the-shelf minimization algorithms, like Levenverg-Marquardt, we
 have to calculate the Jacobian matrix. I have given expressions for that
 in the linked articles for single and multiple right hand sides. Instead of
 the partial derivatives for $$\boldsymbol{P}^\perp_{\boldsymbol{\Phi_w}(\boldsymbol{\alpha})}$$,
-we now need an expression for the partial derivatives of $$\boldsymbol{Q}_2(\boldsymbol{\alpha})$$.
+we now need an expression for the partial derivatives of $$\boldsymbol{Q}_2^T(\boldsymbol{\alpha})$$.
 Luckily, Kaufmann gives an approximation for this expression:
 
 $$
-\frac{\partial \boldsymbol{Q}_2^T}{\boldsymbol{\alpha}_k} \approx -\boldsymbol{Q}_2^T\frac{\partial \boldsymbol{\Phi_w}}{\boldsymbol{\alpha}_k} \boldsymbol{\Phi_w}^\dagger, \tag{10}
+\frac{\partial \boldsymbol{Q}_2^T}{\alpha_k} \approx -\boldsymbol{Q}_2^T\frac{\partial \boldsymbol{\Phi_w}}{\alpha_k} \boldsymbol{\Phi_w}^\dagger, \tag{10}
 $$
 
 with $$\boldsymbol{\Phi}^\dagger$$ as in $$\eqref{phi-dagger}$$. There is a
@@ -240,7 +240,7 @@ if the matrix $$\boldsymbol{\Phi}_w(\boldsymbol{\alpha})$$ becomes singular
 or near-singular while iterating for a solution. If it's safe to assume that this
 won't be the case _for all iterations_, then we can use the QR decomposition
 without column pivoting. This should be even faster to compute, and it's 
-what (Bae23) and (Mul08) do. This leads to the same formulae as presented
+what (Bae23) and (Mul08) do. This leads to virtually the same formulae as presented
 above with the difference that there is no permutation matrix
 ($$\boldsymbol{\Pi}=\boldsymbol{I}$$) and $$r = \text{rank}(\boldsymbol{\Phi}_w) = n$$,
 which implies $$\boldsymbol{Q}_2 \in \mathbb{R}^{m \times (m-n)}$$.
@@ -266,7 +266,7 @@ SIAM J. Numer. Anal. **1973, 10, 413–432**. [DOI link](https://doi.org/10.1137
 # Endnotes
 
 [^fitting]: VarPro isn't strictly for function fitting only, since it's a way of rewriting _separable_ nonlinear least squares minimization problems. It's just widely employed for model fitting, which is also what I am using it for.
-[^kaufmann-qr]: Note that Kaufmann uses slightly different --but equivalent-- convention for the QR decomposition than this article and (Bae23). This must be taken into account when reading comparing the equations across publications. Specifically, Kaufmann gives the decomposition as $$Q\Phi P = R$$, whereas (Bae23) and I use the more common $$\Phi P = QR$$ convention. That's not a big deal. It just means, that for Kaufmann $$Q$$ means $$Q^T$$ in this article and vice versa.
+[^kaufmann-qr]: Note that Kaufmann uses slightly different --but equivalent-- convention for the QR decomposition than this article and (Bae23). This must be taken into account when comparing the equations across publications. Specifically, Kaufmann gives the decomposition as $$Q\Phi P = R$$, whereas (Bae23) and I use the more common $$\Phi P = QR$$ convention. That's not a big deal. It just means, that for Kaufmann $$Q$$ means $$Q^T$$ in this article and vice versa.
 [^bae-qr]: While Kaufmann uses QR decomposition with column-pivoting, Bärligea uses QR decomposition without pivoting. There are some slight changes in the formulae to watch out for. Further, the QR decomposition with column-pivoting will be more stable when the function matrix is singular or nearly singular, albeit at a somewhat higher computational cost.
 [^norm-ortho]: Hooray for ~~margin~~ endnote proofs: the squared Frobenius norm of a matrix $$\boldsymbol{A}$$ can be written as $$\Vert \boldsymbol{A}\Vert_F^2=\text{trace}(\boldsymbol{A}^T A)$$. With that, it's trivial to show that $$\Vert \boldsymbol{QA}\Vert_F^2=\Vert \boldsymbol{A}\Vert_F^2$$, if $$\boldsymbol{Q}$$ is orthogonal, since $$\boldsymbol{Q Q}^T = \boldsymbol{Q}^T \boldsymbol{Q} = I$$. In the single right hand side case, we would have the euclidean norm of a vector instead of the Frobenius norm. The euclidean norm of a vector is also invariant under orthogonal transformation, i.e. $$\Vert \boldsymbol{Q x}\Vert_2^2 = \Vert \boldsymbol{x}\Vert_2^2$$ for all orthogonal matrices $$\boldsymbol{Q}$$ and all vectors $$\boldsymbol{x}$$.  
 [^r2-fullrank]: If $$\boldsymbol{\Phi}_w$$ has full rank, i.e. $$r = n$$, then the matrix $$\boldsymbol{R}_2$$ has zero columns.
