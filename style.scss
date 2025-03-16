@@ -5,11 +5,11 @@
 // IMPORTS
 //
 
-@use "reset" as *;
-@use "fonts" as *;
-@use "variables" as *;
-@use "highlights" as *;
-@use "svg-icons" as *;
+@import "reset";
+@import "fonts";
+@import "variables";
+@import "highlights";
+@import "svg-icons";
 // Syntax highlighting @import is at the bottom of this file
 
 /**************/
