@@ -35,8 +35,12 @@ first try, we could structure our code like so:
 struct SystemAudio {/* ...*/}
 
 impl SystemAudio {
-    fn new(/* config */) -> Self {/*...*/}
-    fn play_music(&self) {/* ...*/}
+    fn new(/* config */) -> Self {
+        /*...*/
+    }
+    fn play_music(&self) {
+        /* ...*/
+    }
 }
 
 // ❓ how do we test this??
@@ -52,7 +56,7 @@ I am a huge nut for testability. I need to make sure that I can test the
 behavior of that function. The least I want to do, is make sure that the
 `play_music` function of the `audio` instance really gets called.
 
-One great way to make all kinds of things testable is [dependency inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle),
+One great way to make all kinds of code testable is [dependency inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle),
 which boils down to coding against interfaces rather than concrete types[^solid]. So
 rather than passing in our imaginary `SystemAudio` instance directly, we'll
 define a trait `Audio` to abstract over the behavior of the audio backend.
@@ -68,11 +72,15 @@ trait Audio {
 struct SystemAudio {/* ...*/}
 
 impl SystemAudio {
-    fn new(/* config */) -> Self {/*...*/}
+    fn new(/* config */) -> Self {
+        /*...*/
+    }
 }
 
 impl Audio for SystemAudio {
-    fn play_music(&self) {/* ...*/}
+    fn play_music(&self) {
+        /* ...*/
+    }
 }
 
 // ⚡ this doesn't compile
