@@ -7,15 +7,15 @@ date: 2025-06-15
 #image: 'BASEURL/assets/blog/img/.png'
 #description:
 #permalink:
-title: 'A Tale of Testability: Sending Non-Send Types in Rust'
+title: 'A Tale of Testability and Sending Non-Send Types in Rust'
 #
 #
 # Make sure this image is correct !!!
-og_image: 
+og_image: testing-and-send.png
 #
 #
 # make sure comments are enabled
-comments_id: 
+comments_id: 86
 math: false
 ---
 
@@ -58,7 +58,7 @@ behavior of that function. The least I want to do, is make sure that the
 
 One great way to make all kinds of code testable is [dependency inversion](https://en.wikipedia.org/wiki/Dependency_inversion_principle),
 which boils down to coding against interfaces rather than concrete types[^solid]. So
-rather than passing in our imaginary `SystemAudio` instance directly, we'll
+rather than passing in our `SystemAudio` instance directly, we'll
 define a trait `Audio` to abstract over the behavior of the audio backend.
 This allows us to mock the audio backend for testing. During testing, we can
 pass in our mock to make sure that the correct behavior was indeed invoked. So
@@ -99,16 +99,19 @@ to move it into the thread. If we can further restrict `A` to be `Send` and
 But what if we _can't_? What if our production audio backend really does not
 implement `Send`?
 
-# How Do We `impl Send` for a Non-`Send` Type?
+# How Do We impl Send for a !Send Type?
 
-!!! TODO: THAT'S THE NEAT PART !!!
+<figure>
+ <img src="/blog/images/rust-testing-send/you-dont-2.jpg" alt="Visualization of the FT and DTFT" style="max-width:100%">
+ <figcaption>The answer to the section heading in a nutshell.</figcaption>
+</figure>
 
 If we've written a type `T`, where the compiler doesn't automatically implement
 `Send` but _we know it would be sound to do so_, we can of course [implement `Send`](https://doc.rust-lang.org/nomicon/send-and-sync.html)
 manually and call it a day[^pointers]. However, what if the compiler doesn't implement
 `Send` on our type for a good reason? Let's say we're using a field of foreign type
-`U` that is itself not `Send`. We'd better assume that the authors of the type deliberately did not implement
-`Send`. Thus, just overriding their decision and manually implementing `Send` on our
+that is itself not `Send`. We'd better assume that the crate authors deliberately did not implement
+`Send` on that type. Thus, just overriding their decision by manually implementing `Send` on our
 type might be unsound. So that's out of the question, unless we have a _very good_ reason
 to believe it's sound.
 
@@ -128,8 +131,7 @@ The short answer is: No, I don't think so, let's have a look on crates.io:
   type from a non-`Send` type. Diplays a "my code is erroneous, don't use"
   warning. I guess we won't be using that then.
 * [`send_cells`](https://crates.io/crates/send_cells): a pretty recent crate
-  claiming to be an alternative to `fragile` (see below) and additionally
-  offers unsafe interfaces.
+  claiming to be an alternative to `fragile` (see below).
 * [`sendable`](https://crates.io/crates/sendable): I believe this crate is concerned
   with sharing resources, rather than moving values across threads. We might
   be able to use it for our purpose, but it would only give us runtime guarantees
@@ -148,7 +150,7 @@ already ruled that out for good reason.
 
 # Why Even Test `spawn_thread`?
 
-Yes, why even do that if the Rust compiler seems to make it hard? Even if we
+Yes, why even do that if the Rust compiler makes it so hard? Even if we
 generally agree on the value of testing, we might be tempted to refactor our
 code like so:
 
@@ -166,24 +168,25 @@ fn execute_thread<A: Audio>(audio: A) {
 }
 ```
 
-Now, we can write a nice test for `execute_thread`, since it depends
+Now, we can write a nice test for `execute_thread`, since that still depends
 on an interface, rather than a concrete type. Isn't this basically just as
 good as testing `spawn_thread`? After all, `spawn_tread` only calls
 `execute_thread` with a `SystemAudio` instance, which we want to use in
 production anyways. Call me crazy, but I'll argue this is not good enough.
 
-To my mind, we should treat items under tests as black boxes as much as is
+To my mind, we should treat items under test as black boxes as much as is
 feasible. Testing `execute_thread` as a substitute for `spawn_thread` relies
 on the knowledge that `spawn_thread` only calls `execute_thread` in a new
 thread. But from a testing point of view, that's an implementation detail we
 shouldn't care about. We should instead be interested in making sure that
 `spawn_thread` does the right thing. This might seem overly pedantic, but
-imagine someone else editing our `spawn_thread` and sticking some more logic
-in there. I personally would want to have a test for `spawn_thread` that flags if something
-unexpected happens, to catch errors higher up the chain. To my mind, this is
-the most important thing. It's not about getting a couple lines more test coverage,
+imagine someone else[^someone-else] editing our `spawn_thread` and inadvertendly introducing a bug.
+I personally would want to have a test for `spawn_thread` that flags if something
+unexpected happens, to catch errors higher up the chain.
+
+For me, that's the most important thing. It's not about getting a couple lines more test coverage,
 but it's about testing the behavior of the things that are actually used... at
-_all_ levels of integration[^downstream-tests]. I'll go one further and will also
+_all_ levels of integration[^downstream-tests]. I'll one up myself and also
 claim that putting in the effort to make `spawn_thread` testable leads to a better design.
 
 # Advanced Dependency Inversion
@@ -223,14 +226,13 @@ that illustrates the use. Here's what we can do now:
 spawn_thread(||SystemAudio::default());
 // a mocking backend 
 spawn_thread(||MockAudio);
-// passing in a configuratio to the
-// closure
+// passing in a configuration
 let config = AudioConfiguration {device: 123, volume: 0.5}; 
 spawn_thread(move ||SystemAudio::with_config(config));
 ```
 
 Using the new API like this is almost as simple as passing in
-the instance, and it makes `spawn_thread` completely testable.
+the instance itself, and it makes `spawn_thread` completely testable.
 We just have to add `||` or `move ||`. One problem we have to deal with
 is constructor failure, meaning the constructor function might
 return a `Result<A,E>` rather than an `A` directly. We have to make the
@@ -243,7 +245,7 @@ In this last section, let me defend my claim that this design is better,
 _not only_ because it makes `spawn_thread` testable. This design also decouples
 the implementation of `spawn_thread` from the actual audio backend again, by
 using dependency inversion. This means that we can use different audio backends
-either at runtime by refactoring to `dyn Audio`, or at compile time e.g. for
+either at runtime (by refactoring to `dyn Audio`), or at compile time e.g. for
 different operating systems or hardware.
 
 I believe the benefits of this approach completely justify the additional complexity...
@@ -257,3 +259,4 @@ even if this starts looking a bit like a factory pattern. It's no
 [^downstream-tests]: Don't get me wrong: you shouldn personally would only test the highest, most integrated, levels of our code. It's good to test `execute_thread` in our example. But, to my mind, that should not absolve us from having to test `spawn_thread` as well.
 [^constructor]: We could also extend the `Audio` trait to provide a constructor. I don't like this quite as much because different implementors of the `Audio` trait might need different parameters for callable `F` .
 [^solid]: Say what you will about SOLID, but dependency inversion is the hill I am willing to die on.
+[^someone-else]: Yes, yes... those pesky _other_ developers. Of course _we_ would never introduce a bug ourselves, right? ;)
