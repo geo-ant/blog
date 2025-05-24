@@ -2,7 +2,7 @@
 layout: post
 tags: rust generics design-patterns testing
 #categories: []
-date: 2025-06-15
+date: 2025-05-24
 #excerpt: ''
 #image: 'BASEURL/assets/blog/img/.png'
 #description:
