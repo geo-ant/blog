@@ -3,6 +3,7 @@ layout: post
 tags: rust generics design-patterns testing
 #categories: []
 date: 2025-05-24
+last_updated: 2025-05-26
 #excerpt: ''
 #image: 'BASEURL/assets/blog/img/.png'
 #description:
@@ -143,10 +144,18 @@ The short answer is: No, I don't think so, let's have a look on crates.io:
   thread that wrapped the value is attempting to access it". That's the
   opposite of what we want.
 
-Please tell me if I'm wrong about this: for fundamental reasons, I can't imagine a
+~~Please tell me if I'm wrong about this: for fundamental reasons, I can't imagine a
 crate existing that gives us `Send` wrappers for non-`Send` types without using
 `unsafe` code that would be equivalent to implementing `Send` ourselves. We've
-already ruled that out for good reason. 
+already ruled that out for good reason.~~
+
+**Update (2025-05-26)**: Fellow Rustacean [Skepfyr](https://crates.io/users/Skepfyr)
+pointed out their [`diplomatic-bag`](https://crates.io/crates/diplomatic-bag) crate
+to me, which does the thing I said couldn't be done. It comes with
+[some caveats](https://docs.rs/diplomatic-bag/0.3.1/diplomatic_bag/struct.DiplomaticBag.html)
+that are well documented. I'd still argue that the solution proposed in this
+article leads to an overall better design than just making a `!Send` type `Send`,
+but that might just be my propensity for obsessive testing speaking.
 
 # Why Even Test `spawn_thread`?
 
@@ -217,14 +226,13 @@ fn spawn_thread<F,A>(audio_constructor: F)
 Instead of passing in the `audio` instance itself, we now pass in a callable
 that constructs the instance. The callable `F` itself is restricted on `Send + 'static`,
 but `A` is _not_ restricted on either of these bounds. I've created a slighty
-more involved [example on the playground](https://play.rust-lang.org/?version=nightly&mode=debug&edition=2021&gist=33e3b1f6629d93b946c221d2803029d4)
+more involved [example on the playground](https://play.rust-lang.org/?version=nightly&mode=debug&edition=2021&gist=4860d3857078bb5b69c3cf704818c743)
 that illustrates the use. Here's what we can do now:
 
 ```rust
-// passing a default system backend
-// using a closure.
-spawn_thread(||SystemAudio::default());
-// a mocking backend 
+// passing a function
+spawn_thread(SystemAudio::default);
+// a callable that returns a mocking backend 
 spawn_thread(||MockAudio);
 // passing in a configuration
 let config = AudioConfiguration {device: 123, volume: 0.5}; 
@@ -233,9 +241,8 @@ spawn_thread(move ||SystemAudio::with_config(config));
 
 Using the new API like this is almost as simple as passing in
 the instance itself, and it makes `spawn_thread` completely testable.
-We just have to add `||` or `move ||`. One problem we have to deal with
-is constructor failure, meaning the constructor function might
-return a `Result<A,E>` rather than an `A` directly. We have to make the
+One problem we have to deal with is constructor failure, meaning the constructor
+function might return a `Result<A,E>` rather than an `A` directly. We have to make the
 thread communicate the error to the outside. However, that problem isn't unique
 to this approach, so I'll leave it at that.
 
@@ -255,8 +262,8 @@ even if this starts looking a bit like a factory pattern. It's no
 # Endnotes
 [^trivial-example]: Since this example is so trivial, there are other ways to go about testing it. But I want to focus on the bare essentials of the problem and I ask you to bear with me, dear reader.
 [^mutex-sync]: Matters would be different if we were interested in implementing `Send` _and_ `Sync` on a type `T` that _only_ implements `Send`. In this case, reachig for `Mutex<T>` is a solution.
-[^pointers]: This can happen if our type contains a raw pointer field.
-[^downstream-tests]: Don't get me wrong: you shouldn personally would only test the highest, most integrated, levels of our code. It's good to test `execute_thread` in our example. But, to my mind, that should not absolve us from having to test `spawn_thread` as well.
-[^constructor]: We could also extend the `Audio` trait to provide a constructor. I don't like this quite as much because different implementors of the `Audio` trait might need different parameters for callable `F` .
+[^pointers]: This commonly happens, e.g. if our type contains a raw pointer field. 
+[^downstream-tests]: Don't get me wrong: I am not suggesting to only test the highest, most integrated, levels of our code. It's good to test `execute_thread` in our example. But, to my mind, that should not absolve us from having to test `spawn_thread`, too.
+[^constructor]: We could also extend the `Audio` trait to provide a constructor. I don't like this quite as much, because different implementors of the `Audio` trait might need different arguments for construction.
 [^solid]: Say what you will about SOLID, but dependency inversion is the hill I am willing to die on.
-[^someone-else]: Yes, yes... those pesky _other_ developers. Of course _we_ would never introduce a bug ourselves, right? ;)
+[^someone-else]: Yes, those pesky _other_ developers. Of course _we_ would never introduce a bug ourselves, right? ;)
