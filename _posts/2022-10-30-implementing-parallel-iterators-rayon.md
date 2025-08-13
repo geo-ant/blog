@@ -191,7 +191,7 @@ we find:
 
 The last sentence tells us that this is exactly what we need. It is worth noting
 that `bridge` requires the first argument (i.e. `self`) to implement `IndexedParallelIterator`,
-which is no problem for us, because that is what we are doing anyways. That lets
+which is no problem for us, because that is what we are doing anyway. That lets
 us fill all but one method with the correct logic. Before we see how to implement
 `with_producer`, let's throw in a low-hanging optimization.
 
@@ -342,7 +342,7 @@ designed) `callback.callback(producer)` syntax.
 
 Now we have sucessfully implemented a parallel iterator. There is one final thing
 we need to do before we can use it. We have to expose an interface on our data structure
-to get one. We can for example expose a member function
+to get one. We can, for example, expose a member function
 
 ```rust
 impl DataCollection {

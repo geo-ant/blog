@@ -179,9 +179,9 @@ fn execute_thread<A: Audio>(audio: A) {
 
 Now, we can write a nice test for `execute_thread`, since that still depends
 on an interface, rather than a concrete type. Isn't this basically just as
-good as testing `spawn_thread`? After all, `spawn_tread` only calls
+good as testing `spawn_thread`? After all, `spawn_thread` only calls
 `execute_thread` with a `SystemAudio` instance, which we want to use in
-production anyways. Call me crazy, but I'll argue this is not good enough.
+production anyway. Call me crazy, but I'll argue this is not good enough.
 
 To my mind, we should treat items under test as black boxes as much as is
 feasible. Testing `execute_thread` as a substitute for `spawn_thread` relies

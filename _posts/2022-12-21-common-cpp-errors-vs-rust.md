@@ -40,7 +40,7 @@ to explore how Rust stacks up on a more fundamental level.
 
 We probably all know how array or vector access using operator `[]` can cause out of
 bounds access in C++. For example, for `std::vector` it does [not perform bounds checking](https://en.cppreference.com/w/cpp/container/vector/operator_at),
-so an illegal memory access can occurr unnoticed[^arrays]. The problem is not that this
+so an illegal memory access can occur unnoticed[^arrays]. The problem is not that this
 is possible at all, since a systems language that cares about performance
 _must_ offer these kinds of unchecked accesses. The problem is that 
 this most fundamental way to access a vector element, deep in every programmers DNA, is

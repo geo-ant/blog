@@ -258,7 +258,7 @@ fn takes_field<T>(t: /*field type*/) {}
 ```
 
 The question is now: can you write `takes_field(value)` without explicitly specifying
-the generic type `T`? For example if the field type is `T`, `&T`, `Option<T>`,
+the generic type `T`? For example, if the field type is `T`, `&T`, `Option<T>`,
 `Option<Result<T,()>>`, you definitely can! That's a _direct_ dependency of the
 field type on the generic type `T`. However, if the field type is something like
 `T::AssocType`, you can't. One reason is that many types `T` or `U` could have

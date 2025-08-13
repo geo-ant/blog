@@ -51,7 +51,7 @@ is the process of fitting a model function to data by minimizing the sum of the 
 residuals. It's called *nonlinear* least squares as opposed to *linear* least 
 squares because the function in question can be nonlinear in the fitting parameters. 
 If the function was purely linear in the fitting parameters, we could take advantage 
-of the fact that linear least squares problems can be [very efficiently solved](https://en.wikipedia.org/wiki/Linear_least_squares). 
+of the fact that linear least squares problems can be [very efficiently solved](https://en.wikipedia.org/wiki/Linear_least_squares).
 
 VarPro shines when fitting a model function that is comprised of both linear
 and nonlinear parameters or rather, to be more precise, if the model is _separable_.
@@ -107,7 +107,7 @@ written as
 
 $$\min_{\boldsymbol{c}\in \mathbb{R}^n, \boldsymbol{\alpha}\in\mathcal{S}_\alpha} R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) \label{FullMinimization}\tag{2}.$$
 
-Note that the nonlinear parameters can be constrained on a subset $$\mathcal{S}_\alpha$$ of $$\mathbb{R}^q$$
+Note that the nonlinear parameters can be constrained on a subset $$\mathcal{S}_\alpha$$ of $$\mathbb{R}^q$$, 
 while the linear parameters are unconstrained[^unconstrained].
 
 # Separating Linear from Nonlinear Parameters
@@ -205,7 +205,7 @@ R_{WLS}(\boldsymbol{\alpha},\boldsymbol{c}) &=& \lVert \boldsymbol{r}_w\rVert^2_
 
 where $$\boldsymbol{r}_w$$ is the _residual vector_.
 When written like this, $$R_{WLS}$$ is called the *projection functional*, which
-is the  the reason why the method is called  *Variable Projection* (Mullen 2009).
+is the reason why the method is called *Variable Projection* (Mullen 2009).
 
 At this point we are almost halfway there. Our aim is to minimize the projection 
 functional using a (possibly constrained) minimization algorithm. If we want to 
@@ -318,7 +318,7 @@ $$
 
 This approximation reduces the computational burden of calculating the Jacobian,
 while still retaining good numerical accuracy (Kaufman 1975). It implies that
-we can approximate the columns of the jacobian as:
+we can approximate the columns of the Jacobian as:
 
 $$
 \boldsymbol{j}_k \approx - \boldsymbol{a_k}
@@ -504,7 +504,7 @@ an urgent need to explore the ideas presented here, but I also cannot quite let
 them go.
 
 If we want to minimize the weighted residual $$R_{WLS}$$ using a general purpose minimizer, 
-then it is preferrable to know its gradient with respect to $$\boldsymbol{\alpha}$$.
+then it is preferable to know its gradient with respect to $$\boldsymbol{\alpha}$$.
 The weighted residual is given in eq. $$\eqref{Rwls}$$. Its gradient is:
 
 $$\nabla R_{WLS}(\boldsymbol\alpha) = \left(\frac{\partial R_{WLS}}{\partial\alpha_1}(\boldsymbol\alpha),\dots,\frac{\partial R_{WLS}}{\partial\alpha_q}(\boldsymbol\alpha)\right)^T.$$
@@ -521,7 +521,7 @@ $$\begin{eqnarray}
 where $$\boldsymbol{j_k}$$ is the $$k$$-th 
 column of the Jacobian $$\boldsymbol{J}(\boldsymbol\alpha)$$, and $$\boldsymbol{r_w}$$ 
 is the weighted residual vector as defined above. We can simplify these expressions 
-if we use the Kaufmann approximation for the Jacobian:
+if we use the Kaufman approximation for the Jacobian:
 
 $$\begin{eqnarray}
 \frac{\partial}{\partial \alpha_k} R_{WLS} &=& -2\, \boldsymbol{r_w}\cdot \boldsymbol{a_k} \\
@@ -552,9 +552,9 @@ $$\begin{eqnarray}
 where we have used the property $$\boldsymbol{\Phi_w}^\dagger = \boldsymbol{\Phi_w}^\dagger \boldsymbol{\Phi_w}\boldsymbol{\Phi_w}^\dagger$$
 of the Moore-Penrose pseudoinverse.
 
-For a general purpose nonlinear minimizer we typically have to supply $$R_{WLS}$$
+For a general purpose nonlinear minimizer, we typically have to supply $$R_{WLS}$$
 and its gradient, maybe additionally the Hessian if we feel particularly adventurous.
-The gradient is very simple to calculate,since it does not 
+The gradient is very simple to calculate, since it does not 
 require the projection matrix or its decomposition explicitly. I say explicitly 
 because we will still need to solve the linear system to obtain $$\boldsymbol{\hat{c}}$$,
 but we might use a linear algebra library that hides that complexity from us.

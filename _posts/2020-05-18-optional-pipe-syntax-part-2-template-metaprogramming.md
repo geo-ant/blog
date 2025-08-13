@@ -66,7 +66,7 @@ Our goal above was to use `wrap_return_type_t<U>` to find the return type of the
 >
 > &mdash; [cppreference.com](https://en.cppreference.com/w/cpp/language/sfinae)
 
-Since we are using the return type in a function template (the pipe operator), this really does apply here. If we want to remove a particular overload, we need to make template substitution fail. How do we do this? We just write an piece of code that would cause a compilation error in other circumstances. We can make `wrap_return_type_t<void>` an invalid expression by not providing a `type` typedef inside the template specialization:
+Since we are using the return type in a function template (the pipe operator), this really does apply here. If we want to remove a particular overload, we need to make template substitution fail. How do we do this? We just write a piece of code that would cause a compilation error in other circumstances. We can make `wrap_return_type_t<void>` an invalid expression by not providing a `type` typedef inside the template specialization:
 
 ```c++
 template<>
