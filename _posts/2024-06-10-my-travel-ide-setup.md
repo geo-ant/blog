@@ -201,7 +201,7 @@ While I am very happy with this setup, there are some things that I did not yet
 get to work or that are otherwise worth mentioning here.
 
 Firstly, I did not get debugging working for Rust and C++. Unfortunately
-helix' debugging support so far isn't great anyways, but I could not even get the required
+helix' debugging support so far isn't great anyway, but I could not even get the required
 debug adapter installed on my system (`lldb-vscode`). I'm grateful for hints.
 
 Another program that I dearly miss is `perf`. Termux does not have it packaged and it
@@ -216,12 +216,12 @@ to Ctrl. There are key remapping tools for Android out there, but I could not ye
 working for me. Leave a comment if you know.
 
 The last thing that should be mentioned is that Android tablets typically use
-Arm processors. That means if you (or a library that you depend on) use x86 instrinsics,
+Arm processors. That means if you (or a library that you depend on) use x86 intrinsics,
 they won't work. Depending how you look at it, it can also be pretty cool
-to have easy access to an Arm processor. Most of the time you won't notice anyways.
+to have easy access to an Arm processor. Most of the time you won't notice anyway.
 
 One problem I never had was performance. Granted, I don't use my travel setup
-for huge projects, but I have recently developed and shipped a new version of my Rust [nonlinear regresssion
+for huge projects, but I have recently developed and shipped a new version of my Rust [nonlinear regression
 library](https://crates.io/crates/varpro) with it.
 
 # Final Words

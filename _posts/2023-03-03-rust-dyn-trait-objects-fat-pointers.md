@@ -171,7 +171,7 @@ A naive approach would be to store the whole vtable instance as part of a trait 
 that would be wasteful for multiple reasons: First of all this approach would add
 a number of pointer members to each instance, which will waste precious
 memory. Secondly, not every instance of a cat requires
-its own vtable instance. All trait related functions pointers of one type would point to the same functions anyways.
+its own vtable instance. All trait related functions pointers of one type would point to the same functions anyway.
 Specifically, for our cat example the function pointer for `sound` will always
 point to the code for the `<Cat as Pet>::sound` function. That is true for all instances
 of `Cat`. Thus, we only need one vtable _per type_, so it makes sense to create one global instance

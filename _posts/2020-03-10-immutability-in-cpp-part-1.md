@@ -12,7 +12,7 @@ comments_id: 3
 math: true
 ---
 
-In an attempt to increase my functional programming skills in C++, I went full functional when writing a simulation for a childrens game. Trying to implement a game state using the paradigms of functional programming presents some interesting challenges. In this post I will explore the concept of *immutability* and how we can implement it in C++ for all kinds of stateful objects.
+In an attempt to increase my functional programming skills in C++, I went full functional when writing a simulation for a children's game. Trying to implement a game state using the paradigms of functional programming presents some interesting challenges. In this post I will explore the concept of *immutability* and how we can implement it in C++ for all kinds of stateful objects.
 
 # Immutability in Functional Programming
 
@@ -59,13 +59,13 @@ public:
 
 };
 ```
-Not crazy, but there is a few things that are different from the usual object oriented way.
+Not crazy, but there are a few things that are different from the usual object oriented way.
 
 ## The Constructor
 The state of the object is initialized at construction. After that it cannot be changed. That means the constructor of this immutable class is the central place that has to enforce the invariants of the class. Here we could for example throw an exception if the number of steps for any player is negative or exceeds `MAX_STEPS`.
 
 ## Member Variables and Functions
-All member variables and member functions are public. The member variables are constants, the functions are `const` qualified. That makes it uneccessary to encapsulate members because they cannot be changed from the outside. Thus we have no getter and setter functions. We just access the steps of the two players by directly accessing the array:
+All member variables and member functions are public. The member variables are constants, the functions are `const` qualified. That makes it unnecessary to encapsulate members because they cannot be changed from the outside. Thus we have no getter and setter functions. We just access the steps of the two players by directly accessing the array:
 
 ```c++
 game_state game;
@@ -90,7 +90,7 @@ game_state game_state::add_steps(int player_index, int amount) const
 }
 ```
 
-This function creates a new game object from its own state. A keen observer will notice that I have created a mutable copy of the state before using that as the input for the constructor. That is were my dogmatism ends.
+This function creates a new game object from its own state. A keen observer will notice that I have created a mutable copy of the state before using that as the input for the constructor. That is where my dogmatism ends.
 
 # Final Thoughts
 The main problem any programmer will notice with the code above is that data gets copied at every step. To a certain extent, we cannot avoid that if we want to have immutable objects. But C++ offers us move semantics which can lead to optimized code. However, for const members we lose the move constructors because we cannot move from const objects. For the example above that is *no problem at all*, because there is no use in move semantics for `int` and thus for an `std::array` of `int`.

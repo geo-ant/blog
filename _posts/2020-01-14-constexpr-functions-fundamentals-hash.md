@@ -27,7 +27,7 @@ unsigned long hash(unsigned char *str)
 }
 ```
 
-The function takes a C-style string, loops over all its elements until it reaches the zero-terminator, performs the hashing calculation and returns a hash. Nothing too crazy there except from some magical constants (33 and 5381). As a little side note: I have used the bitwise xor variant here and also written `hash=(33 * hash)^c` instead of the often cited `hash = (((hash << 5) + hash)^c` which is just the same thing but less readable. I trust my compiler to optimize the expression.
+The function takes a C-style string, loops over all its elements until it reaches the zero-terminator, performs the hashing calculation and returns a hash. Nothing too crazy there except for some magical constants (33 and 5381). As a little side note: I have used the bitwise xor variant here and also written `hash=(33 * hash)^c` instead of the often cited `hash = (((hash << 5) + hash)^c` which is just the same thing but less readable. I trust my compiler to optimize the expression.
 
 Let us see how we can transform it into a `constexpr` function that can be executed at compile time or at runtime in C++ 17.
 
