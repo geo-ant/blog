@@ -342,7 +342,7 @@ designed) `callback.callback(producer)` syntax.
 
 Now we have sucessfully implemented a parallel iterator. There is one final thing
 we need to do before we can use it. We have to expose an interface on our data structure
-to get one. We can for example expose a member function
+to get one. We can, for example, expose a member function
 
 ```rust
 impl DataCollection {

@@ -272,7 +272,7 @@ ASan proved invaluable for me, because it helped me find and eventually fix a we
 out of bounds memory access, that was producing segfaults sometimes and hot
 garbage at other times. I was really happy that the integration across languages
 was pretty smooth, after figuring out I needed the static runtime. There is much
-more we can do with ASan in Rust, for example it can also help us find some problems
+more we can do with ASan in Rust, for example, it can also help us find some problems
 in unsafe Rust code, a small --but important-- subset of what [miri](https://github.com/rust-lang/miri) does,
 where ASan lets the program run much faster than miri.
 

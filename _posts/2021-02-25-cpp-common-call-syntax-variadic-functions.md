@@ -15,7 +15,7 @@ comments_id: 23
 Inspired by the previous article on creating a common interface to call and pass functions of different numbers of arguments in Rust, I wanted to see if and how I could make this work in C++. I was able to get a very similar thing working in C++ at the expense of some of my sanity. Here we go.
 
 # Our Goals
-Our goals for this article are very similar to the goals of the [previous article](/blog/2021/rust-traits-and-variadic-functions/), where we wrote a common interface to call and pass functions with different numbers of arguments. In this post, I want to explore whether I can achieve a similar effect in Modern C++. Given two callables, each taking one and two arguments, respectively. For example these two callables:
+Our goals for this article are very similar to the goals of the [previous article](/blog/2021/rust-traits-and-variadic-functions/), where we wrote a common interface to call and pass functions with different numbers of arguments. In this post, I want to explore whether I can achieve a similar effect in Modern C++. Given two callables, each taking one and two arguments, respectively. For example, these two callables:
 
 ```c++
 float f1(double x) {return 2*x;}
