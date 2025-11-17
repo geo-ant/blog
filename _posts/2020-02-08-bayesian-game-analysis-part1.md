@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: bayesian-probability-theory math games
+tags: statistics math games
 #categories: []
 date: 2020-02-08 00:00:00
 #excerpt: ''
