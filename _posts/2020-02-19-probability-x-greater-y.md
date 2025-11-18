@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: bayesian-probability-theory math
+tags: statistics math
 #categories: []
 date: 2020-02-19
 #excerpt: ''
