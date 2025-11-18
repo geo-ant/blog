@@ -2,7 +2,7 @@
 layout: post
 tags: statistics math
 #categories: []
-date: 2025-11-22
+date: 2025-11-18
 last_updated:
 #excerpt: ''
 #image: 'BASEURL/assets/blog/img/.png'
