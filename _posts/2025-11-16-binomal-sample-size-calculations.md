@@ -2,8 +2,8 @@
 layout: post
 tags: statistics math
 #categories: []
-date: 2025-11-16
-last_updated: 2025-03-20
+date: 2025-11-22
+last_updated:
 #excerpt: ''
 #image: 'BASEURL/assets/blog/img/.png'
 #description:
@@ -47,7 +47,7 @@ other intervals. I will still use it for the following reasons:
 
 1. Due to its conservative nature, it will lead us to overestimate the number
    of samples rather than underestimate them, which is a safe default
-   if you work in a regulated industry, like I do[^sample-overest].
+   if you work in a regulated industry, as I do[^sample-overest].
 2. Frequentist statistics usually don't come naturally for me, but this one
    made sense to me. I admit, this is totally a me problem, but if
    we want to defend your sample size calculations, they _should_ make
@@ -68,7 +68,7 @@ $$
 P(x = k \mid n,p) = \binom{n}{k}p^k (1-p)^{n-k}, \label{binomial-pdf} \tag{1}
 $$
 
-where obviously $$k \leq n$$. This is the [Binomial distribution](https://en.wikipedia.org/wiki/Binomial_distribution).
+where necessarily $$k \leq n$$. This is the [Binomial distribution](https://en.wikipedia.org/wiki/Binomial_distribution).
 The probability of observing _at least_ $$k$$ successes is obviously
 
 $$
@@ -106,7 +106,7 @@ then it's probability density (PDF) is given as follows:
 
 $$\begin{eqnarray}
 Y &\sim& Beta(a,b) \\
-\Rightarrow P(y \mid a,b) &=& \beta^{pdf}_{a,b}(y) = \frac{y^a (1-y)^{b-1}}{B(a,b)}, \tag{5}\label{beta-pdf}
+\Rightarrow P(y \mid a,b) &=& \beta^{pdf}_{a,b}(y) = \frac{y^{a-1} (1-y)^{b-1}}{B(a,b)}, \tag{5}\label{beta-pdf}
 \end{eqnarray}$$
 
 where $$a,b \in \mathbb{R}$$ with $$a,b> 0$$. $$B(a,b)$$ denotes
@@ -117,7 +117,7 @@ is nonstandard notation. This is just to convey that this is a function of
 $$y$$ parametrized by $$a,b$$. It's cumulative distribution function (CDF) is given
 as function of $$y$$ that is parametrized by $$a,b$$.
 
-$$P(y \geq y_0 \mid a,b) = \beta^{cdf}_{a,b}(y_0) = I_{y_0}(a,b), \tag{6} \label{beta-cdf}$$
+$$P(y \leq y_0 \mid a,b) = \beta^{cdf}_{a,b}(y_0) = I_{y_0}(a,b), \tag{6} \label{beta-cdf}$$
 
 where $$I_y(a,b)$$ is the [_regularized_ incomplete beta function](https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function),
 defined as
@@ -167,7 +167,7 @@ $$\boxed{p_U = \beta^{qf}_{k+1,n-k}\left(1-\frac{\alpha}{2}\right)} \tag{10} \la
 
 ### 1.3 The Lower Clopper-Pearson Bound
 
-It turns out, that the left hand side of eq. $$(\ref{clopper-pl})$$ can also
+It turns out that the left hand side of eq. $$(\ref{clopper-pl})$$ can also
 be written in terms of the CDF of the beta distribution with $$a = k$$
 and $$b = n-k+1$$ (Bro01, Thu14):
 
@@ -258,9 +258,9 @@ Note the _lower case_ $$l$$ in $$p_l$$ vs the upper case $$L$$ in
 the lower end of the two sided bound $$p_L$$. Using the same logic as before,
 this allows us to write the lower bound as
 
-$$\boxed{p_l =  \beta^{qf}_{k,n-k+1}\left(\alpha\right)} \tag{12} \label{pl-1}.$$
+$$\boxed{p_l =  \beta^{qf}_{k,n-k+1}\left(\alpha\right)} \tag{15} \label{pl-1}$$
 
-Going forward, I'll use this bound for sample size calculations, since I consider
+for $$k>0$$. Going forward, I'll use this bound for sample size calculations, since I consider
 the question "how confident can I be that my success probability is _at least_
 $$p_l$$, given $$k$$ or more observed successes" more relevant for finding a
 _minimum sample size_ than a two-sided bound. We can always find the two-sided
@@ -292,7 +292,7 @@ $$r$$. Since $$\gamma$$, $$p_{min}$$, and $$r$$ are fixed, we can treat $$p_l$$
 as a function of $$n$$. We're now looking for the smallest $$n_0$$, such that
 $$p_l \geq p_{min}$$, for all $$n\geq n_0$$, formally
 
-$$\boxed{n_0 = \min_{n\in \mathbb{N}} \left\{n: p_l(n) = \beta^{qf}_{\lfloor r\cdot n\rfloor,n-\lfloor r\cdot n\rfloor+1}(\alpha) \geq p_{min}; \; \forall n\geq n_0 \right\}.}$$
+$$\boxed{n_0 = \min_{n\in \mathbb{N}} \left\{m: p_l(n) = \beta^{qf}_{\lfloor r\cdot n\rfloor,n-\lfloor r\cdot n\rfloor+1}(\alpha) \geq p_{min} \; \forall n\geq m \right\}.}$$
 
 I won't go deep on the implementation of this into code, because it's very
 straightforward, but I'll give the code to calculate $$p_l(n)$$ given $$,r,\alpha$$
@@ -305,7 +305,7 @@ from scipy.stats import beta
 def p_lower(n,r,alpha):
    k = np.floor(r*n)
    temp = beta.ppf(alpha,k,n-k+1)
-   if np.isnan(temp)
+   if np.isnan(temp):
       return 0.0
    else
       return temp
@@ -313,7 +313,7 @@ def p_lower(n,r,alpha):
 
 The first idea is to just use this function and find the smallest $$n_0$$ for
 which $$p_l(n_0)\geq p_{min}$$, which is _almost_ correct but there's an
-important caveat: the innocuous $$\forall n \geq n_0$$ qualifier above.
+important caveat: the innocuous "for all $$n \geq n_0$$" qualifier above.
 Let's illustrate this by plotting $$p(n)$$ for an example,
 which will make this immediately obvious.
 
@@ -351,7 +351,7 @@ Statistics, 8(1) 817-840 2014. [link](https://doi.org/10.1214/14-EJS909)
 
 ## Endnotes
 
-[^sample-overest]: This might or might not be a problem in practice. If we have are dealing with _in silico_ simulations, then increasing then increasing the number of samples might be reasonably cheap. If we have to e.g. recruit patients for a study, this will be 
-[^conservative]: Do keep in mind that Brown _et al._ characterize the bounds overly conservative.
+[^sample-overest]: This might or might not be a problem in practice. If we have are dealing with _in silico_ simulations, then increasing then increasing the number of samples might be reasonably cheap. If we have to e.g. recruit patients for a study, this can become a problem.
+[^conservative]: Again, do keep in mind that Brown _et al._ characterize the bounds as "wastefully conservative".
 [^garth]: I've been re-watching [Garth Marenghi's Darkplace](https://www.channel4.com/programmes/garth-marenghis-darkplace) again recently... and so should you. _at least_ $$k$$ successes.
 [^success-rate]: You can also choose $$r = p_l$$, but this will likely blow up your sample size a lot. You can also choose $$r<p_l$$, but that will not allow you to reach high confidence levels of $$p>p_l$$. That should make sense intuitively.
