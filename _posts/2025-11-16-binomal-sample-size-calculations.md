@@ -27,7 +27,11 @@ probability with a certain confidence? If you're interested in joining me
 gaining an understanding of this from first principles, you're invited to
 read along.
 
-## 0. Overview and Caveats
+## 0. Overview, Caveats, and Goal
+
+The question we want to answer in this article is: what's the minimum number of
+samples for a series of Bernoulli experiments so I can be confident that my
+true probability of success is higher than a certain threshold?
 
 Please note that this is a well-known subject and I'll focus on a
 particular _frequentist_ approach here that made sense to me. Specifically,
@@ -42,11 +46,15 @@ describe the Clopper-Pearson interval as "wastefully conservative" and recommend
 other intervals. I will still use it for the following reasons:
 
 1. Due to its conservative nature, it will lead us to overestimate the number
-   of samples rather than underestimate them[^sample-overest].
-2. Frequentist statistics usually don't come naturally for me, this one at
-   least made sense _to me_. I admit this is a me problem. 
+   of samples rather than underestimate them, which is a safe default
+   if you work in a regulated industry, like I do[^sample-overest].
+2. Frequentist statistics usually don't come naturally for me, but this one
+   made sense to me. I admit, this is totally a me problem, but if
+   we want to defend your sample size calculations, they _should_ make
+   sense to us. 
 3. The math involved in this derivation is a great jumping-off point for
    a Bayesian perspective, which I might share in a later post.
+
 
 ## 1. Deriving The Clopper Pearson Lower and Upper Bounds
 
@@ -164,13 +172,13 @@ be written in terms of the CDF of the beta distribution with $$a = k$$
 and $$b = n-k+1$$ (Bro01, Thu14):
 
 $$
-P(x \geq k \mid | p,n) = \beta^{cdf}_{k,n-k+1}(p) \label{johnson-equality} \tag{11}
+P(x \geq k \mid p,n) = \beta^{cdf}_{k,n-k+1}(p) \label{johnson-equality} \tag{11}
 $$
 
 I'll give a proof for this identity in the next section. Using it
 with eq. $$(\ref{clopper-pl})$$ allows us to write the lower bound as
 
-$$\boxed{p_L =  \beta^{qf}_{k,n-k+1}\left(\frac{\alpha}{2}\right)} \tag{12} \label{pl}$$
+$$\boxed{p_L =  \beta^{qf}_{k,n-k+1}\left(\frac{\alpha}{2}\right)} \tag{12} \label{pl-2}$$
 
 ### 1.3.1 Interlude: A Proof
 
@@ -232,7 +240,7 @@ given an observation of $$k$$ _or more_ successes. That interval is:
 
 $$\boxed{p_L < p < p_U}, \tag{13}\label{two-sided}$$
 
-with $$p_L$$ and $$p_U$$ calculated as in eqns. $$(\ref{pl})$$ and $$(\ref{pu})$$,
+with $$p_L$$ and $$p_U$$ calculated as in eqns. $$(\ref{pl-2})$$ and $$(\ref{pu})$$,
 respectively.
 
 
@@ -240,9 +248,97 @@ respectively.
 
 Often, we don't really care about an upper bound for the probability and we
 are only interested in a lower limit, given $$k$$ _or more_ successes in
-a series of $$n$$ experiments. Using the same logic that lead to the two-sided
-confidence interval
+a series of $$n$$ experiments. To get to the $$\gamma = 1-\alpha$$ one sided
+confidence interval $$(p_l,1]$$, where $$p_l$$ is the lower bound of the
+probability, such that
 
+$$P(x \geq k \mid p_l,n) = \alpha. \tag{14}$$
+
+Note the _lower case_ $$l$$ in $$p_l$$ vs the upper case $$L$$ in
+the lower end of the two sided bound $$p_L$$. Using the same logic as before,
+this allows us to write the lower bound as
+
+$$\boxed{p_l =  \beta^{qf}_{k,n-k+1}\left(\alpha\right)} \tag{12} \label{pl-1}.$$
+
+Going forward, I'll use this bound for sample size calculations, since I consider
+the question "how confident can I be that my success probability is _at least_
+$$p_l$$, given $$k$$ or more observed successes" more relevant for finding a
+_minimum sample size_ than a two-sided bound. We can always find the two-sided
+bound $$(p_L,p_U)$$ after the fact, when we've performed the actual experiments.
+
+## 3 Sample Size Estimation
+
+Say we want to prove that the true probability of success $$p$$ is larger
+than $$90\%$$. How many samples do we need? Well, that depends on another
+design aspect of our experiment, which is the ratio $$r \in (0,1]$$ of successes
+that  we expect to observe in a successful run. It should make sense intuitively
+that we should need fewer samples if we want to claim $$p>90\%$$ with $$95\%$$ confidence, when
+we have designed our experiment such that we require a ratio of $$r = 99\%$$
+or more observed successes, versus if we require only $$90\%$$ or more observed successes.
+For a given $$n$$, the ratio $$r$$ means we observe $$k = \lfloor r\cdot n \rfloor$$
+or more successes. We'll typically chose $$r$$ to be larger or equal to the lower bound
+for $$p$$ that we want to claim[^success-rate]. However, we also have to be careful
+not to choose $$r$$ so high that we fail because we set the bar too high.
+So in a way $$r$$ also measures how much we think that $$p_l$$ underestimates
+the true $$p$$. This might venture dangerously close to a Baysian way of thinking,
+so I'll stop this line of thought here, since we're still dealing with a fundamentally
+frequentist approach.
+
+To claim that the true $$p$$ is larger than a certain lower limit $$p_{min}$$
+with confidence $$\gamma = 1-\alpha$$, we can require that the corresponding
+one-sided Clopper-Pearson bound $$p_l$$ becomes at least as large as $$p_{min}$$
+for the given confidence level $$\gamma$$, sample size $$n$$, and ratio of observed successes
+$$r$$. Since $$\gamma$$, $$p_{min}$$, and $$r$$ are fixed, we can treat $$p_l$$
+as a function of $$n$$. We're now looking for the smallest $$n_0$$, such that
+$$p_l \geq p_{min}$$, for all $$n\geq n_0$$, formally
+
+$$\boxed{n_0 = \min_{n\in \mathbb{N}} \left\{n: p_l(n) = \beta^{qf}_{\lfloor r\cdot n\rfloor,n-\lfloor r\cdot n\rfloor+1}(\alpha) \geq p_{min}; \; \forall n\geq n_0 \right\}.}$$
+
+I won't go deep on the implementation of this into code, because it's very
+straightforward, but I'll give the code to calculate $$p_l(n)$$ given $$,r,\alpha$$
+in Python:
+
+```python
+import numpy as np
+from scipy.stats import beta
+
+def p_lower(n,r,alpha):
+   k = np.floor(r*n)
+   temp = beta.ppf(alpha,k,n-k+1)
+   if np.isnan(temp)
+      return 0.0
+   else
+      return temp
+```
+
+The first idea is to just use this function and find the smallest $$n_0$$ for
+which $$p_l(n_0)\geq p_{min}$$, which is _almost_ correct but there's an
+important caveat: the innocuous $$\forall n \geq n_0$$ qualifier above.
+Let's illustrate this by plotting $$p(n)$$ for an example,
+which will make this immediately obvious.
+
+<figure>
+ <img src="/blog/images/clopper-pearson/clopper-bound.png" alt="Lower Clopper Pearson Bounds as a Function of Sample Size" style="width:100%">
+ <figcaption>
+  <b>Figure 1</b>.The lower one-sided clopper pearson bound as
+  a function of sample size for a fixed ratio of observed successes.
+  Parameters are &gamma;=90%, r = 85%, p<sub>min</sub> = 80%.
+</figcaption>
+</figure>
+
+We can see that the $$p_l(n)$$ curve has a jagged look, which is _not an artifact_,
+but a consequence of having to round the number of successes $$k$$ for a fixed success
+ratio $$r$$ to an integer number. That means we can't just take the first $$n_0$$ for
+which $$p_l(n)$$ crosses the desired threshold of $$p_{min}$$. Due to the jagged
+nature, there might be larger numbers $$n>n_0$$ in the vicinity for which the
+probability drops below the threshold.
+
+Thus, what we have to do is calculate
+$$p_l(n)$$ in a range $$[n_{min},n_{max}]$$ and make sure that we take the smallest
+$$n_0(n)$$ such that the condition $$p_l(n)>p_{min}$$ is satisfied for all
+$$n>n_0$$ inside that range. This shouldn't be a problem in practice because
+we can choose $$n_{max}$$ large enough that we can make the claim for all 
+possible sample sizes in practice.
 
 ## References
 
@@ -257,5 +353,5 @@ Statistics, 8(1) 817-840 2014. [link](https://doi.org/10.1214/14-EJS909)
 
 [^sample-overest]: This might or might not be a problem in practice. If we have are dealing with _in silico_ simulations, then increasing then increasing the number of samples might be reasonably cheap. If we have to e.g. recruit patients for a study, this will be 
 [^conservative]: Do keep in mind that Brown _et al._ characterize the bounds overly conservative.
-[^garth]: I've been re-watching [Garth Marenghi's Darkplace](https://www.channel4.com/programmes/garth-marenghis-darkplace) again recently... and so should you.
-_at least_ $$k$$ successes.
+[^garth]: I've been re-watching [Garth Marenghi's Darkplace](https://www.channel4.com/programmes/garth-marenghis-darkplace) again recently... and so should you. _at least_ $$k$$ successes.
+[^success-rate]: You can also choose $$r = p_l$$, but this will likely blow up your sample size a lot. You can also choose $$r<p_l$$, but that will not allow you to reach high confidence levels of $$p>p_l$$. That should make sense intuitively.
