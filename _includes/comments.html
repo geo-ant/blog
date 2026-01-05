@@ -1,71 +1,150 @@
-<script src="  https://unpkg.com/showdown/dist/showdown.min.js"></script>
+<script src="https://unpkg.com/showdown/dist/showdown.min.js"></script>
 <script>
-const GH_API_URL = 'https://api.github.com/repos/geo-ant/blog/issues/{{ page.comments_id }}/comments'; // ?client_id={{ site.data.settings.gh_api.ci }}&client_secret={{ site.data.settings.gh_api.cs }}
+    const GH_API_URL =
+        "https://api.github.com/repos/geo-ant/blog/issues/{{ page.comments_id }}/comments";
 
-let request = new XMLHttpRequest();
-request.open( 'GET', GH_API_URL, true );
-request.onload = function() {
-	if ( this.status >= 200 && this.status < 400 ) {
-		let response = JSON.parse( this.response );
+    let request = new XMLHttpRequest();
+    request.open("GET", GH_API_URL, true);
+    request.onload = function () {
+        if (this.status >= 200 && this.status < 400) {
+            let response = JSON.parse(this.response);
 
-		for ( var i = 0; i < response.length; i++ ) {
-			document.getElementById( 'gh-comments-list' ).appendChild( createCommentEl( response[ i ] ) );
-		}
+            for (var i = 0; i < response.length; i++) {
+                document
+                    .getElementById("gh-comments-list")
+                    .appendChild(createCommentEl(response[i]));
+            }
 
-		if ( 0 === response.length ) {
-			document.getElementById( 'no-comments-found' ).style.display = 'block';
-		}
-	} else {
-		console.error( this );
-	}
-};
+            if (0 === response.length) {
+                document.getElementById("no-comments-found").style.display =
+                    "block";
+            }
+        } else {
+            console.error(this);
+        }
+    };
 
-function createCommentEl( response ) {
-	let user = document.createElement( 'a' );
-	user.setAttribute( 'href', response.user.url.replace( 'api.github.com/users', 'github.com' ) );
-	user.classList.add( 'user' );
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        });
+    }
 
-	//let userAvatar = document.createElement( 'img' );
-	let userAvatar = document.createElement( 'a' );
-	userAvatar.classList.add( 'avatar' );
-	userAvatar.innerHTML =  response.user.login +':';
-	//userAvatar.style.fontStyle = "italic";
+    function createCommentEl(response) {
+        let comment = document.createElement("div");
+        comment.classList.add("github-comment");
 
-	user.appendChild( userAvatar );
+        // Create simple table structure
+        let table = document.createElement("table");
+        table.style.width = "100%";
+        table.style.marginBottom = "1rem";
+        table.style.border = "1px solid #ddd";
+        table.style.borderCollapse = "collapse";
+        table.style.borderRadius = "5px";
 
-	let commentLink = document.createElement( 'a' );
-	commentLink.setAttribute( 'href', response.html_url );
-	commentLink.classList.add( 'comment-url' );
-	commentLink.innerHTML = '(#' + response.id + ' - ' + response.created_at+')';
-	commentLink.style.fontSize = "small";
+        // Header row with avatar and user info
+        let headerRow = document.createElement("tr");
 
-	let commentContents = document.createElement( 'div' );
-	commentContents.classList.add( 'comment-content' );
-	commentContents.innerHTML = response.body;
-	// Progressive enhancement.
-	if ( window.showdown ) {
-		let converter = new showdown.Converter();
-		commentContents.innerHTML = converter.makeHtml( response.body );
-	}
+        let avatarCell = document.createElement("td");
+        avatarCell.style.width = "40px";
+        avatarCell.style.verticalAlign = "middle";
+        avatarCell.style.textAlign = "center";
+        avatarCell.style.paddingRight = "10px";
+        avatarCell.style.border = "none";
 
-	let comment = document.createElement( 'li' );
-	comment.setAttribute( 'data-created', response.created_at );
-	comment.setAttribute( 'data-author-avatar', response.user.avatar_url );
-	comment.setAttribute( 'data-user-url', response.user.url );
+        let userAvatar = document.createElement("img");
+        userAvatar.src = response.user.avatar_url;
+        userAvatar.alt = response.user.login + " avatar";
+        userAvatar.style.maxWidth = "30px";
+        userAvatar.style.maxHeight = "30px";
+        userAvatar.style.borderRadius = "15%";
 
-	comment.appendChild( user );
-	comment.appendChild( commentContents );
-	comment.appendChild( commentLink );
+        avatarCell.appendChild(userAvatar);
 
-	return comment;
-}
-request.send();
+        let userInfoCell = document.createElement("td");
+        userInfoCell.style.verticalAlign = "top";
+        userInfoCell.style.border = "none";
+
+        let userName = document.createElement("a");
+        userName.setAttribute(
+            "href",
+            response.user.url.replace("api.github.com/users", "github.com"),
+        );
+        userName.style.fontWeight = "bold";
+        userName.style.textDecoration = "none";
+        userName.style.color = "inherit";
+        userName.textContent = response.user.login;
+
+        let dateInfo = document.createElement("div");
+        dateInfo.style.fontSize = "small";
+        dateInfo.style.color = "#666";
+
+        let dateText = document.createElement("span");
+        dateText.textContent = formatDate(response.created_at);
+
+        let commentLink = document.createElement("a");
+        commentLink.setAttribute("href", response.html_url);
+        commentLink.style.marginLeft = "10px";
+        commentLink.style.color = "#666";
+        commentLink.textContent = "View on GitHub";
+
+        dateInfo.appendChild(dateText);
+        dateInfo.appendChild(commentLink);
+
+        userInfoCell.appendChild(userName);
+        userInfoCell.appendChild(dateInfo);
+
+        headerRow.appendChild(avatarCell);
+        headerRow.appendChild(userInfoCell);
+        table.appendChild(headerRow);
+
+        // Content row
+        let contentRow = document.createElement("tr");
+        let contentCell = document.createElement("td");
+        contentCell.setAttribute("colspan", "2");
+        contentCell.style.paddingTop = "10px";
+        contentCell.style.border = "none";
+
+        let commentContents = document.createElement("div");
+        commentContents.classList.add("comment-content");
+
+        if (window.showdown) {
+            let converter = new showdown.Converter({
+                tables: true,
+                strikethrough: true,
+                tasklists: true,
+            });
+            commentContents.innerHTML = converter.makeHtml(response.body);
+        } else {
+            commentContents.innerHTML = response.body.replace(/\n/g, "<br>");
+        }
+
+        contentCell.appendChild(commentContents);
+        contentRow.appendChild(contentCell);
+        table.appendChild(contentRow);
+
+        comment.appendChild(table);
+
+        return comment;
+    }
+    request.send();
 </script>
 
-
 <div class="github-comments">
-	<h1>Comments</h1>
-	<ul id="gh-comments-list"></ul>
-	<p id="no-comments-found">You can comment on this post using your GitHub account.</p>
-	<p id="leave-a-comment">Join the discussion for this article on <a href="https://github.com/geo-ant/blog/issues/{{ page.comments_id }}">this ticket</a>. Comments appear on this page instantly.</p>
+    <h2>Comments</h2>
+    <p>
+        Join the discussion for this article on
+        <a
+            href="https://github.com/geo-ant/blog/issues/{{ page.comments_id }}"
+            target="_blank"
+            >this ticket</a
+        >. Comments appear on this page instantly.
+    </p>
+    <div id="gh-comments-list"></div>
+    <div id="no-comments-found" style="display: none">
+        <p>No comments yet. Be the first to comment!</p>
+    </div>
 </div>

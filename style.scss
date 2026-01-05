@@ -162,7 +162,35 @@ figure {
 }
 
 .github-comments {
-  font-size: 0.85em;
+  font-size: 0.9em;
+  margin: 2rem 0;
+
+  h2 {
+    margin-bottom: 1rem;
+    color: $gray;
+  }
+
+  .github-comment {
+    margin-bottom: 1.5rem;
+  }
+
+  .comment-content {
+    line-height: 1.5;
+
+    p {
+      margin: 0.5rem 0;
+    }
+
+
+
+    blockquote {
+      margin: 0.75rem 0;
+      padding: 0 0.75rem;
+      border-left: 3px solid $lightGray;
+      color: $gray;
+      font-style: italic;
+    }
+  }
 }
 
 figcaption {
