@@ -172,6 +172,18 @@ figure {
 
   .github-comment {
     margin-bottom: 1.5rem;
+
+    table {
+      border: 1px solid $lightGray;
+    }
+  }
+
+  .comment-date-info {
+    color: $mutedColor;
+  }
+
+  .comment-github-link {
+    color: $mutedColor;
   }
 
   .comment-content {
@@ -187,7 +199,7 @@ figure {
       margin: 0.75rem 0;
       padding: 0 0.75rem;
       border-left: 3px solid $lightGray;
-      color: $gray;
+      color: $mutedColor;
       font-style: italic;
     }
   }

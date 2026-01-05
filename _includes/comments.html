@@ -41,7 +41,6 @@
         let table = document.createElement("table");
         table.style.width = "100%";
         table.style.marginBottom = "1rem";
-        table.style.border = "1px solid #ddd";
         table.style.borderCollapse = "collapse";
         table.style.borderRadius = "5px";
 
@@ -79,16 +78,16 @@
         userName.textContent = response.user.login;
 
         let dateInfo = document.createElement("div");
+        dateInfo.classList.add("comment-date-info");
         dateInfo.style.fontSize = "small";
-        dateInfo.style.color = "#666";
 
         let dateText = document.createElement("span");
         dateText.textContent = formatDate(response.created_at);
 
         let commentLink = document.createElement("a");
         commentLink.setAttribute("href", response.html_url);
+        commentLink.classList.add("comment-github-link");
         commentLink.style.marginLeft = "10px";
-        commentLink.style.color = "#666";
         commentLink.textContent = "View on GitHub";
 
         dateInfo.appendChild(dateText);
