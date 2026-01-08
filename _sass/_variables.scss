@@ -10,12 +10,13 @@ $darkRed: #A70000;
 // light and dark mode according to browser settings
 // see here: https://derekkedziora.com/blog/dark-mode-revisited
 // these are the colors for LIGHT MODE
-html { 
+html {
   --dark-color: rgb(42,42,42);
   --bright-color: #fafafa;
   --background-color : var(--bright-color);
   --foreground-color : var(--dark-color);
   --code-background : #d6d6d6;
+  --muted-color: #666;
 }
 
 // these are the colors for DARK MODE
@@ -26,6 +27,7 @@ html {
   --background-color : var(--dark-color);
   --foreground-color : var(--bright-color);
   --code-background : rgb(32,32,32);
+  --muted-color: rgb(178, 178, 178);
   }
 }
 
@@ -36,8 +38,9 @@ $lightGray: rgb(204, 204, 204);
 
 $darkColor: var(--dark-color);
 $backgroundColor: var(--background-color);//#171717;
-$foregroundColor:var(--foreground-color);// #efe9ef; 
+$foregroundColor:var(--foreground-color);// #efe9ef;
 $separatorColor: $foregroundColor;
+$mutedColor: var(--muted-color);
 
 //Font stacks new
 //see:http://sebrink.de/Google-Webfonts-for-my-Jekyll/
