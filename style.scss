@@ -195,6 +195,18 @@ figure {
 
 
 
+    pre {
+      overflow-x: auto;
+      white-space: pre;
+      word-wrap: normal;
+      max-width: 100%;
+    }
+
+    code {
+      white-space: pre;
+      word-wrap: normal;
+    }
+
     blockquote {
       margin: 0.75rem 0;
       padding: 0 0.75rem;
