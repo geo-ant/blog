@@ -1,4 +1,5 @@
 <script src="https://unpkg.com/showdown/dist/showdown.min.js"></script>
+<script src="https://unpkg.com/dompurify/dist/purify.min.js"></script>
 <script>
     const GH_API_URL =
         "https://api.github.com/repos/geo-ant/blog/issues/{{ page.comments_id }}/comments";
@@ -110,15 +111,22 @@
         let commentContents = document.createElement("div");
         commentContents.classList.add("comment-content");
 
-        if (window.showdown) {
-            let converter = new showdown.Converter({
-                tables: true,
-                strikethrough: true,
-                tasklists: true,
-            });
-            commentContents.innerHTML = converter.makeHtml(response.body);
+        if (!window.DOMPurify) {
+            commentContents.textContent =
+                "Could not display comment: sanitizer failed to load.";
         } else {
-            commentContents.innerHTML = response.body.replace(/\n/g, "<br>");
+            let rawHtml;
+            if (window.showdown) {
+                let converter = new showdown.Converter({
+                    tables: true,
+                    strikethrough: true,
+                    tasklists: true,
+                });
+                rawHtml = converter.makeHtml(response.body);
+            } else {
+                rawHtml = response.body.replace(/\n/g, "<br>");
+            }
+            commentContents.innerHTML = DOMPurify.sanitize(rawHtml);
         }
 
         contentCell.appendChild(commentContents);
