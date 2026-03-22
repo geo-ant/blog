@@ -1,4 +1,9 @@
-<script src="https://unpkg.com/showdown/dist/showdown.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"
+        integrity="sha384-GP2+CwBlakZSDJUr+E4JvbxpM75i1i8+RKkieQxzuyDZLG+5105E1OfHIjzcXyWH"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"
+        integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu"
+        crossorigin="anonymous"></script>
 <script>
     const GH_API_URL =
         "https://api.github.com/repos/geo-ant/blog/issues/{{ page.comments_id }}/comments";
@@ -110,15 +115,22 @@
         let commentContents = document.createElement("div");
         commentContents.classList.add("comment-content");
 
-        if (window.showdown) {
-            let converter = new showdown.Converter({
-                tables: true,
-                strikethrough: true,
-                tasklists: true,
-            });
-            commentContents.innerHTML = converter.makeHtml(response.body);
+        if (!window.DOMPurify) {
+            commentContents.textContent =
+                "Could not display comment: sanitizer failed to load.";
         } else {
-            commentContents.innerHTML = response.body.replace(/\n/g, "<br>");
+            let rawHtml;
+            if (window.showdown) {
+                let converter = new showdown.Converter({
+                    tables: true,
+                    strikethrough: true,
+                    tasklists: true,
+                });
+                rawHtml = converter.makeHtml(response.body);
+            } else {
+                rawHtml = response.body.replace(/\n/g, "<br>");
+            }
+            commentContents.innerHTML = DOMPurify.sanitize(rawHtml);
         }
 
         contentCell.appendChild(commentContents);
