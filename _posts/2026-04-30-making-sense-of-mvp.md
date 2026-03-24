@@ -81,6 +81,14 @@ more valuable in the development process than constantly getting user feedback
 on the frontend, which might lead you to optimize a frontend without ever getting
 to the backend and actual functionality.
 
+!!! "delivering a front tire sucks". HOWEVER: real development is MODULAR.
+The idea that we can always ship something simple and from there go to something
+more complex is highly problematic. Sometimes there are intermediate steps that
+don't actually bring much user facing value. That's okay. The important thing
+is to make sure that those modules play nicely during the development process
+and the likely breaking points are the interfaces between modules, so we need
+to INTEGRATE to expose those weaknesses.
+
 ![Anti-Agile Development](/blog/images/mvp/mvp-illustration.png)
 
 ## Endnotes
