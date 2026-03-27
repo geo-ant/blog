@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: agile development
+tags: agile development systems-engineering
 #categories: []
 date: 2026-04-30
 last_updated:
@@ -12,7 +12,7 @@ title: 'The Agile MVP: The Problem with Skateboards, Bikes, and Cars'
 #
 #
 # Make sure this image is correct !!!
-og_image: 
+og_image: not-like-this.png
 #
 #
 # make sure comments are enabled
