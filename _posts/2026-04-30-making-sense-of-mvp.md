@@ -29,22 +29,27 @@ critique. That requires some digging, because the core idea is great
 when viewed from certain perspectives, but I'll argue it's actually harmful when
 taken as an actual _development_ metaphor.
 
-Before we get into my thoughts, let's remind ourselves of the original image
-and then jump into the parts of Kniberg's argument that I actually like.
+Let's remind ourselves of the original image quickly before we go further.
 
 <figure>
  <img src="/blog/images/mvp/kniberg-mvp.png" alt="Kniberg's Illustration" style="width:100%">
    <figcaption> Kniberg's original illustration from <a href="https://blog.crisp.se/2016/01/25/henrikkniberg/making-sense-of-mvp">this article</a>. He writes "The picture is a metaphor. It is not about actual car development, it is about product development in general, using a car as a metaphor."</figcaption>
 </figure>
 
+The image illustrates the key metaphor presented in the article. Attacking a
+metaphor always feels a bit like attacking a strawman and I'll try my best not
+to do that. But without attacking the metaphor by taking it too literally, what I 
+_can_ do is critically evaluate the mental model that underlies it. A mental model guides our 
+thinking and consequently our decision making. That's why, if it is flawed, it can lead 
+us to make bad decisions.
+
 ## The Good
 
-I don't want to focus on the image alone too much because as Kniberg states, it's just
-a metaphor, so here's the message of the article stripped to its core:
-rather than building incomplete pieces of a grand vision,
-start with a simple solution that already delivers real user value. Evolve
-testable, usable, lovable versions through feedback. This avoids wasted effort
-and leads to a better product than executing a fixed upfront plan.
+Here's the message of the article stripped to its core: rather than building 
+incomplete pieces of a grand vision, start with a simple solution that already 
+delivers real user value. Evolve testable, usable, lovable versions through 
+feedback. This avoids wasted effort and leads to a better product than executing a 
+fixed upfront plan.
 
 Kniberg's argument is very strong when viewed through the lens of satisfying
 your users' underlying needs. We all know the _"If I had asked people what they
@@ -114,18 +119,17 @@ playable and testable, I still think that the skateboard isn't a good metaphor.
 ### Big Government Example and Lego
 
 I'll keep it short, because this plays out much like the other examples above.
-I actually like this case study a lot because it shows how they released a very narrowly
-scoped initial version (with respect to both capabilities and distribution)
-and built on the gathered feedback. However, I don't see how that first version is a
-skateboard except for it being a much simpler, stripped-down version of
-the releases that came after. But again, a skateboard is not a simpler car,
-it's not a partial car, it's not part of a car.
+Like the other two examples, I also like this case study a lot because it shows 
+how they released a very narrowly scoped initial version (with respect to both 
+capabilities and distribution) and built on the gathered feedback. However, I 
+don't see how that first version is a skateboard except for it being a much 
+simpler, stripped-down version compared to the releases that came after. But again, 
+a skateboard is not a simpler car, it's not a partial car, it's not part of a car.
 
 There's another example (Lego) in Kniberg's article, where he explicitly
 admits that he doesn't even know where the skateboard is, but he does emphasize
 the importance of early user feedback. For good measure, he throws in
 another Lego example that didn't have a skateboard and subsequently failed...[^lego-worlds]
-
 
 ## A Skateboard Isn't a Simpler Car...
 
@@ -140,7 +144,7 @@ that, but a concrete vision is very helpful because it constrains the solution s
 you'll explore. And exploration doesn't come for free.
 
 So sure, in the most charitable interpretation, the skateboard just means to get
-early feedback. And it tells us that the first versions of our
+early feedback and it reminds us that the first versions of our
 product are simpler than the later versions. None of this is objectionable,
 but the fact that products start simple is also not very insightful[^big-bang].
 
@@ -163,7 +167,7 @@ is a better mental model to inform our development and one that still helps us g
 feedback[^potentially-shippable]. Because, mind you, that whole getting-feedback-thingy
 is still great.
 
-## A Better Development Model: Verticals
+## A Better Development Model: Vertical Slices
 
 So now that we've abandoned the skateboard-to-car mental model, let's revisit
 Kniberg's examples again. What do they actually represent? They are _thin vertical
@@ -190,8 +194,12 @@ being vertical slices. They definitely aren't what a skateboard is to a car
 and we should all free ourselves from the idea that incremental versions have a high
 degree of independence. Your versions _of course_
 won't be independent from each other, _that's the whole point_! You're building
-something incrementally. Spelled out like this, it should sound banal and yet
-the skateboard-to-car metaphor exists.
+something incrementally. Thinking of vertical slices helps us remember that 
+we are iterating towards a (possibly evolving) vision incrementally rather
+than building solutions of increasing complexity independently from each other.
+Vertical slices make it clear that the decisions you make in
+the early stages will have an impact on the later stages. Spelled out like 
+this, it should sound banal and yet the skateboard-to-car metaphor exists.
 
 And now for the final question: does this mental model help us plan development?
 Absolutely. If we prioritize verticals, then this helps us slice our work
@@ -199,15 +207,15 @@ into manageable chunks. Pick as thin and as deep a vertical as possible and,
 of course, modularize. Within those modules, again prioritize verticals.
 But also make sure to integrate those modules.
 
-Let's get concrete and say you want to design a webshop. Rather than having your frontend
-and backend team flesh out fancy system parts independently, have them build
+Let's get concrete and say you want to design a webshop. Rather than 
+fleshing out your frontend first (or independently from the backend), build
 very narrowly scoped versions from the start and integrate asap.
-Your frontend has just a search bar and maybe a coupon code field.
+Your frontend could just be a search bar and maybe a coupon code field at first.
 Your backend database has just one item in it, and there's some business
 logic to check if the coupon code is valid. Make all this work together, and
-you'll expose a zillion architectural decisions you need to make
+you'll expose a lot of architectural decisions you need to make
 and as many potential sources of problems: from all your API specifications
-being incorrect, to a user (maybe just a different team member) trying a
+being incorrect, to an early tester trying a
 [Bobby Tables](https://xkcd.com/327/) style SQL injection for fun.
 
 ## Conclusion
