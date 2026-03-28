@@ -100,17 +100,16 @@ a prototype for a car? Hardly.
 
 ### The Minecraft Example
 
-Here, in one of the most baffling takes of the article, Kniberg describes the
-skateboard of Minecraft as:
+The skateboard of Minecraft is described as:
 
-> "You couldn’t do much in the first version – it was basically an ugly
+> "You couldn't do much in the first version – it was basically an ugly
 > blocky 3d-landscape where you can dig up blocks and place them elsewhere
 > to build crude structures."
 
-Isn't that... just Minecraft?? I'm not making any friends here, I know. And yes,
-I'm being a bit facetious here, but can you honestly say that this first release
-(as described) has the same relation to Minecraft as a skateboard has to a car?
-I don't think so.
+I see how this is a much more reduced version of the game, but does this version of Minecraft
+(as described) have the same relation to modern Minecraft as a skateboard has to a car?
+Why not leave it at prototype here as well? If the core point is that this version was
+playable and testable, I still think that the skateboard isn't a good metaphor.
 
 ### Big Government Example and Lego
 
