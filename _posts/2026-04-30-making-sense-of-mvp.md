@@ -134,9 +134,13 @@ another Lego example that didn't have a skateboard and subsequently failed...[^l
 ## A Skateboard Isn't a Simpler Car...
 
 it's a simpler _mode of transportation!_ I hear you shout at your screen, shaking your copy of
-the Agile Manifesto at it. But let's be real here, wouldn't it be much easier to start a company
-with a concrete vision, a car company, rather than a _mode of transportation_ company?
-Just think of pure practical reasons like hiring decisions, funding rounds, etc...[^mode-of-transport]
+the Agile Manifesto at it. But let's consider the examples again. The Spotify skateboard was 
+already all about music streaming and not entertainment in general. This constraint to music
+allowed them to focus on the specific technical challenge of low-latency streaming in that context. 
+Same story with the Minecraft skateboard, which started as a 3D block building 
+game rather than a general creativity sandbox.
+The point I want to drive home is that successful development profits a lot from clear
+constraints. Just think of pure practical reasons like hiring decisions, funding rounds, etc...[^mode-of-transport]
 You can start with a visionary, but still constrained, hypothesis of where
 your product should go, hopefully informed by lots of user analysis and market
 research. Your vision might still be off and early user testing will help you correct
@@ -207,16 +211,7 @@ into manageable chunks. Pick as thin and as deep a vertical as possible and,
 of course, modularize. Within those modules, again prioritize verticals.
 But also make sure to integrate those modules.
 
-Let's get concrete and say you want to design a webshop. Rather than 
-fleshing out your frontend first (or independently from the backend), build
-very narrowly scoped versions from the start and integrate asap.
-Your frontend could just be a search bar and maybe a coupon code field at first.
-Your backend database has just one item in it, and there's some business
-logic to check if the coupon code is valid. Make all this work together, and
-you'll expose a lot of architectural decisions you need to make
-and as many potential sources of problems: from all your API specifications
-being incorrect, to an early tester trying a
-[Bobby Tables](https://xkcd.com/327/) style SQL injection for fun.
+!!! TODO VERTICAL SLICE EXAMPLE
 
 ## Conclusion
 
