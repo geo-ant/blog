@@ -45,7 +45,7 @@ us to make bad decisions.
 
 ## The Good
 
-At it's core, the original article argues that rather than building 
+At its core, the original article argues that rather than building 
 incomplete pieces of a grand vision, start with a simple solution that already 
 delivers real user value. Evolve testable, usable, lovable versions through 
 feedback. This avoids wasted effort and leads to a better product than executing a 
@@ -131,7 +131,7 @@ already all about music streaming rather than entertainment in general. This con
 allowed them to focus on the specific technical challenge of low-latency streaming
 in that context. Same for the other examples.
 
-A thing that I strongly believe is that is that successful development needs clear
+A thing that I strongly believe is that successful development needs clear
 constraints. Just think of practical reasons like hiring decisions, funding rounds,
 technology choices and the like[^mode-of-transport]. A concrete vision helps by
 constraining the solution spaces you'll explore. And exploration doesn't come for free.
