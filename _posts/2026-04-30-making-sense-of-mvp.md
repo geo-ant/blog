@@ -8,7 +8,7 @@ last_updated:
 #image:
 #description:
 #permalink:
-title: 'The Skateboard To Car Metaphor Considered Harmful'
+title: 'The Skateboard To Car Metaphor Is A Poor Mental Model for Vertical Slices'
 #
 #
 # Make sure this image is correct !!!
@@ -73,12 +73,10 @@ And yet, something just feels off to me about this skateboard to car
 metaphor. Of course! No car manufacturer started with a
 skateboard, right? Sure, but that's just taking the metaphor uncharitably
 literally. So does the skateboard just mean _simpler car_? That also feels
-wrong. Of course, to say "simpler car" we would have had to know that eventually
-we'll arrive at a car. I don't know whether Kniberg would actually argue that
-we couldn't have known _at all_ that we'll arrive at a car eventually, or
-whether he'd argue that we'll arrive at a _better_[^better] car using his
-mental model. I would think it's the second one, but let's dig into the
-properties a little more.
+wrong. In Kniberg's article the skateboard is described to the customer
+by saying "don't worry [...] We’re still aiming to build a car, but in the meantime please
+try this and give us feedback". So the metaphorical skateboard _is_ a stepping
+stone on the way to a car.
 
 In the article, the first thing that the customer would get delivered
 in the _Not Like This_ section is a single wheel of a car, which is of no use
@@ -128,35 +126,38 @@ to do with the skateboard-to-car mental model and all to do with vertical integr
 it's a simpler _mode of transportation!_ I hear you shout at your screen, shaking your copy of
 the Agile Manifesto at it. But let's think about it. The Spotify "skateboard" was 
 already all about music streaming rather than entertainment in general. This constraint
-allowed them to focus on the specific technical challenge of low-latency streaming
-in that context. Same for the other examples.
+allowed them to focus on the specific technical challenge of low-latency
+music streaming. Same for the other examples.
 
-A thing that I strongly believe is that successful development needs clear
+One principle that I strongly believe is that successful development needs clear
 constraints. Just think of practical reasons like hiring decisions, funding rounds,
 technology choices and the like[^mode-of-transport]. A concrete vision helps by
 constraining the solution spaces you'll explore. And exploration doesn't come for free.
 And yes, do get user feedback early and often, because it will help you align
-your vision with user needs.
+your vision with user needs. 
 
 So sure, in the most charitable interpretation, the skateboard just means to start
 simple and get early user feedback. None of this is objectionable, but I'd argue
-it's also not very helpful for planning actual development[^big-bang]. My main
-problem with that mental model is that it presents a sequence of products,
-but it doesn't address the process that goes from one step to the next, other than
-getting user feedback. That process, that's _development_! Say you've somehow identified
-your (metaphorical) skateboard, which although less complex than a (metaphorical) car, will likely be a product
-of decent complexity. It'll take requirements analysis, architecture decisions, actual engineering
-work, and much more. This is where a lot of the complexity lies. Nobody in their right mind
-would suggest that you can incrementally evolve every product in essentially
-_trivial_ steps, where the only thing that's missing is user feedback[^bus-ticket].
-I don't think that's what Kniberg argues either, but the article doesn't present
-a guidance on how to structure a development process so that you can even
-get to this early feedback. So there. That's my problem with that mental model[^potentially-shippable].
+it's also not very helpful for planning actual development[^big-bang]. Kniberg
+writes "Think big, but deliver in small functionally viable increments". I agree
+whole-heartedly, but the skateboard metaphor is a very bad way of illustrating
+_how_ to do that. One big problem with that article is it does present the idea
+of functionally viable increments without addressing how to 
+go from one step to the next systematically, other than getting user feedback. 
+
+Say you've identified your (metaphorical) skateboard, which
+although less complex than a (metaphorical) car, will likely be a product of decent
+complexity. It'll take requirements analysis, architecture decisions, actual engineering
+work, and much more. This is where a lot of the complexity lies. More than that,
+the skateboard to car metaphor implies a harmful level of independence of earlier
+and later versions. In reality, architectural decisions will compound and components
+will be shared across iterations. In that sense, the metaphor doesn't just fail
+as a guide for development, it actively points in the wrong direction[^potentially-shippable].
 
 ## A Better Development Model: Vertical Slices
 
-So now that we've abandoned the skateboard-to-car mental model, let's revisit
-Kniberg's examples again. What do they actually represent? They are _thin vertical
+One last time, let's revisit Kniberg's examples again. What do they
+actually represent? They are _thin vertical
 slices_, which are a "narrow but complete sliver of the final product vision"[^vertical].
 They are all highly incomplete and/or narrowly scoped when compared
 against their later versions, but all examples show a high level of
