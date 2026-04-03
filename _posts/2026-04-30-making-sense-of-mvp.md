@@ -200,14 +200,11 @@ But also make sure to integrate those modules.
 
 Structuring development along vertically integrated slices will both allow
 you to test your system in a meaningful way as you go along _and_ help you
-gather much-needed user feedback faster. It's also a great way to prevent bike-shedding,
-since it's much easier to fall into these patterns within a single module ("should we use
-serifs or sans-serifs in the frontend?") than it is to do that on a vertical slice.
-
-I have many more thoughts on development, but I'll leave it at this for now. Please note
-that I don't claim that I came up with any of this. Those are just solid
-system engineering principles and it's helpful to remind ourselves of them from
-time to time.
+gather much-needed user feedback faster. Kniberg clearly knows that, since
+this was the case in all his examples. Maybe his whole point was just to hammer
+home the importance of simple incremental steps with user feedback, which
+I clearly think is important. I just wish he'd never come up with the
+skateboard-to-car metaphor because this is just a bad mental model for this.
 
 ## Endnotes
 
