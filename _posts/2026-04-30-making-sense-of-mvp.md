@@ -41,7 +41,7 @@ This illustrates the key metaphor presented in the article. Attacking a
 metaphor always runs the risk of attacking a strawman by taking the metaphor
 too literally. I'll try my best not to do that. But what I _can_ do is critically
 evaluate the mental model that underlies the metaphor. A mental model guides our 
-thinking and consequently our decision making. That's why, if it is flawed, it can lead 
+thinking and consequently our decision-making. That's why, if it is flawed, it can lead 
 us to make bad decisions.
 
 ## The Good
@@ -52,13 +52,14 @@ delivers real user value. Evolve testable, usable, lovable versions through
 feedback. This avoids wasted effort and leads to a better product than executing a 
 fixed upfront plan.
 
-Kniberg's argument is very strong when we see the iterative understanding
-and subsequent addressing of the actual user needs as the guiding principle.
-We all know the _"If I had asked people what they
-wanted, they would have said faster horses"_ quote often attributed to Henry Ford[^henry-ford-quote]
+Gathering user feedback frequenly and using it to iteratively
+improve your product during development is great advice. Understanding
+actual user needs is hard enough as it is and almost impossible in isolation.
+We all know the _"If I had asked people what they wanted, they would have said
+faster horses"_ quote often attributed to Henry Ford[^henry-ford-quote]
 and there's much wisdom in it. Continuous feedback informing us of how aligned
-we are with the user needs is indeed invaluable. I think as a
-framework for _product discovery_ this is great. It also shines when
+we are with the user needs is indeed invaluable. I think, as a
+framework for _product discovery_, this is great. It also shines when
 used as a mental model for getting us to actually commit to the earliest
 testable/usable/lovable/... version of a product. This prevents us from optimizing
 something to death in an ivory tower.
@@ -70,11 +71,11 @@ something to death in an ivory tower.
    <figcaption> Me, obsessing over the skateboard metaphor.</figcaption>
 </figure>
 
-And yet, something just feels off to me about this skateboard to car
+And yet, something just feels off to me about this skateboard-to-car
 metaphor. Of course! No car manufacturer started with a
 skateboard, right? Sure, but that's just taking the metaphor uncharitably
 literally. So does the skateboard just mean _simpler car_? That also feels
-wrong. In Kniberg's article the skateboard is described to the customer
+wrong. In Kniberg's article, the skateboard is described to the customer
 by saying "don't worry [...] We’re still aiming to build a car, but in the meantime please
 try this and give us feedback". So the metaphorical skateboard _is_ a stepping
 stone on the way to a car.
@@ -85,9 +86,9 @@ to them. In the _Like This_ section, a skateboard is shipped to them. They are p
 not happy about it, but it's definitely something that they can use and
 provide feedback on. So _usable_ is one important property of a metaphorical skateboard.
 Obviously, it's also _simpler_ than a (metaphorical) car. And thirdly, it's
-_self contained_. It's not a _partial_ car, in fact: it's not even _part of a car_!
+_self-contained_. It's not a _partial_ car, in fact: it's not even _part of a car_!
 You _could_ give a partial car to users to test it, and as a matter of fact that's
-pretty much what I'll argue later, but still Kniberg chose to go with skateboard.
+pretty much what I'll argue later, but still Kniberg chose to go with a skateboard.
 Those notions of self-containedness (is that a word?) and independence
 are where, I believe, things start to unravel.
 
@@ -98,7 +99,7 @@ Kniberg could mean by skateboard...
 
 I'll try to keep this short, because this is shaping up to be a long article, but we do
 need to talk about the examples in the original article briefly. For the Spotify
-example Kniberg writes: 
+example, Kniberg writes: 
 
 > "developers basically sat down and hacked up a technical prototype, put in
 > whatever ripped music they had on their laptops, and started experimenting
@@ -115,7 +116,7 @@ The Big Government example in the original article is a great case study of
 how they released a very narrowly scoped initial version (with respect to both 
 capabilities and distribution) and built on the gathered feedback. However, again I 
 don't see how that first version is a skateboard except for it being a much 
-simpler, stripped-down version compared to the releases that came after. But again, 
+simpler, stripped-down version compared to the releases that came after. But again,
 a skateboard is not a simpler car, it's not a partial car, it's not part of a car.
 
 All this is to say that the examples in the text are excellent examples of good
@@ -142,24 +143,24 @@ simple and get early user feedback. None of this is objectionable, but I'd argue
 it's also not very helpful for planning actual development[^big-bang]. Kniberg
 writes "Think big, but deliver in small functionally viable increments". I agree
 whole-heartedly, but the skateboard metaphor is a very bad way of illustrating
-_how_ to do that. One big problem with that article is that it does present the idea
-of functionally viable increments without addressing how to 
+_how_ to do that. One big problem with that article is that it tells us to
+deliver functionally viable increments, without explaining how to 
 go from one step to the next systematically, other than getting user feedback. 
-As a pure product discovery framework this might seem useful, but there is no
+As a pure product discovery framework, this might seem useful, but there is no
 discovery without development.
 
 Say you've identified your (metaphorical) skateboard, which,
 although less complex than a (metaphorical) car, will likely be a product of decent
 complexity. It'll take requirements analysis, architecture decisions, actual engineering
 work, and much more. This is where a lot of the complexity lies. More than that,
-the skateboard to car metaphor can imply a harmful level of independence of earlier
+the skateboard-to-car metaphor can imply a harmful level of independence of earlier
 and later versions. In reality, architectural decisions will compound and components
 will be shared across iterations. In that sense, the metaphor doesn't just fail
-as a guide for development, at worst it actually points in the wrong direction.
+as a guide for development: at worst, it actually points in the wrong direction.
 
-Kniberg does acknowledge this continuity of vision, since even at the skateboard
+Kniberg does acknowledge a _continuity of vision_, since even at the skateboard
 state we're "still aiming to build a car", but he doesn't explicitly acknowledge
-the continuity of engineering decisions in his prose. That's how the
+the _continuity of engineering_ in his prose[^morph]. That's how the
 skateboard-to-car metaphor obscures crucial aspects of the development process
 necessary to even get from one stage to the next.
 
@@ -182,23 +183,24 @@ which is where a lot of the breaking points of a system are. Sure, it's easy
 for a team to deliver a brilliantly polished module, but that's worthless
 without seeing if their assumptions and the formal interface specifications
 (you _do_ have those, right?) hold up in reality. Fail early here and iterate,
-to save yourself a lot of costly reworks later.
+to save yourself a lot of costly rework later.
 
 Are vertical slices _simpler_ than what comes after? Of course! Are they
 _self contained_? In a way, yes. But to me, that's more a consequence of them
 being vertical slices. They definitely aren't what a skateboard is to a car,
 and we should all free ourselves from the idea that incremental versions have a high
-degree of independence. Your versions _of course_
+degree of independence. Your versions, _of course_,
 won't be independent from each other, _that's the whole point_! You're building
 something incrementally. Thinking of vertical slices helps us remember that 
 we are iterating towards a (possibly evolving) vision incrementally rather
 than building solutions of increasing complexity independently from each other.
 Vertical slices make it clear that the decisions you make in
 the early stages will have an impact on the later stages. Vertical slices
-aren't a new idea, and spelled out like this, all of this may sound banal and yet
+aren't a new idea, and spelled out like this, all of this may sound banal, and yet
 the skateboard-to-car metaphor exists. This article isn't about inventing a
-new development practice. It's pointing out what Kniberg's examples already show,
-and arguing that the popular skateboard to car metaphor obscures a better mental model.
+new development practice. I'm pointing out what Kniberg's examples already show,
+and arguing that the popular skateboard to car metaphor obscures a better
+mental model.
 
 And now for the final question: does this mental model help us plan development?
 Absolutely. If we prioritize verticals, then this helps us slice our work
@@ -209,21 +211,20 @@ achieve exactly that. They force end-to-end integration and thus requirements
 have to be concrete enough to implement, interfaces have to be specified _and actually used_.
 Foundational architectural decisions can't be deferred, but they also don't have to be made
 all at once. This allows you to test internally, both manually and automatically,
-ideally through all levels of integration. You'll catch wrong assumptions fast,
-and when it's still cheap to correct them, and can ultimately deliver a product early.
+ideally through all levels of integration. You'll catch wrong assumptions while it's still cheap to correct them, and can ultimately deliver a product early.
 
 ## Conclusion
 
 The examples in Kniberg's original article are all excellent illustrations
 of good development practices. What made them work wasn't the skateboard,
 it was the fact that the early releases were all thin, integrated vertical
-slices. Gathering early user feedback was used to inform future iterations,
-which incrementally built on the engineering decisions in their predecessors.
-The skateboard metaphor obscures that last part. If you think "skateboard",
+slices. Gathering early user feedback was used to inform future iterations.
+Those were incrementally built on the engineering decisions in their predecessors.
+The skateboard metaphor obscures that part. If you think "skateboard",
 it's easy to forget that earlier versions lay the groundwork for their
 successive increments.
 
-Think "vertical slices" instead. They are simpler, testable, and most importantly
+Think "vertical slices" instead. They are simpler, testable, and most importantly:
 you'll be forced to make decisions that lay the groundwork for subsequent
 increments. To my mind, that's a better mental model of a good incremental
 development process, and one that's both well-known and worth repeating.
@@ -233,5 +234,6 @@ development process, and one that's both well-known and worth repeating.
 [^henry-ford-quote]: While it _is true_ that the quote is often attributed to Ford, there's [no evidence](https://www.snopes.com/news/2025/02/23/horses-quote-henry-ford/) of him actually saying it. But _"never let the truth get in the way of a good story"_ --Mark Twain, or was it...?
 [^big-bang]: I'll extend an olive branch here and say that there truly are people who try to design the perfect product in their ivory tower, and yes, those people will most likely never release _anything_, let alone anything that anyone actually wants.
 [^vertical]: Quote from Richin Jose: "How not to build an MVP: The Flawed 'Skateboard to Car' Analogy" [here](https://richinjose.medium.com/how-not-to-build-an-mvp-the-flawed-skateboard-to-car-analogy-4920a845f151). The article goes on to compare the MVP to a thin slice of layered cake, rather than delivering the whole top layer of frosting. Very tasty mental image, but doesn't work one bit as a development metaphor, since we'd have to bake the whole cake to deliver a slice...
-[^mode-of-transport]: Cut to all AI and DeFi companies with hundreds of millions in funding and absolutely no concrete vision other than to "revolutionize" finance, intelligence—you name it...
+[^mode-of-transport]: Cut to all AI and DeFi companies with hundreds of millions in funding and absolutely no concrete vision other than to "revolutionize" finance, intelligence - you name it...
 [^minecraft]: The skateboard of Minecraft is described as:  "You couldn't do much in the first version – it was basically an ugly blocky 3d-landscape where you can dig up blocks and place them elsewhere to build crude structures.". Surely a simpler version, but does this version of Minecraft (as described) have the same relation to modern Minecraft as a skateboard has to a car? Why not leave it at prototype here as well? If the core point is that this version was playable and testable, I still think that the skateboard isn't a good metaphor.
+[^morph]: He writes 'This model is especially suitable for software, since software is, well, Soft. You can “morph” the product as you go'. The words "soft" and "morph" do a lot of heavy lifting in those sentences and I'd say this is a very handwavy description of the development process at best. Again, this totally obscures the fact that engineering decisions in early versions lay the foundations for later increments.
