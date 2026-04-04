@@ -198,13 +198,19 @@ But also make sure to integrate those modules.
 
 ## Conclusion
 
-Structuring development along vertically integrated slices will both allow
-you to test your system in a meaningful way as you go along _and_ help you
-gather much-needed user feedback faster. Kniberg clearly knows that, since
-this was the case in all his examples. Maybe his whole point was just to hammer
-home the importance of simple incremental steps with user feedback, which
-I clearly think is important. I just wish he'd never come up with the
-skateboard-to-car metaphor because this is just a bad mental model for this.
+The examples in Kniberg's original article are all excellent illustrations
+of good development practices. What made them work wasn't the skateboard,
+it was the fact that the early releases were all thin, integrated vertical
+slices. Gathering early user feedback was used to inform future iterations,
+which incrementally built on the engineering decisions in their predecessors.
+The skateboard metaphor obscures that last part. If you think "skateboard",
+it's easy to forget that earlier versions lay the groundwork for their
+successive increments.
+
+Think "vertical slices" instead. They are simpler, testable, and most importantly
+you'll be forced to make decisions that lay the groundwork for subsequent
+increments. To my mind, that's a better mental model of a good incremental
+development process, and one that's both well-known and worth repeating.
 
 ## Endnotes
 
