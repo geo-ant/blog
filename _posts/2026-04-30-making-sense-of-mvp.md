@@ -8,7 +8,7 @@ last_updated:
 #image:
 #description:
 #permalink:
-title: 'The Skateboard To Car Metaphor Is A Poor Mental Model for Vertical Slices'
+title: "A Skateboard Isn't A Vertical Slice of A Car"
 #
 #
 # Make sure this image is correct !!!
@@ -22,12 +22,13 @@ math: false
 
 It's been one too many times that I've seen the famous _skateboard, scooter, bike,
 motorcycle, and car_ [image](https://blog.crisp.se/2016/01/25/henrikkniberg/making-sense-of-mvp)
-by Henrik Kniberg about agile product development and I needed to know what irked
-me about that so much. Follow me for a deep dive that goes beyond the obvious and
-shallow "car manufacturer didn't use to build skateboards"
-critique. That requires some digging, because the original article contains great
-insights and examples, but I'll still argue that the mental image underlying the
-metaphor doesn't work to guide _development_.
+by Henrik Kniberg, which he says is about (agile) "product development
+in general". I've finally figured out what bothers me about it so much.
+I'll argue that the underlying mental model is at best not helpful
+and at worst actively misleading for product development, despite the article
+making a couple of excellent points and presenting great examples. Vertical
+slices are a better mental model already hidden in Kniberg's own examples and
+prose.
 
 Let's remind ourselves of the (in)famous image quickly before we go further.
 
@@ -119,7 +120,7 @@ a skateboard is not a simpler car, it's not a partial car, it's not part of a ca
 
 All this is to say that the examples in the text are excellent examples of good
 development practices that led to great products, but none of this has anything
-to do with the skateboard-to-car mental model and all to do with vertical integrations.
+to do with the skateboard-to-car mental model and all to do with vertical integration.
 
 ## A Skateboard Isn't a Simpler Car...
 
@@ -144,15 +145,23 @@ whole-heartedly, but the skateboard metaphor is a very bad way of illustrating
 _how_ to do that. One big problem with that article is that it does present the idea
 of functionally viable increments without addressing how to 
 go from one step to the next systematically, other than getting user feedback. 
+As a pure product discovery framework this might seem useful, but there is no
+discovery without development.
 
 Say you've identified your (metaphorical) skateboard, which,
 although less complex than a (metaphorical) car, will likely be a product of decent
 complexity. It'll take requirements analysis, architecture decisions, actual engineering
 work, and much more. This is where a lot of the complexity lies. More than that,
-the skateboard to car metaphor implies a harmful level of independence of earlier
+the skateboard to car metaphor can imply a harmful level of independence of earlier
 and later versions. In reality, architectural decisions will compound and components
 will be shared across iterations. In that sense, the metaphor doesn't just fail
-as a guide for development, it actively points in the wrong direction.
+as a guide for development, at worst it actually points in the wrong direction.
+
+Kniberg does acknowledge this continuity of vision, since even at the skateboard
+state we're "still aiming to build a car", but he doesn't explicitly acknowledge
+the continuity of engineering decisions in his prose. That's how the
+skateboard-to-car metaphor obscures crucial aspects of the development process
+necessary to even get from one stage to the next.
 
 ## A Better Development Model: Vertical Slices
 
@@ -226,4 +235,3 @@ development process, and one that's both well-known and worth repeating.
 [^vertical]: Quote from Richin Jose: "How not to build an MVP: The Flawed 'Skateboard to Car' Analogy" [here](https://richinjose.medium.com/how-not-to-build-an-mvp-the-flawed-skateboard-to-car-analogy-4920a845f151). The article goes on to compare the MVP to a thin slice of layered cake, rather than delivering the whole top layer of frosting. Very tasty mental image, but doesn't work one bit as a development metaphor, since we'd have to bake the whole cake to deliver a slice...
 [^mode-of-transport]: Cut to all AI and DeFi companies with hundreds of millions in funding and absolutely no concrete vision other than to "revolutionize" finance, intelligence—you name it...
 [^minecraft]: The skateboard of Minecraft is described as:  "You couldn't do much in the first version – it was basically an ugly blocky 3d-landscape where you can dig up blocks and place them elsewhere to build crude structures.". Surely a simpler version, but does this version of Minecraft (as described) have the same relation to modern Minecraft as a skateboard has to a car? Why not leave it at prototype here as well? If the core point is that this version was playable and testable, I still think that the skateboard isn't a good metaphor.
-[^lego]: Except for the lego example, where he explicitly admits that he doesn't even know where the skateboard is, but he does emphasize the importance of early user feedback. For good measure, he throws in another Lego example that didn't have a skateboard and subsequently failed...I guess that the point of that section is to say that the successful development did incorporate early user feedback, while the failed one did not. Sure, but what's that got to do with skateboards?
