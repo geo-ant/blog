@@ -222,7 +222,15 @@ figcaption {
   //font-style: italic;
   padding: 2px;
   text-align: left;
-  font-size: 0.85em
+  font-size: 0.85em;
+
+  // images always have a dark background, so links match caption gray
+  a {
+    color: $gray;
+    &:hover, &:active {
+      color: $darkRed;
+    }
+  }
 }
 
 // Fixes images in popup boxes from Google Translate
@@ -374,7 +382,7 @@ nav {
     margin: 1.8em .8em;
     border-left: 2px solid $gray;
     padding: 0.1em 1em;
-    color: $gray;
+    color: var(--quote-color);
     font-style: italic;
   }
 
