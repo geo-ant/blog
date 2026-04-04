@@ -199,10 +199,9 @@ integration and work towards them, but don't stress about sprints or
 potentially shippable products. Vertical slices force end-to-end integration and
 thus requirements have to be concrete enough to implement, interfaces have
 to be specified _and actually used_, and foundational architectural decisions
-can't be deferred. That allows you to test internally, both manually and
-automatically, through many levels of integration. That allows you to correct
-wrong assumptions fast and when it's still cheap. And that helps us to actually 
-deliver a product early.
+can't be deferred. This allows you to test internally, both manually and
+automatically (ideally through all levels of integration), catch wrong assumptions fast
+and when it's still cheap to correct them, and ultimately deliver a product early.
 
 ## Conclusion
 
