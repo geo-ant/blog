@@ -38,7 +38,7 @@ Let's remind ourselves of the (in)famous image quickly before we go further.
 
 This illustrates the key metaphor presented in the article. Attacking a
 metaphor always runs the risk of attacking a strawman by taking the metaphor
-too literally. I'll try my best not to do that. But what I  _can_ do is critically
+too literally. I'll try my best not to do that. But what I _can_ do is critically
 evaluate the mental model that underlies the metaphor. A mental model guides our 
 thinking and consequently our decision making. That's why, if it is flawed, it can lead 
 us to make bad decisions.
@@ -127,8 +127,7 @@ it's a simpler _mode of transportation!_ I hear you shout at your screen, shakin
 the Agile Manifesto at it. But let's think about it. The Spotify "skateboard" was 
 built around specific commitments in the realm of low-latency music streaming.
 Later increments were built on top of those commitments, not independently from
-them. Same for the other examples. A skateboard doesn't share the foundational
-principles with a car, whereas a vertical slice does.
+them. Same for the other examples. 
 
 One principle that I strongly believe is that successful development needs clear
 constraints. Just think of practical reasons like hiring decisions, funding rounds,
@@ -153,11 +152,11 @@ work, and much more. This is where a lot of the complexity lies. More than that,
 the skateboard to car metaphor implies a harmful level of independence of earlier
 and later versions. In reality, architectural decisions will compound and components
 will be shared across iterations. In that sense, the metaphor doesn't just fail
-as a guide for development, it actively points in the wrong direction[^potentially-shippable].
+as a guide for development, it actively points in the wrong direction.
 
 ## A Better Development Model: Vertical Slices
 
-One last time, let's revisit Kniberg's examples again. What do they
+One last time, let's revisit Kniberg's examples. What do they
 actually represent? They are _thin vertical
 slices_, which are a "narrow but complete sliver of the final product vision"[^vertical].
 They are all highly incomplete and/or narrowly scoped when compared
@@ -195,13 +194,14 @@ and arguing that the popular skateboard to car metaphor obscures a better mental
 And now for the final question: does this mental model help us plan development?
 Absolutely. If we prioritize verticals, then this helps us slice our work
 into manageable chunks. Prioritize narrow goals which require high vertical
-integration and work towards them, but don't stress about sprints or
-potentially shippable products. Vertical slices force end-to-end integration and
-thus requirements have to be concrete enough to implement, interfaces have
-to be specified _and actually used_, and foundational architectural decisions
-can't be deferred. This allows you to test internally, both manually and
-automatically (ideally through all levels of integration), catch wrong assumptions fast
-and when it's still cheap to correct them, and ultimately deliver a product early.
+integration and work towards them. Just like Kniberg says: "Think big, but deliver in small
+functionally viable increments". Vertical slices help you achieve exactly that.
+They force end-to-end integration and thus requirements have to be concrete enough
+to implement, interfaces have to be specified _and actually used_. Foundational
+architectural decisions can't be deferred, but they also don't have to be made
+all at once. This allows you to test internally, both manually and automatically
+,ideally through all levels of integration. You'll catch wrong assumptions fast
+and when it's still cheap to correct them, and can ultimately deliver a product early.
 
 ## Conclusion
 
@@ -224,8 +224,6 @@ development process, and one that's both well-known and worth repeating.
 [^henry-ford-quote]: While it _is true_ that the quote is often attributed to Ford, there's [no evidence](https://www.snopes.com/news/2025/02/23/horses-quote-henry-ford/) of him actually saying it. But _"never let the truth get in the way of a good story"_ --Mark Twain, or was it...?
 [^big-bang]: I'll extend an olive branch here and say that there truly are people who try to design the perfect product in their ivory tower, and yes, those people will most likely never release _anything_, let alone anything that anyone actually wants.
 [^vertical]: Quote from Richin Jose: "How not to build an MVP: The Flawed 'Skateboard to Car' Analogy" [here](https://richinjose.medium.com/how-not-to-build-an-mvp-the-flawed-skateboard-to-car-analogy-4920a845f151). The article goes on to compare the MVP to a thin slice of layered cake, rather than delivering the whole top layer of frosting. Very tasty mental image, but doesn't work one bit as a development metaphor, since we'd have to bake the whole cake to deliver a slice...
-[^potentially-shippable]: I had a whole rant about how this ties into the whole _potentially shippable product_ that's still echoing in the agile world. But I'll leave it at that and present what I think is a better mental model to inform our development and one that still helps us gather feedback. Because, mind you, that whole getting-feedback-thingy is still great. I went down a rabbit hole trying to find the origins of the potentially releasable product phrasing. I looked in various editions of the Scrum guide. The [2013 guide](https://scrumguides.org/docs/scrumguide/v1/Scrum-Guide-US.pdf) speaks of the "potentially releasable increment", which is pretty close. The [2020 guide](https://scrumguides.org/docs/scrumguide/v2020/2020-Scrum-Guide-US.pdf) has notably softened the language to: "In order to provide value, the Increment must be usable". While that language sure is mellower, the whole idea is still echoing in agile circles today and I don't think that it's doing anyone any good. See [here](https://www.visual-paradigm.com/scrum/sprint-increment-potential-shippable-mvp-mmp/) or [here](https://staragile.com/blog/potentially-shippable-product) for pretty recent references to the terminology.
 [^mode-of-transport]: Cut to all AI and DeFi companies with hundreds of millions in funding and absolutely no concrete vision other than to "revolutionize" finance, intelligence—you name it...
-[^better]: Where _better_ is measured by the degree to which the user needs and requirements are satisfied.
 [^minecraft]: The skateboard of Minecraft is described as:  "You couldn't do much in the first version – it was basically an ugly blocky 3d-landscape where you can dig up blocks and place them elsewhere to build crude structures.". Surely a simpler version, but does this version of Minecraft (as described) have the same relation to modern Minecraft as a skateboard has to a car? Why not leave it at prototype here as well? If the core point is that this version was playable and testable, I still think that the skateboard isn't a good metaphor.
 [^lego]: Except for the lego example, where he explicitly admits that he doesn't even know where the skateboard is, but he does emphasize the importance of early user feedback. For good measure, he throws in another Lego example that didn't have a skateboard and subsequently failed...I guess that the point of that section is to say that the successful development did incorporate early user feedback, while the failed one did not. Sure, but what's that got to do with skateboards?
