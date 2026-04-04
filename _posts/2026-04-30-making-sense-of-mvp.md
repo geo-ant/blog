@@ -125,9 +125,10 @@ to do with the skateboard-to-car mental model and all to do with vertical integr
 
 it's a simpler _mode of transportation!_ I hear you shout at your screen, shaking your copy of
 the Agile Manifesto at it. But let's think about it. The Spotify "skateboard" was 
-already all about music streaming rather than entertainment in general. This constraint
-allowed them to focus on the specific technical challenge of low-latency
-music streaming. Same for the other examples.
+built around specific commitments in the realm of low-latency music streaming.
+Later increments were built on top of those commitments, not independently from
+them. Same for the other examples. A skateboard doesn't share the foundational
+principles with a car, whereas a vertical slice does.
 
 One principle that I strongly believe is that successful development needs clear
 constraints. Just think of practical reasons like hiring decisions, funding rounds,
@@ -185,8 +186,11 @@ something incrementally. Thinking of vertical slices helps us remember that
 we are iterating towards a (possibly evolving) vision incrementally rather
 than building solutions of increasing complexity independently from each other.
 Vertical slices make it clear that the decisions you make in
-the early stages will have an impact on the later stages. Spelled out like 
-this, it should sound banal and yet the skateboard-to-car metaphor exists.
+the early stages will have an impact on the later stages. Vertical slices
+aren't a new idea and spelled out like this, all of this may sound banal and yet
+the skateboard-to-car metaphor exists. This article isn't about inventing a
+new development practice. It's pointing out what Kniberg's examples already show,
+and arguing that the popular skateboard to car metaphor obscures a better mental model.
 
 And now for the final question: does this mental model help us plan development?
 Absolutely. If we prioritize verticals, then this helps us slice our work
