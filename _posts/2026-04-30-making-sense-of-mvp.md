@@ -128,7 +128,7 @@ it's a simpler _mode of transportation!_ I hear you shout at your screen, shakin
 the Agile Manifesto at it. But let's think about it. The Spotify "skateboard" was 
 built around specific commitments in the realm of low-latency music streaming.
 Later increments were built on top of those commitments, not independently from
-them. Same for the other examples. 
+them. The other examples play out much the same way.
 
 One principle that I strongly believe is that successful development needs clear
 constraints. Just think of practical reasons like hiring decisions, funding rounds,
@@ -203,11 +203,11 @@ and arguing that the popular skateboard to car metaphor obscures a better mental
 And now for the final question: does this mental model help us plan development?
 Absolutely. If we prioritize verticals, then this helps us slice our work
 into manageable chunks. Prioritize narrow goals which require high vertical
-integration and work towards them. Just like Kniberg says: "Think big, but deliver in small
-functionally viable increments". Vertical slices help you achieve exactly that.
-They force end-to-end integration and thus requirements have to be concrete enough
-to implement, interfaces have to be specified _and actually used_. Foundational
-architectural decisions can't be deferred, but they also don't have to be made
+integration and work towards them. Remember Kniberg telling us to "Think big,
+but deliver in small functionally viable increments". Vertical slices help you
+achieve exactly that. They force end-to-end integration and thus requirements
+have to be concrete enough to implement, interfaces have to be specified _and actually used_.
+Foundational architectural decisions can't be deferred, but they also don't have to be made
 all at once. This allows you to test internally, both manually and automatically,
 ideally through all levels of integration. You'll catch wrong assumptions fast,
 and when it's still cheap to correct them, and can ultimately deliver a product early.
