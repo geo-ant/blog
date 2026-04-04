@@ -55,10 +55,10 @@ Kniberg's argument is very strong when we see the iterative understanding
 and subsequent addressing of the actual user needs as the guiding principle.
 We all know the _"If I had asked people what they
 wanted, they would have said faster horses"_ quote often attributed to Henry Ford[^henry-ford-quote]
-and there's much wisdom in it. Continuous feedback informing us on how aligned
+and there's much wisdom in it. Continuous feedback informing us of how aligned
 we are with the user needs is indeed invaluable. I think as a
 framework for _product discovery_ this is great. It also shines when
-used as a mental model for getting us to actually commit to an earliest
+used as a mental model for getting us to actually commit to the earliest
 testable/usable/lovable/... version of a product. This prevents us from optimizing
 something to death in an ivory tower.
 
@@ -107,7 +107,7 @@ He goes on to explain that they focused on the singular metric of latency to
 make the product viable and used friends and family to test it. I can definitely
 see that this is pretty far from what Spotify is today (or even at the time the
 article was written), but why not just leave it at prototype? Is a skateboard
-a prototype for a car? Hardly. I'd argue the same is true for the minecraft
+a prototype for a car? Hardly. I'd argue the same is true for the Minecraft
 example presented in the article [^minecraft].
 
 The Big Government example in the original article is a great case study of 
@@ -141,11 +141,11 @@ simple and get early user feedback. None of this is objectionable, but I'd argue
 it's also not very helpful for planning actual development[^big-bang]. Kniberg
 writes "Think big, but deliver in small functionally viable increments". I agree
 whole-heartedly, but the skateboard metaphor is a very bad way of illustrating
-_how_ to do that. One big problem with that article is it does present the idea
+_how_ to do that. One big problem with that article is that it does present the idea
 of functionally viable increments without addressing how to 
 go from one step to the next systematically, other than getting user feedback. 
 
-Say you've identified your (metaphorical) skateboard, which
+Say you've identified your (metaphorical) skateboard, which,
 although less complex than a (metaphorical) car, will likely be a product of decent
 complexity. It'll take requirements analysis, architecture decisions, actual engineering
 work, and much more. This is where a lot of the complexity lies. More than that,
@@ -165,7 +165,7 @@ _vertical integration_, meaning a lot of system components from top to bottom
 have to work together. Let's check how a vertical slice compares to the
 key properties of the (metaphorical) skateboard we identified above.
 
-Are vertical slices usable? Yes they are, though I much prefer _testable_,
+Are vertical slices usable? Yes, they are, though I much prefer _testable_,
 as Kniberg does, too. That's actually one of their major benefits. A vertical
 slice through a complex system means that many modules will have to work
 together successfully. Thus, you really get to pressure test those interfaces,
@@ -177,7 +177,7 @@ to save yourself a lot of costly reworks later.
 
 Are vertical slices _simpler_ than what comes after? Of course! Are they
 _self contained_? In a way, yes. But to me, that's more a consequence of them
-being vertical slices. They definitely aren't what a skateboard is to a car
+being vertical slices. They definitely aren't what a skateboard is to a car,
 and we should all free ourselves from the idea that incremental versions have a high
 degree of independence. Your versions _of course_
 won't be independent from each other, _that's the whole point_! You're building
@@ -186,7 +186,7 @@ we are iterating towards a (possibly evolving) vision incrementally rather
 than building solutions of increasing complexity independently from each other.
 Vertical slices make it clear that the decisions you make in
 the early stages will have an impact on the later stages. Vertical slices
-aren't a new idea and spelled out like this, all of this may sound banal and yet
+aren't a new idea, and spelled out like this, all of this may sound banal and yet
 the skateboard-to-car metaphor exists. This article isn't about inventing a
 new development practice. It's pointing out what Kniberg's examples already show,
 and arguing that the popular skateboard to car metaphor obscures a better mental model.
@@ -199,8 +199,8 @@ functionally viable increments". Vertical slices help you achieve exactly that.
 They force end-to-end integration and thus requirements have to be concrete enough
 to implement, interfaces have to be specified _and actually used_. Foundational
 architectural decisions can't be deferred, but they also don't have to be made
-all at once. This allows you to test internally, both manually and automatically
-,ideally through all levels of integration. You'll catch wrong assumptions fast
+all at once. This allows you to test internally, both manually and automatically,
+ideally through all levels of integration. You'll catch wrong assumptions fast,
 and when it's still cheap to correct them, and can ultimately deliver a product early.
 
 ## Conclusion
