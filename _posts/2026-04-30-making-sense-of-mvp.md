@@ -194,11 +194,15 @@ and arguing that the popular skateboard to car metaphor obscures a better mental
 
 And now for the final question: does this mental model help us plan development?
 Absolutely. If we prioritize verticals, then this helps us slice our work
-into manageable chunks. Pick as thin and as deep a vertical as possible and,
-of course, modularize. Within those modules, again prioritize verticals.
-But also make sure to integrate those modules.
-
-!!! TODO VERTICAL SLICE EXAMPLE
+into manageable chunks. Prioritize narrow goals which require high vertical
+integration and work towards them, but don't stress about sprints or
+potentially shippable products. Vertical slices force end-to-end integration and
+thus requirements have to be concrete enough to implement, interfaces have
+to be specified _and actually used_, and foundational architectural decisions
+can't be deferred. That allows you to test internally, both manually and
+automatically, through many levels of integration. That allows you to correct
+wrong assumptions fast and when it's still cheap. And that helps us to actually 
+deliver a product early.
 
 ## Conclusion
 
@@ -221,7 +225,6 @@ development process, and one that's both well-known and worth repeating.
 [^henry-ford-quote]: While it _is true_ that the quote is often attributed to Ford, there's [no evidence](https://www.snopes.com/news/2025/02/23/horses-quote-henry-ford/) of him actually saying it. But _"never let the truth get in the way of a good story"_ --Mark Twain, or was it...?
 [^big-bang]: I'll extend an olive branch here and say that there truly are people who try to design the perfect product in their ivory tower, and yes, those people will most likely never release _anything_, let alone anything that anyone actually wants.
 [^vertical]: Quote from Richin Jose: "How not to build an MVP: The Flawed 'Skateboard to Car' Analogy" [here](https://richinjose.medium.com/how-not-to-build-an-mvp-the-flawed-skateboard-to-car-analogy-4920a845f151). The article goes on to compare the MVP to a thin slice of layered cake, rather than delivering the whole top layer of frosting. Very tasty mental image, but doesn't work one bit as a development metaphor, since we'd have to bake the whole cake to deliver a slice...
-[^bus-ticket]: Say _bus ticket_. I dare you, I double dare you. Do we _really_ have to argue about the fact that there is no such thing as the (metaphorical) _bus ticket_? The idea that there are always absolutely _trivial_ steps to go from one release to the next and the only thing that's missing is user feedback is just mind-boggling to me and I don't actually think anyone would take it seriously. For the record, I don't think this is what Kniberg is arguing. But this _is_ the internet and there's probably one agile apologist (or AI bro...) out there getting ready to lecture me.
 [^potentially-shippable]: I had a whole rant about how this ties into the whole _potentially shippable product_ that's still echoing in the agile world. But I'll leave it at that and present what I think is a better mental model to inform our development and one that still helps us gather feedback. Because, mind you, that whole getting-feedback-thingy is still great. I went down a rabbit hole trying to find the origins of the potentially releasable product phrasing. I looked in various editions of the Scrum guide. The [2013 guide](https://scrumguides.org/docs/scrumguide/v1/Scrum-Guide-US.pdf) speaks of the "potentially releasable increment", which is pretty close. The [2020 guide](https://scrumguides.org/docs/scrumguide/v2020/2020-Scrum-Guide-US.pdf) has notably softened the language to: "In order to provide value, the Increment must be usable". While that language sure is mellower, the whole idea is still echoing in agile circles today and I don't think that it's doing anyone any good. See [here](https://www.visual-paradigm.com/scrum/sprint-increment-potential-shippable-mvp-mmp/) or [here](https://staragile.com/blog/potentially-shippable-product) for pretty recent references to the terminology.
 [^mode-of-transport]: Cut to all AI and DeFi companies with hundreds of millions in funding and absolutely no concrete vision other than to "revolutionize" finance, intelligence—you name it...
 [^better]: Where _better_ is measured by the degree to which the user needs and requirements are satisfied.
