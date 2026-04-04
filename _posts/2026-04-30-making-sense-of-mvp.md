@@ -32,7 +32,7 @@ prose.
 
 Let's remind ourselves of the (in)famous image quickly before we go further.
 
-<figure>
+<figure class="natural">
  <img src="/blog/images/mvp/kniberg-mvp.png" alt="Kniberg's Illustration" style="width:100%">
    <figcaption> Kniberg's original illustration from <a href="https://blog.crisp.se/2016/01/25/henrikkniberg/making-sense-of-mvp">this article</a>. He writes "The picture is a metaphor. It is not about actual car development, it is about product development in general, using a car as a metaphor."</figcaption>
 </figure>
@@ -66,7 +66,7 @@ something to death in an ivory tower.
 
 ## Digging Deeper
 
-<figure>
+<figure class="natural">
  <img src="/blog/images/mvp/pepe-silvia.jpg" alt="Pepe Silvia Meme" style="width:50%">
    <figcaption> Me, obsessing over the skateboard metaphor.</figcaption>
 </figure>

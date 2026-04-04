@@ -159,6 +159,37 @@ figure {
   max-width: 100%;
   background-color: var(--dark-color); //images are designed for dark background
   border-radius: 5px;
+
+  figcaption {
+    color: $gray;
+    //font-style: italic;
+    padding: 2px;
+    text-align: left;
+    font-size: 0.85em;
+
+    // dark background: links match caption gray
+    a {
+      color: $gray;
+      &:hover, &:active {
+        color: $darkRed;
+      }
+    }
+  }
+
+  &.natural {
+    background-color: var(--background-color);
+
+    figcaption {
+      color: $foregroundColor;
+
+      a {
+        color: $foregroundColor;
+        &:hover, &:active {
+          color: $darkRed;
+        }
+      }
+    }
+  }
 }
 
 .github-comments {
@@ -213,22 +244,6 @@ figure {
       border-left: 3px solid $lightGray;
       color: $mutedColor;
       font-style: italic;
-    }
-  }
-}
-
-figcaption {
-  color: $gray;
-  //font-style: italic;
-  padding: 2px;
-  text-align: left;
-  font-size: 0.85em;
-
-  // images always have a dark background, so links match caption gray
-  a {
-    color: $gray;
-    &:hover, &:active {
-      color: $darkRed;
     }
   }
 }
