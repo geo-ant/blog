@@ -36,12 +36,13 @@ Let's remind ourselves of the (in)famous image quickly before we go further.
    <figcaption> Kniberg's original illustration from <a href="https://blog.crisp.se/2016/01/25/henrikkniberg/making-sense-of-mvp">this article</a>. He writes "The picture is a metaphor. It is not about actual car development, it is about product development in general, using a car as a metaphor."</figcaption>
 </figure>
 
-This illustrates the key metaphor presented in the article. Attacking a
+This image illustrates the key metaphor presented in the article. Attacking a
 metaphor always runs the risk of attacking a strawman by taking the metaphor
-too literally. I'll try my best not to do that. But what I _can_ do is critically
-evaluate the mental model that underlies the metaphor. A mental model guides our 
-thinking and consequently our decision-making. That's why, if it is flawed, it can lead 
-us to make bad decisions.
+too literally. Still, it is fair to examine the metaphor as such to evaluate whether
+it's even a helpful way of illustrating Kniberg's core thesis. Then, I'll
+also critically evaluate the mental model that underlies
+the metaphor. A mental model guides our thinking and consequently our decision-making.
+When it is flawed, it can lead us to make bad decisions.
 
 ## The Good
 
@@ -51,7 +52,7 @@ delivers real user value. Evolve testable, usable, lovable versions through
 feedback. This avoids wasted effort and leads to a better product than executing a 
 fixed upfront plan.
 
-Gathering user feedback frequenly and using it to iteratively
+Gathering user feedback frequently and using it to iteratively
 improve your product during development is great advice. Understanding
 actual user needs is hard enough as it is and almost impossible in isolation.
 We all know the _"If I had asked people what they wanted, they would have said
@@ -185,8 +186,8 @@ without seeing if their assumptions and the formal interface specifications
 to save yourself a lot of costly rework later.
 
 Are vertical slices _simpler_ than what comes after? Of course! Are they
-_self contained_? In a way, yes. But to me, that's more a consequence of them
-being vertical slices. They definitely aren't what a skateboard is to a car,
+_self contained_? Yes, self-containedness is a byproduct of pursuing vertical
+integration, and this enables getting early feedback. They definitely aren't what a skateboard is to a car,
 and we should all free ourselves from the idea that incremental versions have a high
 degree of independence. Your versions, _of course_,
 won't be independent from each other, _that's the whole point_! You're building
@@ -235,4 +236,4 @@ development process, and one that's both well-known and worth repeating.
 [^vertical]: Quote from Richin Jose: "How not to build an MVP: The Flawed 'Skateboard to Car' Analogy" [here](https://richinjose.medium.com/how-not-to-build-an-mvp-the-flawed-skateboard-to-car-analogy-4920a845f151). The article goes on to compare the MVP to a thin slice of layered cake, rather than delivering the whole top layer of frosting. Very tasty mental image, but doesn't work one bit as a development metaphor, since we'd have to bake the whole cake to deliver a slice...
 [^mode-of-transport]: Cut to all AI and DeFi companies with hundreds of millions in funding and absolutely no concrete vision other than to "revolutionize" finance, intelligence - you name it...
 [^minecraft]: The skateboard of Minecraft is described as:  "You couldn't do much in the first version – it was basically an ugly blocky 3d-landscape where you can dig up blocks and place them elsewhere to build crude structures.". Surely a simpler version, but does this version of Minecraft (as described) have the same relation to modern Minecraft as a skateboard has to a car? Why not leave it at prototype here as well? If the core point is that this version was playable and testable, I still think that the skateboard isn't a good metaphor.
-[^morph]: He writes 'This model is especially suitable for software, since software is, well, Soft. You can “morph” the product as you go'. The words "soft" and "morph" do a lot of heavy lifting in those sentences and I'd say this is a very handwavy description of the development process at best. Again, this totally obscures the fact that engineering decisions in early versions lay the foundations for later increments.
+[^morph]: He writes 'This model is especially suitable for software, since software is, well, Soft. You can "morph" the product as you go'. The words "soft" and "morph" do a lot of heavy lifting in those sentences and I'd say this is a very handwavy description of the development process at best. At best this tells us _that_ software can be changed, not _how_ to navigate the engineering decisions involved in doing so. Again, this totally obscures the fact that engineering decisions in early versions lay the foundations for later increments.
