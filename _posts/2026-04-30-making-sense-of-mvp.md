@@ -26,9 +26,8 @@ by Henrik Kniberg, which he says is about (agile) "product development
 in general". I've finally figured out what bothers me about it so much.
 I'll argue that the underlying mental model is at best not helpful
 and at worst actively misleading for product development, despite the article
-making a couple of excellent points and presenting great examples. Vertical
-slices are a better mental model already hidden in Kniberg's own examples and
-prose.
+making a couple of excellent points and presenting great examples. Hiding
+in Kniberg's own text and examples is a better mental model: vertical slices.
 
 Let's remind ourselves of the (in)famous image quickly before we go further.
 
@@ -114,7 +113,7 @@ example presented in the article [^minecraft].
 
 The Big Government example in the original article is a great case study of 
 how they released a very narrowly scoped initial version (with respect to both 
-capabilities and distribution) and built on the gathered feedback. However, again I 
+capabilities and distribution) and built on the gathered feedback. However, I 
 don't see how that first version is a skateboard except for it being a much 
 simpler, stripped-down version compared to the releases that came after. But again,
 a skateboard is not a simpler car, it's not a partial car, it's not part of a car.
