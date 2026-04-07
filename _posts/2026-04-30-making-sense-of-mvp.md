@@ -186,8 +186,9 @@ without seeing if their assumptions and the formal interface specifications
 to save yourself a lot of costly rework later.
 
 Are vertical slices _simpler_ than what comes after? Of course! Are they
-_self contained_? Yes, self-containedness is a byproduct of pursuing vertical
-integration, and this enables getting early feedback. They definitely aren't what a skateboard is to a car,
+_self-contained_? Yes, that's a byproduct of pursuing vertical
+integration, but they aren't _independent_ from later versions nor should they
+be. They enable us to get early feedback, but they definitely aren't what a skateboard is to a car,
 and we should all free ourselves from the idea that incremental versions have a high
 degree of independence. Your versions, _of course_,
 won't be independent from each other, _that's the whole point_! You're building
