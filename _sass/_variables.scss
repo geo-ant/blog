@@ -17,6 +17,7 @@ html {
   --foreground-color : var(--dark-color);
   --code-background : #d6d6d6;
   --muted-color: #666;
+  --quote-color: #555;
 }
 
 // these are the colors for DARK MODE
@@ -28,6 +29,7 @@ html {
   --foreground-color : var(--bright-color);
   --code-background : rgb(32,32,32);
   --muted-color: rgb(178, 178, 178);
+  --quote-color: rgb(178, 178, 178);
   }
 }
 

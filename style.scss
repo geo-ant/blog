@@ -159,6 +159,37 @@ figure {
   max-width: 100%;
   background-color: var(--dark-color); //images are designed for dark background
   border-radius: 5px;
+
+  figcaption {
+    color: $gray;
+    //font-style: italic;
+    padding: 2px;
+    text-align: left;
+    font-size: 0.85em;
+
+    // dark background: links match caption gray
+    a {
+      color: $gray;
+      &:hover, &:active {
+        color: $darkRed;
+      }
+    }
+  }
+
+  &.natural {
+    background-color: var(--background-color);
+
+    figcaption {
+      color: $foregroundColor;
+
+      a {
+        color: $foregroundColor;
+        &:hover, &:active {
+          color: $darkRed;
+        }
+      }
+    }
+  }
 }
 
 .github-comments {
@@ -215,14 +246,6 @@ figure {
       font-style: italic;
     }
   }
-}
-
-figcaption {
-  color: $gray;
-  //font-style: italic;
-  padding: 2px;
-  text-align: left;
-  font-size: 0.85em
 }
 
 // Fixes images in popup boxes from Google Translate
@@ -374,7 +397,7 @@ nav {
     margin: 1.8em .8em;
     border-left: 2px solid $gray;
     padding: 0.1em 1em;
-    color: $gray;
+    color: var(--quote-color);
     font-style: italic;
   }
 

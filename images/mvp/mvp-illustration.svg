@@ -1,0 +1,905 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 497 238"
+   version="1.1"
+   id="svg50"
+   sodipodi:docname="mvp-illustration.svg"
+   width="497"
+   height="238"
+   inkscape:version="1.4.3 (1:1.4.3+202512261035+0d15f75042)"
+   inkscape:export-filename="mvp-illustration.png"
+   inkscape:export-xdpi="208.61"
+   inkscape:export-ydpi="208.61"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview50"
+     pagecolor="#d7d7d7"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="true"
+     inkscape:zoom="2.745"
+     inkscape:cx="233.87978"
+     inkscape:cy="152.45902"
+     inkscape:window-width="2560"
+     inkscape:window-height="1313"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg50"
+     inkscape:export-bgcolor="#d7d7d700">
+    <inkscape:grid
+       id="grid50"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="1"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14902"
+       empspacing="5"
+       enabled="true"
+       visible="true" />
+  </sodipodi:namedview>
+  <style
+     id="style1">
+    .arrow { stroke: #999; stroke-width: 2; fill: none; }
+    .title { font-family: Arial, sans-serif; font-weight: bold; font-size: 18px; }
+  </style>
+  <!-- Background -->
+  <!-- Top Section Label -->
+  <rect
+     style="fill:#cccccc;stroke:#000000;stroke-width:1.21848;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:0"
+     id="rect1"
+     width="495.78152"
+     height="236.78152"
+     x="0.60923767"
+     y="0.60923648"
+     ry="16.95517" />
+  <text
+     x="80"
+     y="30"
+     text-anchor="middle"
+     class="title"
+     fill="#c0392b"
+     id="text1"
+     style="font-size:21.3333px"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.3333px;font-family:'Sedgwick Ave';-inkscape-font-specification:'Sedgwick Ave';fill:#1a1a1a"
+       id="tspan50">Not like this...</tspan></text>
+  <text
+     x="58.525986"
+     y="159.9427"
+     text-anchor="middle"
+     class="title"
+     fill="#c0392b"
+     id="text1-0"
+     style="font-weight:bold;font-size:21.3333px;font-family:Arial, sans-serif"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.3333px;font-family:'Sedgwick Ave';-inkscape-font-specification:'Sedgwick Ave';fill:#1a1a1a"
+       id="tspan50-6">Like this:</tspan></text>
+  <!-- Top Row: Skateboard progression -->
+  <!-- 1. Skateboard -->
+  <g
+     transform="translate(10,70)"
+     id="g3">
+    <rect
+       x="5"
+       y="15"
+       width="45"
+       height="8"
+       fill="#e74c3c"
+       rx="3"
+       id="rect2" />
+    <circle
+       cx="15"
+       cy="28"
+       r="6"
+       fill="#333333"
+       id="circle2" />
+    <circle
+       cx="40"
+       cy="28"
+       r="6"
+       fill="#333333"
+       id="circle3" />
+  </g>
+  <!-- 2. Scooter -->
+  <g
+     transform="translate(105,50)"
+     id="g5">
+    <!-- Handlebar at front (right side) - stem connects to deck -->
+    <line
+       x1="40"
+       y1="5"
+       x2="40"
+       y2="35"
+       stroke="#666666"
+       stroke-width="4"
+       id="line3" />
+    <line
+       x1="28"
+       y1="5"
+       x2="52"
+       y2="5"
+       stroke="#666666"
+       stroke-width="3"
+       id="line4" />
+    <!-- Deck -->
+    <rect
+       x="8"
+       y="35"
+       width="38"
+       height="6"
+       fill="#e74c3c"
+       rx="2"
+       id="rect4" />
+    <!-- Wheels -->
+    <circle
+       cx="12"
+       cy="46"
+       r="7"
+       fill="#333333"
+       id="circle4" />
+    <circle
+       cx="42"
+       cy="46"
+       r="7"
+       fill="#333333"
+       id="circle5" />
+  </g>
+  <!-- 3. Bicycle -->
+  <g
+     transform="translate(205,55)"
+     id="g14">
+    <!-- Wheels -->
+    <circle
+       cx="10"
+       cy="32"
+       r="12"
+       fill="none"
+       stroke="#333333"
+       stroke-width="2"
+       id="circle6" />
+    <circle
+       cx="50"
+       cy="32"
+       r="12"
+       fill="none"
+       stroke="#333333"
+       stroke-width="2"
+       id="circle7" />
+    <!-- Diamond frame -->
+    <!-- Rear triangle: seat tube + chain stay + seat stay -->
+    <line
+       x1="10"
+       y1="32"
+       x2="26"
+       y2="32"
+       stroke="#e74c3c"
+       stroke-width="2"
+       id="line7" />
+    <line
+       x1="26"
+       y1="32"
+       x2="22"
+       y2="12"
+       stroke="#e74c3c"
+       stroke-width="2"
+       id="line8" />
+    <line
+       x1="10"
+       y1="32"
+       x2="22"
+       y2="12"
+       stroke="#e74c3c"
+       stroke-width="2"
+       id="line9" />
+    <!-- Front triangle: top tube + down tube -->
+    <line
+       x1="22"
+       y1="12"
+       x2="46"
+       y2="18"
+       stroke="#e74c3c"
+       stroke-width="2"
+       id="line10" />
+    <line
+       x1="26"
+       y1="32"
+       x2="46"
+       y2="18"
+       stroke="#e74c3c"
+       stroke-width="2"
+       id="line11" />
+    <!-- Fork to front wheel -->
+    <line
+       x1="46"
+       y1="18"
+       x2="50"
+       y2="32"
+       stroke="#666666"
+       stroke-width="2"
+       id="line12" />
+    <!-- Handlebar -->
+    <line
+       x1="46"
+       y1="18"
+       x2="48"
+       y2="8"
+       stroke="#666666"
+       stroke-width="2"
+       id="line13" />
+    <line
+       x1="42"
+       y1="6"
+       x2="54"
+       y2="6"
+       stroke="#666666"
+       stroke-width="2"
+       id="line14" />
+    <!-- Seat -->
+    <ellipse
+       cx="20"
+       cy="10"
+       rx="5"
+       ry="2"
+       fill="#333333"
+       id="ellipse14" />
+  </g>
+  <!-- 4. Motorcycle -->
+  <g
+     transform="translate(310,55)"
+     id="g17">
+    <!-- Wheels -->
+    <circle
+       cx="10"
+       cy="32"
+       r="10"
+       fill="#333333"
+       id="circle14" />
+    <circle
+       cx="50"
+       cy="32"
+       r="10"
+       fill="#333333"
+       id="circle15" />
+    <!-- Body/fuel tank -->
+    <path
+       d="m 18,28 4,-13 h 16 l 4,13 z"
+       fill="#e74c3c"
+       id="path15" />
+    <!-- Seat -->
+    <path
+       d="m 10,28 2,-8 12,-2 v 4 l -14,6"
+       fill="#c0392b"
+       id="path16" />
+    <!-- Front fork and handlebar -->
+    <line
+       x1="50"
+       y1="32"
+       x2="48"
+       y2="10"
+       stroke="#666666"
+       stroke-width="3"
+       id="line16" />
+    <line
+       x1="42"
+       y1="8"
+       x2="54"
+       y2="8"
+       stroke="#666666"
+       stroke-width="2"
+       id="line17" />
+    <!-- Engine block -->
+    <rect
+       x="24"
+       y="24"
+       width="12"
+       height="8"
+       fill="#555555"
+       rx="1"
+       id="rect17" />
+    <!-- Exhaust -->
+    <path
+       d="m 36,30 h 12 l 2,-2"
+       stroke="#888888"
+       stroke-width="2"
+       fill="none"
+       id="path17" />
+  </g>
+  <!-- 5. Convertible Car -->
+  <g
+     transform="translate(420,50)"
+     id="g20">
+    <rect
+       x="0"
+       y="22"
+       width="65"
+       height="22"
+       fill="#e74c3c"
+       rx="5"
+       id="rect18" />
+    <path
+       d="M 10,22 Q 15,8 25,8 h 15 q 10,0 15,14"
+       fill="none"
+       stroke="#e74c3c"
+       stroke-width="3"
+       id="path19" />
+    <circle
+       cx="15"
+       cy="48"
+       r="10"
+       fill="#333333"
+       id="circle19" />
+    <circle
+       cx="52"
+       cy="48"
+       r="10"
+       fill="#333333"
+       id="circle20" />
+  </g>
+  <!-- Divider -->
+  <!-- Bottom Section Label -->
+  <!-- Bottom Row: Vertical slices of a CAR - each step is testable -->
+  <!-- 1. Separated components (not yet integrated) -->
+  <g
+     transform="translate(5,174)"
+     id="g24">
+    <!-- Frame rails (separated, floating above) -->
+    <rect
+       x="10"
+       y="5"
+       width="40"
+       height="5"
+       fill="#666666"
+       rx="1"
+       id="rect20" />
+    <rect
+       x="10"
+       y="14"
+       width="40"
+       height="5"
+       fill="#666666"
+       rx="1"
+       id="rect21" />
+    <rect
+       x="10"
+       y="5"
+       width="5"
+       height="14"
+       fill="#666666"
+       id="rect22" />
+    <rect
+       x="45"
+       y="5"
+       width="5"
+       height="14"
+       fill="#666666"
+       id="rect23" />
+    <!-- Wheels (separated, below) -->
+    <circle
+       cx="15"
+       cy="42"
+       r="10"
+       fill="#333333"
+       id="circle23" />
+    <circle
+       cx="45"
+       cy="42"
+       r="10"
+       fill="#333333"
+       id="circle24" />
+  </g>
+  <!-- 2. Rolling chassis (wheels attached - first integration!) -->
+  <g
+     transform="translate(105,174)"
+     id="g29">
+    <!-- Frame rails -->
+    <rect
+       x="5"
+       y="20"
+       width="50"
+       height="6"
+       fill="#666666"
+       rx="1"
+       id="rect24" />
+    <rect
+       x="5"
+       y="30"
+       width="50"
+       height="6"
+       fill="#666666"
+       rx="1"
+       id="rect25" />
+    <rect
+       x="5"
+       y="20"
+       width="6"
+       height="16"
+       fill="#666666"
+       id="rect26" />
+    <rect
+       x="49"
+       y="20"
+       width="6"
+       height="16"
+       fill="#666666"
+       id="rect27" />
+    <!-- Wheels -->
+    <circle
+       cx="12"
+       cy="42"
+       r="10"
+       fill="#333333"
+       id="circle27" />
+    <circle
+       cx="48"
+       cy="42"
+       r="10"
+       fill="#333333"
+       id="circle28" />
+    <!-- Axles -->
+  </g>
+  <!-- 3. Chassis + seat + steering (can sit and steer - testable!) -->
+  <g
+     transform="translate(210,174)"
+     id="g36">
+    <!-- Frame rails -->
+    <rect
+       x="5"
+       y="20"
+       width="50"
+       height="6"
+       fill="#666666"
+       rx="1"
+       id="rect29" />
+    <rect
+       x="5"
+       y="30"
+       width="50"
+       height="6"
+       fill="#666666"
+       rx="1"
+       id="rect30" />
+    <rect
+       x="5"
+       y="20"
+       width="6"
+       height="16"
+       fill="#666666"
+       id="rect31" />
+    <rect
+       x="49"
+       y="20"
+       width="6"
+       height="16"
+       fill="#666666"
+       id="rect32" />
+    <!-- Wheels -->
+    <circle
+       cx="12"
+       cy="42"
+       r="10"
+       fill="#333333"
+       id="circle32" />
+    <circle
+       cx="48"
+       cy="42"
+       r="10"
+       fill="#333333"
+       id="circle33" />
+    <!-- Axles -->
+    <!-- Steering column (tilted toward seat) -->
+    <line
+       x1="48"
+       y1="20"
+       x2="38"
+       y2="5"
+       stroke="#888888"
+       stroke-width="3"
+       id="line35" />
+    <!-- Steering wheel -->
+    <circle
+       cx="37"
+       cy="3"
+       r="6"
+       fill="none"
+       stroke="#333333"
+       stroke-width="2"
+       id="circle35" />
+    <!-- Seat -->
+    <rect
+       x="18"
+       y="10"
+       width="14"
+       height="10"
+       fill="#3498db"
+       rx="2"
+       id="rect35" />
+    <rect
+       x="16"
+       y="2"
+       width="4"
+       height="12"
+       fill="#3498db"
+       rx="1"
+       id="rect36" />
+  </g>
+  <!-- 4. Chassis + seat + steering + engine (it drives! - testable!) -->
+  <g
+     transform="translate(315,174)"
+     id="g45">
+    <!-- Frame rails -->
+    <rect
+       x="5"
+       y="20"
+       width="50"
+       height="6"
+       fill="#666666"
+       rx="1"
+       id="rect37" />
+    <rect
+       x="5"
+       y="30"
+       width="50"
+       height="6"
+       fill="#666666"
+       rx="1"
+       id="rect38" />
+    <rect
+       x="5"
+       y="20"
+       width="6"
+       height="16"
+       fill="#666666"
+       id="rect39" />
+    <rect
+       x="49"
+       y="20"
+       width="6"
+       height="16"
+       fill="#666666"
+       id="rect40" />
+    <!-- Wheels -->
+    <circle
+       cx="12"
+       cy="42"
+       r="10"
+       fill="#333333"
+       id="circle40" />
+    <circle
+       cx="48"
+       cy="42"
+       r="10"
+       fill="#333333"
+       id="circle41" />
+    <!-- Steering column (tilted toward seat) -->
+    <line
+       x1="48"
+       y1="20"
+       x2="38"
+       y2="5"
+       stroke="#888888"
+       stroke-width="3"
+       id="line41" />
+    <!-- Steering wheel -->
+    <circle
+       cx="37"
+       cy="3"
+       r="6"
+       fill="none"
+       stroke="#333333"
+       stroke-width="2"
+       id="circle42" />
+    <!-- Seat -->
+    <rect
+       x="18"
+       y="10"
+       width="14"
+       height="10"
+       fill="#3498db"
+       rx="2"
+       id="rect42" />
+    <rect
+       x="16"
+       y="2"
+       width="4"
+       height="12"
+       fill="#3498db"
+       rx="1"
+       id="rect43" />
+    <!-- Engine block (metallic gray) -->
+    <rect
+       x="42"
+       y="10"
+       width="14"
+       height="10"
+       fill="#707070"
+       rx="1"
+       id="rect44" />
+    <!-- Cylinder head -->
+    <rect
+       x="43"
+       y="6"
+       width="12"
+       height="5"
+       fill="#888888"
+       rx="1"
+       id="rect45" />
+    <!-- Air filter/intake on top -->
+    <ellipse
+       cx="49"
+       cy="4"
+       rx="4"
+       ry="2"
+       fill="#555555"
+       id="ellipse45" />
+    <!-- Exhaust header -->
+    <path
+       d="m 42,15 -4,2 v 3"
+       stroke="#666666"
+       stroke-width="2"
+       fill="none"
+       id="path45" />
+  </g>
+  <!-- 5. Complete car with body (finished product!) -->
+  <g
+     transform="translate(420,169)"
+     id="g50">
+    <!-- Car body -->
+    <rect
+       x="0"
+       y="22"
+       width="65"
+       height="22"
+       fill="#3498db"
+       rx="5"
+       id="rect46" />
+    <!-- Cabin -->
+    <rect
+       x="8"
+       y="8"
+       width="40"
+       height="18"
+       fill="#85c1e9"
+       rx="3"
+       id="rect47" />
+    <!-- Windows -->
+    <rect
+       x="12"
+       y="11"
+       width="14"
+       height="10"
+       fill="#d5e8f7"
+       rx="1"
+       id="rect48" />
+    <rect
+       x="30"
+       y="11"
+       width="14"
+       height="10"
+       fill="#d5e8f7"
+       rx="1"
+       id="rect49" />
+    <!-- Wheels -->
+    <circle
+       cx="15"
+       cy="48"
+       r="10"
+       fill="#333333"
+       id="circle49" />
+    <circle
+       cx="52"
+       cy="48"
+       r="10"
+       fill="#333333"
+       id="circle50" />
+  </g>
+  <!-- Arrow marker definition -->
+  <defs
+     id="defs50">
+    <marker
+       style="overflow:visible"
+       id="ArrowWideHeavy"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide, heavy arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="m 1,0 -3,3 h -2 l 3,-3 -3,-3 h 2 z"
+         id="path3" />
+    </marker>
+    <marker
+       id="arrowhead"
+       markerWidth="10"
+       markerHeight="7"
+       refX="9"
+       refY="3.5"
+       orient="auto">
+      <polygon
+         points="0,7 0,0 10,3.5 "
+         fill="#999999"
+         id="polygon50" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ArrowWideHeavy-5"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide, heavy arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="m 1,0 -3,3 h -2 l 3,-3 -3,-3 h 2 z"
+         id="path3-9" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ArrowWideHeavy-0"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide, heavy arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="m 1,0 -3,3 h -2 l 3,-3 -3,-3 h 2 z"
+         id="path3-91" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ArrowWideHeavy-1"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide, heavy arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="m 1,0 -3,3 h -2 l 3,-3 -3,-3 h 2 z"
+         id="path3-1" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ArrowWideHeavy-7"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide, heavy arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="m 1,0 -3,3 h -2 l 3,-3 -3,-3 h 2 z"
+         id="path3-6" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ArrowWideHeavy-6"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide, heavy arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="m 1,0 -3,3 h -2 l 3,-3 -3,-3 h 2 z"
+         id="path3-5" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ArrowWideHeavy-4"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide, heavy arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="m 1,0 -3,3 h -2 l 3,-3 -3,-3 h 2 z"
+         id="path3-8" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ArrowWideHeavy-9"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide, heavy arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="m 1,0 -3,3 h -2 l 3,-3 -3,-3 h 2 z"
+         id="path3-3" />
+    </marker>
+  </defs>
+  <path
+     style="fill:#000000;stroke:#000000;stroke-width:1.21701;marker-end:url(#ArrowWideHeavy)"
+     d="m 70,90 h 30"
+     id="path50" />
+  <path
+     style="fill:#000000;stroke:#000000;stroke-width:1.21701;marker-end:url(#ArrowWideHeavy-7)"
+     d="M 65,204 H 95"
+     id="path50-3" />
+  <path
+     style="fill:#000000;stroke:#000000;stroke-width:1.21701;marker-end:url(#ArrowWideHeavy-5)"
+     d="m 160,90 h 30"
+     id="path50-9" />
+  <path
+     style="fill:#000000;stroke:#000000;stroke-width:1.21701;marker-end:url(#ArrowWideHeavy-0)"
+     d="m 275,90 h 30"
+     id="path50-7" />
+  <path
+     style="fill:#000000;stroke:#000000;stroke-width:1.21701;marker-end:url(#ArrowWideHeavy-1)"
+     d="m 380,90 h 30"
+     id="path50-97" />
+  <path
+     style="fill:#000000;stroke:#000000;stroke-width:1.21701;marker-end:url(#ArrowWideHeavy-6)"
+     d="m 170,204 h 30"
+     id="path50-39" />
+  <path
+     style="fill:#000000;stroke:#000000;stroke-width:1.21701;marker-end:url(#ArrowWideHeavy-4)"
+     d="m 275,204 h 30"
+     id="path50-2" />
+  <path
+     style="fill:#000000;stroke:#000000;stroke-width:1.21701;marker-end:url(#ArrowWideHeavy-9)"
+     d="m 380,204 h 30"
+     id="path50-0" />
+  <path
+     style="fill:#800000;stroke:#000000;stroke-width:1.217;stroke-linejoin:bevel;stroke-opacity:0;fill-opacity:0.4979516"
+     id="path5"
+     d="m 43.346454,42.271737 c 0.438926,0.107897 0.882712,0.197656 1.316778,0.323691 2.187652,0.635205 2.991063,1.019656 5.342066,1.776403 5.282575,1.70037 10.624969,3.238683 15.936865,4.843394 18.792709,5.328667 37.587167,10.651591 56.391787,15.938135 17.95433,4.993236 35.86318,10.172008 53.94925,14.677544 14.02569,3.494027 16.7633,3.956678 31.04612,7.021404 34.22841,6.9041 68.73323,12.327316 103.23436,17.660302 20.3057,3.15164 40.63991,6.11276 60.96354,9.14428 8.62025,1.28581 17.2345,2.61154 25.85466,3.89794 18.87206,2.83082 37.71503,5.85703 56.60146,8.59122 8.35573,1.10764 16.6987,2.31594 25.08706,3.15411 2.39967,0.2074 1.28348,0.10937 3.34866,0.29288 0,0 -11.72701,-8.61279 -11.72701,-8.61279 v 0 c -1.82455,-0.016 -0.82805,0.003 -2.98923,-0.071 -7.83068,-0.38424 -15.62712,-1.21985 -23.42501,-2.00998 -18.28427,-2.13797 -36.50393,-4.77201 -54.74813,-7.22055 -28.43856,-3.8344 -56.86364,-7.77009 -85.26285,-11.886811 -5.57679,-0.821628 -11.15799,-1.613897 -16.73038,-2.464886 -29.01738,-4.431396 -57.97431,-9.356334 -86.70059,-15.409779 -13.9095,-3.105337 -17.75379,-3.8464 -31.4186,-7.351049 C 150.97076,69.835181 132.72289,64.37185 114.43595,59.070409 95.027261,53.37653 75.619402,47.673677 56.283535,41.736762 50.606266,39.876026 44.911111,38.053922 39.296854,36.007352 38.098212,35.570409 36.915969,35.08953 35.71969,34.646159 34.299888,34.119944 33.042351,33.693522 31.636334,33.209565 Z" />
+  <path
+     style="fill:#800000;stroke:#000000;stroke-width:1.217;stroke-linejoin:bevel;stroke-opacity:0;fill-opacity:0.50111681"
+     id="path6"
+     d="m 51.807624,122.27659 c 13.686355,-2.28362 27.367425,-4.61197 41.061205,-6.85591 4.625914,-0.74474 9.252171,-1.48735 13.877741,-2.23424 15.14932,-2.44613 17.74455,-2.90091 33.32202,-5.32346 8.7852,-1.36624 30.28315,-4.6007 38.81541,-6.02936 6.9351,-1.16122 13.84737,-2.454914 20.77105,-3.682373 42.73188,-7.741388 84.87996,-18.278466 126.95463,-28.94465 27.10419,-6.944637 54.19901,-13.939697 81.09959,-21.641239 0,0 -9.70484,-6.576828 -9.70484,-6.576828 v 0 c -7.25476,2.894943 -8.63408,3.528532 -16.57497,6.286781 -19.80265,6.878408 -40.00296,12.53388 -60.16024,18.256352 -6.48373,1.751911 -12.95774,3.540247 -19.4512,5.255733 -35.38296,9.347704 -71.04667,17.767662 -107.1456,23.870869 -7.02316,1.152274 -14.03438,2.379816 -21.06947,3.456824 -11.85775,1.815311 -27.69577,3.859611 -39.6514,5.436291 -16.37397,2.15936 -32.74834,4.32514 -49.161802,6.16804 -10.497161,1.20808 -20.985934,2.47041 -31.517755,3.34338 -2.950142,0.24454 -7.584423,0.59477 -10.741314,0.6721 -0.876189,0.0215 -1.752766,-0.022 -2.629148,-0.0331 z" />
+</svg>
