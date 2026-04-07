@@ -2,13 +2,13 @@
 layout: post
 tags: agile development systems-engineering
 #categories: []
-date: 2026-04-30
+date: 2026-04-07
 last_updated:
 #excerpt: ''
 #image:
 #description:
 #permalink:
-title: "A Skateboard Isn't A Vertical Slice of A Car"
+title: "A Skateboard Isn't a Vertical Slice of a Car But It Should Be"
 #
 #
 # Make sure this image is correct !!!
@@ -16,7 +16,7 @@ og_image: not-like-this.png
 #
 #
 # make sure comments are enabled
-comments_id: 
+comments_id: 94
 math: false
 ---
 
