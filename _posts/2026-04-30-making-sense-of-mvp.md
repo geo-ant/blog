@@ -142,7 +142,7 @@ So sure, in the most charitable interpretation, the skateboard just means to sta
 simple and get early user feedback. None of this is objectionable, but I'd argue
 it's also not very helpful for planning actual development[^big-bang]. Kniberg
 writes "Think big, but deliver in small functionally viable increments". I agree
-whole-heartedly, but the skateboard metaphor is a very bad way of illustrating
+wholeheartedly, but the skateboard metaphor is a very bad way of illustrating
 _how_ to do that. One big problem with that article is that it tells us to
 deliver functionally viable increments, without explaining how to 
 go from one step to the next systematically, other than getting user feedback. 
@@ -187,7 +187,7 @@ to save yourself a lot of costly rework later.
 
 Are vertical slices _simpler_ than what comes after? Of course! Are they
 _self-contained_? Yes, that's a byproduct of pursuing vertical
-integration, but they aren't _independent_ from later versions nor should they
+integration, but they aren't _independent_ from later versions, nor should they
 be. They enable us to get early feedback, but they definitely aren't what a skateboard is to a car,
 and we should all free ourselves from the idea that incremental versions have a high
 degree of independence. Your versions, _of course_,
@@ -200,7 +200,7 @@ the early stages will have an impact on the later stages. Vertical slices
 aren't a new idea, and spelled out like this, all of this may sound banal, and yet
 the skateboard-to-car metaphor exists. This article isn't about inventing a
 new development practice. I'm pointing out what Kniberg's examples already show,
-and arguing that the popular skateboard to car metaphor obscures a better
+and arguing that the popular skateboard-to-car metaphor obscures a better
 mental model.
 
 And now for the final question: does this mental model help us plan development?
@@ -236,5 +236,5 @@ development process, and one that's both well-known and worth repeating.
 [^big-bang]: I'll extend an olive branch here and say that there truly are people who try to design the perfect product in their ivory tower, and yes, those people will most likely never release _anything_, let alone anything that anyone actually wants.
 [^vertical]: Quote from Richin Jose: "How not to build an MVP: The Flawed 'Skateboard to Car' Analogy" [here](https://richinjose.medium.com/how-not-to-build-an-mvp-the-flawed-skateboard-to-car-analogy-4920a845f151). The article goes on to compare the MVP to a thin slice of layered cake, rather than delivering the whole top layer of frosting. Very tasty mental image, but doesn't work one bit as a development metaphor, since we'd have to bake the whole cake to deliver a slice...
 [^mode-of-transport]: Cut to all AI and DeFi companies with hundreds of millions in funding and absolutely no concrete vision other than to "revolutionize" finance, intelligence - you name it...
-[^minecraft]: The skateboard of Minecraft is described as:  "You couldn't do much in the first version – it was basically an ugly blocky 3d-landscape where you can dig up blocks and place them elsewhere to build crude structures.". Surely a simpler version, but does this version of Minecraft (as described) have the same relation to modern Minecraft as a skateboard has to a car? Why not leave it at prototype here as well? If the core point is that this version was playable and testable, I still think that the skateboard isn't a good metaphor.
+[^minecraft]: The skateboard of Minecraft is described as: "You couldn't do much in the first version – it was basically an ugly blocky 3d-landscape where you can dig up blocks and place them elsewhere to build crude structures.". Surely a simpler version, but does this version of Minecraft (as described) have the same relation to modern Minecraft as a skateboard has to a car? Why not leave it at prototype here as well? If the core point is that this version was playable and testable, I still think that the skateboard isn't a good metaphor.
 [^morph]: He writes 'This model is especially suitable for software, since software is, well, Soft. You can "morph" the product as you go'. The words "soft" and "morph" do a lot of heavy lifting in those sentences and I'd say this is a very handwavy description of the development process at best. At best this tells us _that_ software can be changed, not _how_ to navigate the engineering decisions involved in doing so. Again, this totally obscures the fact that engineering decisions in early versions lay the foundations for later increments.
