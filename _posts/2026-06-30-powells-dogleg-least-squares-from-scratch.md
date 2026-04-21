@@ -124,23 +124,26 @@ trust region radius as is. All of this is summarized in the following algorithm.
 
 <div class="pseudocode" markdown="1">
 **Algorithm 1** (Trust Region)
-- **Given**
+- Given
   - initial guess $$x_0$$
   - intial trust region radius $$\Delta_0 > 0$$
   - step acceptance threshold $$\rho_\min \in [0,\frac{1}{4}]$$
-- **while** stopping criterion **not** reached
+- `while` stopping criterion `not` reached
   - Obtain step $$\boldsymbol{p}_k$$ by (approximately) solving $$\eqref{min-mk-tr}$$.
   - Calculate $$\rho_k$$ using $$\eqref{rho-k}$$.
-  - **if** $$\rho_k > \frac{3}{4}$$ then 
+  - `if` $$\rho_k > \frac{3}{4}$$ then 
     - let $$\Delta_{k+1} = \max(\Delta_k,3 \cdot \lVert \boldsymbol{p}_k \rVert)$$
-  - **else if** $$\rho < \frac{1}{4}$$
+  - `else if` $$\rho < \frac{1}{4}$$
     - let $$\Delta_{k+1} = \Delta_k/2$$
-  - **else**
+  - `else`
     - let $$\Delta_{k+1} = \Delta_k$$
-  - **if** $$\rho > \rho_\min$$
+  - `end if`
+  - `if` $$\rho > \rho_\min$$
     - let $$\boldsymbol{x}_{k+1} = \boldsymbol{x}_k + \boldsymbol{p}_k$$
-  - **else**
+  - `else`
     - let $$\boldsymbol{x}_{k+1} = \boldsymbol{x}_k$$
+  - `end if`
+- `end while`
 
 <span class="caption">
 The high level outline of a typical trust region algorithm, including Dogleg, cf
@@ -210,7 +213,7 @@ Note also that this section already specializes Dogleg to least squares problems
 
 The Gauss-Newton step $$\boldsymbol{p}_{gn}$$ is given as the solution to 
 
-$$\boldsymbol{p}_{gn}(\boldsymbol{x}) = \arg \min_{p} \lVert \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} + f(\boldsymbol{x}) \rVert^2, \tag{9} \label{pgn}$$
+$$\boldsymbol{p}_{gn}(\boldsymbol{x}) = \arg \min_{p} \lVert \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} + f(\boldsymbol{x}) \rVert^2, \tag{9} \label{p-gn}$$
 
 which is just the least squares solution to the following system of equations
 
@@ -222,7 +225,7 @@ but that becomes numerically unstable quickly. Using matrix decompositions is
 the way to go here and we'll return to this later. For now, let's look at the
 steepest descent step, which is given as: 
 
-$$ \boldsymbol{p}_{sd}(\boldsymbol{x}) = -\frac{\lVert \boldsymbol{g}(\boldsymbol{x})\rVert^2}{\lVert \boldsymbol{J}(\boldsymbol{x})\boldsymbol{g}(\boldsymbol{x})\rVert^2} \boldsymbol{g}(\boldsymbol{x}),$$
+$$ \boldsymbol{p}_{sd}(\boldsymbol{x}) = -\frac{\lVert \boldsymbol{g}(\boldsymbol{x})\rVert^2}{\lVert \boldsymbol{J}(\boldsymbol{x})\boldsymbol{g}(\boldsymbol{x})\rVert^2} \boldsymbol{g}(\boldsymbol{x}), \tag{11} \label{p-sd}$$
 
 where $$g$$ is the gradient of $$f$$ as defined in eq. $$\eqref{g-def}$$. The
 Dogleg algorithm searches for the minimum on a path of finite length, which
@@ -230,9 +233,9 @@ is parametrized using a $$\tau \in [0,2]$$ like so:
 
 $$\boldsymbol{p}(\tau) = \left\{
 \begin{array}{ll} \tau \, \boldsymbol{p}_{sd}, & \tau \in [0,1] \\
-\boldsymbol{p}_{sd} + (1-\tau) (\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}), & \tau \in (0,2] . \\
+\boldsymbol{p}_{sd} + (1-\tau) (\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}), & \tau \in (1,2] . \\
 \end{array}
-\right.$$
+\right. \tag{12} \label{dogleg-path}$$
 
 This definition of the path looks a bit unwieldy at first sight, but it has a very simple
 geometric interpretation: the path first follows the steepest descent step to
@@ -251,17 +254,77 @@ in golf. This figure is heavily inspired by N&W figure 4.4, p. 74.
  </figcaption>
 </figure>
 
-TODO TODO TODO
+It can be shown that $$\lVert m_k(\boldsymbol{p}(\tau)) \rVert$$ will decrease
+along the dogleg path and that the path will have at most _one_ intersection
+with the trust region boundary[^lemma-4-2]. To take the biggest possible step that's
+still inside the trust region, we can chose the _dogleg step_ $$\boldsymbol{p}_{dl}$$
+as the point on the dogleg path where it intersects the trust region boundary.
+Otherwise the dogleg step goes to the end of the path, which is just the
+Gauss-Newton step. So the algorithm for choosing the Dogleg step is:
 
-The dogleg step is chosen as the intersection
-of the dogleg path with the trust region boundary if they intersect. Otherwise
-the path is traversed in full, which is just the Gauss-Newtwon step.
+
+<div class="pseudocode" markdown="1">
+**Algorithm 2** (Classic Dogleg Step)
+- Calculate $$\boldsymbol{p}_{sd}$$ as in eq. $$\eqref{p-sd}$$
+- `if` $$\lVert \boldsymbol{p}_{sd} \rVert \leq \Delta$$
+  - return $$\boldsymbol{p}_{dl} = \Delta \; \boldsymbol{p}_{sd} / \lVert \boldsymbol{p}_{sd}\rVert$$
+- `end if`
+- Calculate $$\boldsymbol{p}_{gn}$$ as in eq. $$\eqref{p-gn}$$
+- `if` $$\lVert \boldsymbol{p}_{gn} \rVert \leq \Delta$$
+  - return $$\boldsymbol{p}_{dl} = \boldsymbol{p}_{gn}$$
+- `else`
+  - Find $$\tau_{dl} \in [1,2) $$ such that $$\lVert \boldsymbol{p}(\tau_{dl}) \rVert = \Delta$$ with $$\boldsymbol{p}(\tau)$$ from $$\eqref{dogleg-path}$$
+  - return $$\boldsymbol{p}_{dl} = \boldsymbol{p}(\tau_{dl})$$
+- `end if`
+
+<span class="caption">
+We call this the classic dogleg step, because later in the article
+we will make one tiny modification to the calculation of the
+Gauss-Newton step, that brings a significant stability improvement
+in practice.
+</span>
+</div>
+
+To obtain the magical $$\tau_{dl}$$ in the third `if` branch, we have to
+realize that we are now in the $$\tau \in [1,2)$$ path segment. That means
+the condition $$\lVert \boldsymbol{p}(\tau_{dl}) \rVert = \Delta$$ is now
+equivalent to the quadratic equation
+
+$$\lVert \boldsymbol{p}_{sd} + (1-\tau_{dl}) (\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}) \rVert = \Delta^2. \tag {13}$$
+
+It can be shown that the solution to this equation can always be written as follows
+(see Appendix A):
+
+$$
+\begin{eqnarray}
+\tau_{dl} &=& 1 - \xi + \sqrt{\frac{\Delta^2-\lVert \boldsymbol{p}_{sd}\rVert^2}{\lVert \boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}\rVert^2} + \xi^2} \tag{14a} \label{tau-dl} \\
+\xi &:=& \frac{\boldsymbol{p}_{sd}^T (\boldsymbol{p}_{gn} - \boldsymbol{p}_{sd})}{\lVert \boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}\rVert^2} \tag{14b}.
+\end{eqnarray}
+$$
+
+In principle, we now have all the pieces together. We just use the Dogleg step
+from Algorithm 2 and plug this into Algorithm 1 as the step that approximately
+solves $$\eqref{min-mk-tr}$$. However, there are a couple of pesky little details
+that we still have to take care of. 
+
+# Finding the (Regularized) Gauss-Newton Step
+
+For practical reasons, we'll make one modification to the 
+
+
+
 # TODO SCALING!!!!
 # TODO REGULARIZED GN STEP
 (also note that dogleg requires matrix to be pos def, not sure that the lemma 4.2
 is still verified, but the regularization works in practice!)
 
+# Appendix A: Finding $$\tau_{dl}$$
+
+TODO TODO TODO
+
+# Appendix B: Singular Value Decomposition for Finding $$\boldsymbol{p}_{gn}$$
 
 [^local-min]: Convergence guarantees of solver methods are their own beast that I won't touch at all in this article. Everyone that has ever worked with optimization algorithms knows that finding global optima is often a pipe dream and even finding a local optimum can be highly sensitive to starting conditions, implementation details, condition numbers, birthdates, star signs, etc etc...
 [^ellipsoid-tr]: Other shapes are available. One very common case is a spherical trust region, which is just a special case of the ellipsoid. Another common case would be a box-shaped region in hyperspace.
 [^quadratic-model]: You guessed, it: it doesn't _have_ to be quadratic. See e.g. pp 25, 26 in N&W 2<sup>nd</sup> ed. for a demonstration how a linear model leads to a steepest descent algorithm.
+[^lemma-4-2]: See N&W pp. 74, in particular Lemma 4.2 for this. For this lemma to hold, we need the Jacobian $$\boldsymbol{J}$$ to have full rank. We'll later see that we can also use Dogleg in practice for all Jacobians, if we use a _regularized_ Gauss-Newton step, rather than the vanilla step defined in $$\eqref{p-gn}$$.
