@@ -30,7 +30,7 @@ did, then here's everything you need to know about it.
 I'll try to do my best to actually go into details around the algorithm and
 implementation details, rather than leaving it at the high-level stuff.
 However, since this will be a long article, I'll need to focus on Dogleg
-specifically and can only touch on broader adjacent topics. Additionally, I will
+specifically and I can only touch on adjacent topics. Additionally, I will
 focus on the topic of _unconstrained least squares minimization_. Dogleg itself is a general
 purpose minimization minimization algorithm and not restricted to least squares.
 However, when applied to this important subproblem, we can exploit the structure
@@ -47,7 +47,7 @@ and the [Modern Minpack source code](https://github.com/fortran-lang/minpack).
 I'll be pretty sloppy with my citations because most of them would just be Nocedal&Wright
 or Madsen _et al_. 
 
-# The Basics of Trust Region Algorithms
+# Trust Region Algorithms
 
 Let's start from the basics: we'd like to minimize a scalar-valued
 _objective function_ $$f:\mathbb{R}^n \rightarrow \mathbb{R}$$ with respect
@@ -71,8 +71,8 @@ quadratic function taken from the 2<sup>nd</sup> order Taylor expansion
 of $$f(\boldsymbol{x}_k+ \boldsymbol{p})$$ around $$\boldsymbol{x}_k$$:
 
 $$\begin{eqnarray}
-m_k(\boldsymbol{p}) &:=& f_k + \boldsymbol{g}_k^T \boldsymbol{p} + \frac{1}{2} \boldsymbol{p}^T \boldsymbol{B} \boldsymbol{p} \tag{2} \label{mk-def} \\
-\boldsymbol{g}_k &:=& \nabla f(\boldsymbol{x}_k) \in \mathbb{R}^n,
+m_k(\boldsymbol{p}) &:=& f_k + \boldsymbol{g}_k^T \boldsymbol{p} + \frac{1}{2} \boldsymbol{p}^T \boldsymbol{B} \boldsymbol{p} \tag{2a} \label{mk-def} \\
+\boldsymbol{g}_k &:=& \nabla f(\boldsymbol{x}_k) \in \mathbb{R}^n, \tag{2b} \label{g-def}
 \end{eqnarray}$$
 
 where $$\boldsymbol{g}_k$$ is the gradient of $$f$$ and $$\boldsymbol{B} \in \mathbb{R}^{n x n}$$
@@ -84,15 +84,16 @@ $$k$$ of the algorithm we try to find a _candidate step_ $$\boldsymbol{p}_k$$ by
 our current model $$m_k$$ _inside_ the trust region. Formally:
 
 $$\begin{eqnarray}
-\boldsymbol{p}_k &=& \arg \min_{\boldsymbol{p}} m_k(\boldsymbol{x}_k + \boldsymbol{p}) \text{ , s.t. } \lVert \boldsymbol{D}_k \boldsymbol{p} \rVert \leq \Delta \tag{3} \label{min-mk-tr} \\
-\boldsymbol{D}_k &=& \text{diag}(d_1,...,d_n) \in \mathbb{R}^{n \times n},
+\boldsymbol{p}_k &=& \arg \min_{\boldsymbol{p}} m_k(\boldsymbol{x}_k + \boldsymbol{p}) \text{ , s.t. } \lVert \boldsymbol{p} \rVert \leq \Delta \tag{3} \label{min-mk-tr} \\
 \end{eqnarray}$$
 
-where the _trust region radius_ $$\Delta \in \mathbb{R}$$ and the _diagonal matrix_
-$$\boldsymbol{D}_k$$ define the elliptical shape of the trust region. If $$\boldsymbol{D}_k$$
-is chosen as the identity matrix, we'd have a spherical trust region. We'll later
-see that the matrix $$\boldsymbol{D}_k$$ acts as a scaling matrix with stabilizing
-influence that can vary from step to step.
+where the _trust region radius_ $$\Delta \in \mathbb{R}$$ and $$\lVert . \rVert$$ is the
+[euclidian vector norm](https://en.wikipedia.org/wiki/Norm_(mathematics)#Euclidean_norm)
+or L<sup>2</sup> norm. But wait, eagle-eyed readers will have spotted that
+$$\lVert \boldsymbol{p} \rVert \leq \Delta$$ doesn't define an elliptical trust region, but
+a spherical one. This leads into the topic of _scaling_, which is one of the
+trickier aspects to get right in practice, but not because the theory is hard.
+I promise I'll get back to that, but let's proceed without scaling for now.
 
 I've called $$\boldsymbol{p}_k$$ a candidate step, because it's not automatically
 accepted. In the following, we'll introduce a value $$\rho_k \in \mathbb{R}$$
@@ -127,7 +128,6 @@ trust region radius as is. All of this is summarized in the following algorithm.
   - initial guess $$x_0$$
   - intial trust region radius $$\Delta_0 > 0$$
   - step acceptance threshold $$\rho_\min \in [0,\frac{1}{4}]$$
-  - initial elliptical scaling $$\boldsymbol{D}_0$$
 - **while** stopping criterion **not** reached
   - Obtain step $$\boldsymbol{p}_k$$ by (approximately) solving $$\eqref{min-mk-tr}$$.
   - Calculate $$\rho_k$$ using $$\eqref{rho-k}$$.
@@ -139,7 +139,6 @@ trust region radius as is. All of this is summarized in the following algorithm.
     - let $$\Delta_{k+1} = \Delta_k$$
   - **if** $$\rho > \rho_\min$$
     - let $$\boldsymbol{x}_{k+1} = \boldsymbol{x}_k + \boldsymbol{p}_k$$
-    - calculate new elliptical scaling $$\boldsymbol{D}_{k+1}$$
   - **else**
     - let $$\boldsymbol{x}_{k+1} = \boldsymbol{x}_k$$
 
@@ -155,8 +154,112 @@ and Madsen for details (but not that many).
 Typically, and in this article, The trust region itself is a multidimensional
 ellipsoid. 
 
-# The Basics of Least Squares
+# Least Squares Minimization
 
+For least squares minimization we are concerned with minizing, you guessed
+it, a sum of squares:
+
+$$f(\boldsymbol{x}) = \frac{1}{2}\sum_{i=1}^{m} r_i(\boldsymbol{x})^2 = \lVert \boldsymbol{r}(\boldsymbol{x})\rVert^2 \tag{5} \label{f-lsqr},$$
+
+where $$\boldsymbol{r}(\boldsymbol{x}) = (r_1(\boldsymbol{x}),\dots, r_m(\boldsymbol{x})) \in \mathbb{R}^m$$ is called the _residual vector_
+or the vector of residuals. It turns out (cf. N&W p. 245-247), that we can write
+the gradient and the Hessian of $$f$$ in terms of the [Jacobian matrix](https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant)
+$$\boldsymbol{J}(\boldsymbol{x})$$ of $$\boldsymbol{r}(\boldsymbol{x})$$. The
+Jacobian is defined as:
+
+$$\boldsymbol{J}(\boldsymbol{x})=
+\left(\begin{matrix}
+\nabla r_1(\boldsymbol{x})^T \\
+\vdots \\
+\nabla r_m(\boldsymbol{x})^T \\
+\end{matrix}\right) \in \mathbb{R}^{m \times n}, \tag{6} \label{jac-r}$$
+
+and now we can write the gradient and Hessian of $$f$$ as
+
+$$\begin{eqnarray}
+\nabla f(\boldsymbol{x}) &=& \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{r} \tag{7a} \label{grad-f} \\
+\nabla^2 f(\boldsymbol{x}) &=& \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) + \sum_{i=1}^{m} r_i(\boldsymbol{x})^T \nabla^2 r_i(\boldsymbol{x}) \approx \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) \tag{7b} \label{hessian-f}.
+\end{eqnarray}$$
+
+The approximation $$\boldsymbol{B} \approx \boldsymbol{J}^T \boldsymbol{J}$$ is
+typically used for the Hessian of $$f$$ and we'll plug the results above into
+eq. $$\eqref{mk-def}$$:
+
+
+$$\begin{eqnarray}
+m_k(\boldsymbol{p}) &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}) \rVert^2 + \boldsymbol{r}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x})\boldsymbol{p} + \frac{1}{2} (\boldsymbol{J}(\boldsymbol{x})\boldsymbol{p})^T \boldsymbol{J}(\boldsymbol{x})\boldsymbol{p} \tag{8a} \label{mk-lsqr1} \\
+ &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}) + \boldsymbol{J}(\boldsymbol{x})\boldsymbol{p} \rVert^2 \tag{8b} \label{mk-lsqr2}.
+\end{eqnarray}$$
+
+Both formulations are useful. Just as an aside, the second line reveals an interesting insight:
+since $$m_k(\boldsymbol{p})$$ is meant to approximate
+$$f(\boldsymbol{x}+\boldsymbol{p}) = \frac{1}{2}\lVert \boldsymbol{r}(\boldsymbol{x}+\boldsymbol{p})\rVert^2$$,
+we can see that what we did so far actually implies a linear approximation of the
+residuals $$\boldsymbol{r}(\boldsymbol{x}+\boldsymbol{p}) \approx \boldsymbol{r}(\boldsymbol{x}) + \boldsymbol{J}(\boldsymbol{x})\boldsymbol{p}$$.
+Fascinating, but let's get on with it. Now we have taken to big steps on the
+way to solving least squares problem with the Dogleg algorithm, but we still need
+to know the first thing about the Dogleg algorithm. So let's look into that next.
+
+# Dogleg Basics
+
+The basic idea of the dogleg algorithm is to approximate a solution to $$\eqref{min-mk-tr}$$
+by combining two steps: the _Gauss-Newton step_ and the _steepest descent step_.
+Please see N&W pp. 73 and Madsen _et al_ sections 3.1 and 3.3 for theoretical
+background on those steps; in this article I'm just going to assume them as given.
+Note also that this section already specializes Dogleg to least squares problems.
+
+The Gauss-Newton step $$\boldsymbol{p}_{gn}$$ is given as the solution to 
+
+$$\boldsymbol{p}_{gn}(\boldsymbol{x}) = \arg \min_{p} \lVert \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} + f(\boldsymbol{x}) \rVert^2, \tag{9} \label{pgn}$$
+
+which is just the least squares solution to the following system of equations
+
+$$\boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} \simeq -f(\boldsymbol{x}). \tag{10}$$
+
+Note the minus sign on the right hand side. It's possible to solve this system
+using the [normal equations](https://en.wikipedia.org/wiki/Linear_least_squares),
+but that becomes numerically unstable quickly. Using matrix decompositions is
+the way to go here and we'll return to this later. For now, let's look at the
+steepest descent step, which is given as: 
+
+$$ \boldsymbol{p}_{sd}(\boldsymbol{x}) = -\frac{\lVert \boldsymbol{g}(\boldsymbol{x})\rVert^2}{\lVert \boldsymbol{J}(\boldsymbol{x})\boldsymbol{g}(\boldsymbol{x})\rVert^2} \boldsymbol{g}(\boldsymbol{x}),$$
+
+where $$g$$ is the gradient of $$f$$ as defined in eq. $$\eqref{g-def}$$. The
+Dogleg algorithm searches for the minimum on a path of finite length, which
+is parametrized using a $$\tau \in [0,2]$$ like so:
+
+$$\boldsymbol{p}(\tau) = \left\{
+\begin{array}{ll} \tau \, \boldsymbol{p}_{sd}, & \tau \in [0,1] \\
+\boldsymbol{p}_{sd} + (1-\tau) (\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}), & \tau \in (0,2] . \\
+\end{array}
+\right.$$
+
+This definition of the path looks a bit unwieldy at first sight, but it has a very simple
+geometric interpretation: the path first follows the steepest descent step to
+its "tip" and from there in a straight line goes to the "tip" of the Gauss-Newton
+step. Overall, this creates a path with a corner in it, as illustrated in Figure 1.
+
+<figure>
+ <img src="/blog/images/dogleg/dogleg-step.svg" alt="dogleg step illustration" style="width:100%">
+ <figcaption>
+Figure 1. The dogleg path is constructed from the steepest descent
+step and the Gauss-Newton step. This illustration
+also helps us understand where the Dogleg algorithm got it's name. Apparently
+the inventor of the algorithm <a href="https://en.wikipedia.org/wiki/Michael_J._D._Powell">Michael Powell</a>
+was an avid golfer and was reminded of a <a href = "https://en.wikipedia.org/wiki/Golf_course">dogleg hole</a>
+in golf. This figure is heavily inspired by N&W figure 4.4, p. 74.
+ </figcaption>
+</figure>
+
+TODO TODO TODO
+
+The dogleg step is chosen as the intersection
+of the dogleg path with the trust region boundary if they intersect. Otherwise
+the path is traversed in full, which is just the Gauss-Newtwon step.
+# TODO SCALING!!!!
+# TODO REGULARIZED GN STEP
+(also note that dogleg requires matrix to be pos def, not sure that the lemma 4.2
+is still verified, but the regularization works in practice!)
 
 
 [^local-min]: Convergence guarantees of solver methods are their own beast that I won't touch at all in this article. Everyone that has ever worked with optimization algorithms knows that finding global optima is often a pipe dream and even finding a local optimum can be highly sensitive to starting conditions, implementation details, condition numbers, birthdates, star signs, etc etc...
