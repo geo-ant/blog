@@ -44,7 +44,7 @@ topic are [Nocedal&Wright](https://link.springer.com/book/10.1007/978-0-387-4006
 and [source code](https://github.com/ceres-solver/ceres-solver), and (to a lesser
 extent, but surprisingly) the [Minpack User Guide](https://www.osti.gov/biblio/6997568)
 and the [Modern Minpack source code](https://github.com/fortran-lang/minpack).
-I'll be pretty sloppy with my citations because most of them would just be Nocedal&Wright
+I'll be pretty sloppy with my citations because most of them would just be N&W
 or Madsen _et al_. 
 
 # Trust Region Algorithms
@@ -80,7 +80,7 @@ is a symmetric matrix that's either the [Hessian](https://en.wikipedia.org/wiki/
 of $$f$$ or an approximation of it. We'll come back to this again later and make
 this more concrete for the least squares case, but let's continue with
 the general purpose trust region description just a little more. In each step
-$$k$$ of the algorithm we try to find a _candidate step_ $$\boldsymbol{p}_k$$ by minimizing
+$$k$$ of the algorithm we try to find a _candidate step_ $$\boldsymbol{p}_k \in \mathbb{R}^n$$ by minimizing
 our current model $$m_k$$ _inside_ the trust region. Formally:
 
 $$\begin{eqnarray}
@@ -107,7 +107,7 @@ Note that the denominator (the predicted reduction) will always be nonnegative
 (cf. N&W pp 68, 69). Thus, a $$\rho_k > 0$$ thus tells us that the objective function
 would be reduced by taking the step, whereas the $$\rho_k \leq 0$$ indicates that 
 it wouldn't be. So using a small value $$\rho_\min \geq 0$$ as a threshold
-$$\rho > \rho_\min$$ allows us to accept or reject the step. Nocedal&Wright
+$$\rho > \rho_\min$$ allows us to accept or reject the step. N&W
 give the bound $$\rho_\min \in [0, \frac{1}{4})$$, Madsen _et al_ use
 $$\rho_\min = 0$$, Minpack [uses](https://github.com/fortran-lang/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1794) $$\rho = 10^{-4}$$,
 and Ceres [leaves it configurable](https://github.com/ceres-solver/ceres-solver/blob/806af056feb22a1236baca247b4f4b6e1ea911e5/internal/ceres/trust_region_minimizer.cc#L801)
@@ -147,7 +147,7 @@ trust region radius as is. All of this is summarized in the following algorithm.
 
 <span class="caption">
 The high level outline of a typical trust region algorithm, including Dogleg, cf
-Algorithm 4.1 in Nocedal&Wright and Algorithm 3.21 in the Madsen _et al._
+Algorithm 4.1 in N&W and Algorithm 3.21 in the Madsen _et al._
 paper. I promise that the handwavy parts will be explained in detail later.
 The one thing I won't ever explain are the magical 1/4 and 3/4 constants, cf. Nocedal
 and Madsen for details (but not that many).
@@ -307,9 +307,47 @@ from Algorithm 2 and plug this into Algorithm 1 as the step that approximately
 solves $$\eqref{min-mk-tr}$$. However, there are a couple of pesky little details
 that we still have to take care of. 
 
+# Parameter Scaling
+
+Parameter scaling is used to address the fact that an objective function can
+be very sensitive to changes in certain parameters, while it's less sensitive
+to others. In this case, we say that the objective function is _poorly scaled_,
+which can manifest as the minimizer laying in a narrow valley. In this case,
+elliptical trust regions are a much better fit than the spherical trust regions
+we had considered so far. The test suite of my Dogleg implementation taught
+me that compensating for parameter scaling is one of the most important things
+to go from a decent implementation to a great one.
+
+Elliptical trust regions are defined by
+
+$$\begin{eqnarray}
+\lVert \boldsymbol{D} \boldsymbol{p} \rVert &\leq& \Delta, \tag{15a} \label{elliptical-tr} \\
+\boldsymbol{D} &:=& \text{diag}(d_1,\dots,d_n) \in \mathbb{R}^{n \times n} \tag{15b} \label{d-def}
+\end{eqnarray}$$
+
+where $$\boldsymbol{D}$$ is a diagonal matrix. Madsen _et al._ don't mention
+scaling at all, while N&W simply state: "Information to construct the scaling
+matrix $$\boldsymbol{D}$$ can be derived from the second derivatives [...].
+We can allow $$\boldsymbol{D}$$ to change from iteration to iteration" (N&W
+section 4.5). For more useful information, we have to turn to gold-standard
+implementations, like Ceres Solver or Minpack. The Minpack User Guide
+[section 2.5](https://www.osti.gov/biblio/6997568) gives some good theoretical
+and practical insight into scaling. However, the best performing
+scaling I've found is the one that's implemented in the Ceres Solver[^test-suite]<sup>,</sup> TODO LINK SOURCES.
+
+
+
 # Finding the (Regularized) Gauss-Newton Step
 
-For practical reasons, we'll make one modification to the 
+!!! TODO REGULARIZATION AND SCALING
+
+I've alluded to the fact that we'll make a minor modification to the calculation
+of the Gauss-Newton step. Instead of using eq. $$\eqref{p-gn}$$ for the Gauss-Newton
+step, we'll use a _regularized_ Gauss-Newton step:
+
+$$\boldsymbol{p}_{gn}(\boldsymbol{x}) = \arg \min_{p} \lVert \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} + f(\boldsymbol{x}) \rVert^2 + \mu \lVert p \rVert^2. \tag{TODO TODO} \label{reg-p-gn}$$
+
+
 
 
 
@@ -328,3 +366,4 @@ TODO TODO TODO
 [^ellipsoid-tr]: Other shapes are available. One very common case is a spherical trust region, which is just a special case of the ellipsoid. Another common case would be a box-shaped region in hyperspace.
 [^quadratic-model]: You guessed, it: it doesn't _have_ to be quadratic. See e.g. pp 25, 26 in N&W 2<sup>nd</sup> ed. for a demonstration how a linear model leads to a steepest descent algorithm.
 [^lemma-4-2]: See N&W pp. 74, in particular Lemma 4.2 for this. For this lemma to hold, we need the Jacobian $$\boldsymbol{J}$$ to have full rank. We'll later see that we can also use Dogleg in practice for all Jacobians, if we use a _regularized_ Gauss-Newton step, rather than the vanilla step defined in $$\eqref{p-gn}$$.
+[^test-suite]: Were "best" is evaluated against the suite of test problems that I use. This is the famous MGH test suite described by More, Garbow, and Hilstrom in ["Testing Unconstrained Optimization Software"](https://doi.org/10.1145/355934.355936).
