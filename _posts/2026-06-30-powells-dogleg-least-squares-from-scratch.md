@@ -71,7 +71,8 @@ quadratic function taken from the 2<sup>nd</sup> order Taylor expansion
 of $$f(\boldsymbol{x}_k+ \boldsymbol{p})$$ around $$\boldsymbol{x}_k$$:
 
 $$\begin{eqnarray}
-m_k(\boldsymbol{p}) &:=& f_k + \boldsymbol{g}_k^T \boldsymbol{p} + \frac{1}{2} \boldsymbol{p}^T \boldsymbol{B} \boldsymbol{p} \tag{2a} \label{mk-def} \\
+m_k(\boldsymbol{p}) &:=& f_k + \boldsymbol{g}_k^T \boldsymbol{p} + \frac{1}{2} \boldsymbol{p}^T \boldsymbol{B} \boldsymbol{p} \label{mk-def} \\
+&=& f(\boldsymbol{x}+\boldsymbol{p}) + \mathcal{O}(\lVert \boldsymbol{p} \rVert^2) \\
 \boldsymbol{g}_k &:=& \nabla f(\boldsymbol{x}_k) \in \mathbb{R}^n, \tag{2b} \label{g-def}
 \end{eqnarray}$$
 
@@ -83,9 +84,9 @@ the general purpose trust region description just a little more. In each step
 $$k$$ of the algorithm we try to find a _candidate step_ $$\boldsymbol{p}_k \in \mathbb{R}^n$$ by minimizing
 our current model $$m_k$$ _inside_ the trust region. Formally:
 
-$$\begin{eqnarray}
-\boldsymbol{p}_k &=& \arg \min_{\boldsymbol{p}} m_k(\boldsymbol{x}_k + \boldsymbol{p}) \text{ , s.t. } \lVert \boldsymbol{p} \rVert \leq \Delta \tag{3} \label{min-mk-tr} \\
-\end{eqnarray}$$
+$$
+\boldsymbol{p}_k = \arg \min_{\boldsymbol{p}} m_k(\boldsymbol{x}_k + \boldsymbol{p}) \text{ , s.t. } \lVert \boldsymbol{p} \rVert \leq \Delta \tag{3} \label{pk-def} 
+$$
 
 where the _trust region radius_ $$\Delta \in \mathbb{R}$$ and $$\lVert . \rVert$$ is the
 [euclidian vector norm](https://en.wikipedia.org/wiki/Norm_(mathematics)#Euclidean_norm)
@@ -129,7 +130,7 @@ trust region radius as is. All of this is summarized in the following algorithm.
   - intial trust region radius $$\Delta_0 > 0$$
   - step acceptance threshold $$\rho_\min \in [0,\frac{1}{4}]$$
 - `while` stopping criterion `not` reached
-  - Obtain step $$\boldsymbol{p}_k$$ by (approximately) solving $$\eqref{min-mk-tr}$$.
+  - Obtain step $$\boldsymbol{p}_k$$ by (approximately) solving $$\eqref{pk-def}$$.
   - Calculate $$\rho_k$$ using $$\eqref{rho-k}$$.
   - `if` $$\rho_k > \frac{3}{4}$$ then 
     - let $$\Delta_{k+1} = \max(\Delta_k,3 \cdot \lVert \boldsymbol{p}_k \rVert)$$
@@ -180,7 +181,7 @@ $$\boldsymbol{J}(\boldsymbol{x})=
 and now we can write the gradient and Hessian of $$f$$ as
 
 $$\begin{eqnarray}
-\nabla f(\boldsymbol{x}) &=& \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{r} \tag{7a} \label{grad-f} \\
+\nabla f(\boldsymbol{x}) &=:& \boldsymbol{g}(\boldsymbol{x}) = \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{r} \tag{7a} \label{grad-f} \\
 \nabla^2 f(\boldsymbol{x}) &=& \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) + \sum_{i=1}^{m} r_i(\boldsymbol{x})^T \nabla^2 r_i(\boldsymbol{x}) \approx \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) \tag{7b} \label{hessian-f}.
 \end{eqnarray}$$
 
@@ -205,7 +206,7 @@ to know the first thing about the Dogleg algorithm. So let's look into that next
 
 # Dogleg Basics
 
-The basic idea of the dogleg algorithm is to approximate a solution to $$\eqref{min-mk-tr}$$
+The basic idea of the dogleg algorithm is to approximate a solution to $$\eqref{pk-def}$$
 by combining two steps: the _Gauss-Newton step_ and the _steepest descent step_.
 Please see N&W pp. 73 and Madsen _et al_ sections 3.1 and 3.3 for theoretical
 background on those steps; in this article I'm just going to assume them as given.
@@ -227,7 +228,7 @@ steepest descent step, which is given as:
 
 $$ \boldsymbol{p}_{sd}(\boldsymbol{x}) = -\frac{\lVert \boldsymbol{g}(\boldsymbol{x})\rVert^2}{\lVert \boldsymbol{J}(\boldsymbol{x})\boldsymbol{g}(\boldsymbol{x})\rVert^2} \boldsymbol{g}(\boldsymbol{x}), \tag{11} \label{p-sd}$$
 
-where $$g$$ is the gradient of $$f$$ as defined in eq. $$\eqref{g-def}$$. The
+where $$g$$ is the gradient of $$f$$ as defined in eq. $$\eqref{grad-f}$$. The
 Dogleg algorithm searches for the minimum on a path of finite length, which
 is parametrized using a $$\tau \in [0,2]$$ like so:
 
@@ -304,7 +305,7 @@ $$
 
 In principle, we now have all the pieces together. We just use the Dogleg step
 from Algorithm 2 and plug this into Algorithm 1 as the step that approximately
-solves $$\eqref{min-mk-tr}$$. However, there are a couple of pesky little details
+solves $$\eqref{pk-def}$$. However, there are a couple of pesky little details
 that we still have to take care of. 
 
 # Parameter Scaling
@@ -325,16 +326,45 @@ $$\begin{eqnarray}
 \boldsymbol{D} &:=& \text{diag}(d_1,\dots,d_n) \in \mathbb{R}^{n \times n} \tag{15b} \label{d-def}
 \end{eqnarray}$$
 
-where $$\boldsymbol{D}$$ is a diagonal matrix. Madsen _et al._ don't mention
-scaling at all, while N&W simply state: "Information to construct the scaling
-matrix $$\boldsymbol{D}$$ can be derived from the second derivatives [...].
-We can allow $$\boldsymbol{D}$$ to change from iteration to iteration" (N&W
-section 4.5). For more useful information, we have to turn to gold-standard
-implementations, like Ceres Solver or Minpack. The Minpack User Guide
-[section 2.5](https://www.osti.gov/biblio/6997568) gives some good theoretical
-and practical insight into scaling. However, the best performing
-scaling I've found is the one that's implemented in the Ceres Solver[^test-suite]<sup>,</sup> TODO LINK SOURCES.
+where $$\boldsymbol{D}$$ is a diagonal matrix. Now the optimization problem
+in eq. $$\eqref{pk-def}$$ becomes
 
+$$\boldsymbol{p}_k = \arg \min_{\boldsymbol{p}} m_k(\boldsymbol{p}) \text{ , s.t. } \lVert \boldsymbol{D p} \rVert \leq \Delta \tag{16} \label{pk-elliptical},$$
+
+where the only change to the problem before is the elliptical shape of the trust
+region. There are ways to express the solution to this problem using the elliptical
+bounds, but a much simpler alternative is to perform a coordinate transform
+such that are now working in a _scaled_ coordinate system for the steps.
+
+$$\boldsymbol{\widetilde{p}} = \boldsymbol{D p}. \tag{17} \label{scaled-p}$$
+
+By substituting this into $$\eqref{pk-elliptical}$$, we obtain a
+minimization problem with spherical bounds in the scaled step coordinates:
+
+$$\begin{eqnarray}
+\boldsymbol{\widetilde{p}}_k &=& \arg \min_{\boldsymbol{p}} \widetilde{m}_k(\boldsymbol{\widetilde{p}}) \text{ , s.t. } \lVert \boldsymbol{\widetilde{p}} \rVert \leq \Delta \tag{18a} \label{mk-scaled}, \\
+\widetilde{m}_k(\boldsymbol{\widetilde{p}}) &:=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}) \rVert^2 + \boldsymbol{\widetilde{g}}(\boldsymbol{x})^T \boldsymbol{\widetilde{p}} + \frac{1}{2} (\boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}})^T \boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}} \tag{18b} \label{mk-scaled-1} \\
+ &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}) + \boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}} \rVert^2 \tag{18c} \label{mk-scaled2} \\
+\boldsymbol{\widetilde{g}}(\boldsymbol{x}) &:=& \boldsymbol{\widetilde{J}}(\boldsymbol{x})^T \boldsymbol{r}(\boldsymbol{x}) = \boldsymbol{D}^{-1} \boldsymbol{g}(\boldsymbol{x})  \tag{18d} \label{g-scaled} \\
+\boldsymbol{\widetilde{J}}(\boldsymbol{x}) &:=& \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{D}^{-1}  \tag{18e} \label{j-scaled},
+\end{eqnarray}$$
+
+where we call $$\boldsymbol{\widetilde{g}}$$ the _scaled_ gradient and
+$$\boldsymbol{\widetilde{J}}$$ the _scaled_ Jacobian. 
+
+
+## Implementing Parameter Scaling
+
+Now, let's look at how to actually implement practically useful parameter
+scaling. Madsen _et al._ don't mention scaling at all, while N&W simply state:
+"Information to construct the scaling matrix $$\boldsymbol{D}$$ can be derived
+from the second derivatives [...]. We can allow $$\boldsymbol{D}$$ to change
+from iteration to iteration" (N&W section 4.5). For more practically useful
+information, we have to turn to gold-standard implementations, like Ceres
+Solver or Minpack. The Minpack User Guide
+[section 2.5](https://www.osti.gov/biblio/6997568) gives some good theoretical
+and practical insight. However, the best performing
+scaling I've found is the one that's implemented in the Ceres Solver[^test-suite]<sup>,</sup>.
 
 
 # Finding the (Regularized) Gauss-Newton Step
@@ -346,8 +376,7 @@ of the Gauss-Newton step. Instead of using eq. $$\eqref{p-gn}$$ for the Gauss-Ne
 step, we'll use a _regularized_ Gauss-Newton step:
 
 $$\boldsymbol{p}_{gn}(\boldsymbol{x}) = \arg \min_{p} \lVert \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} + f(\boldsymbol{x}) \rVert^2 + \mu \lVert p \rVert^2. \tag{TODO TODO} \label{reg-p-gn}$$
-
-
+In here, $$\mu$$ 
 
 
 
