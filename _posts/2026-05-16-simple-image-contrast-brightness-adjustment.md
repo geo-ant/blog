@@ -1,11 +1,22 @@
 ---
 layout: post
 tags: image-processing least-squares
-date: 2026-05-16
+#categories: []
+date: 2026-04-18
 last_updated:
+#excerpt: ''
+#image:
+#description:
+#permalink:
 title: "A Simple Image Brightness And Contrast Adjustment Technique"
-og_image: ""
-comments_id: ""
+#
+#
+# Make sure this image is correct !!!
+og_image:
+#
+#
+# make sure comments are enabled
+comments_id: 
 math: true
 ---
 
