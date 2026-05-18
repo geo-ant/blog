@@ -48,7 +48,7 @@ Now let's find a simple brightness transform that maps image $$\boldsymbol{J}$$
 to image $$\boldsymbol{I}$$. Let's allow a linear brightness transform with
 coefficients because such a transform is typically so constrained that it won't
 alter the structures of interest. It will only help us shift one image to the
-value range of the other image to make it comparable[^template]. Every pixel
+value range of the other image to make it comparable. Every pixel
 $$J_k$$ at index $$k$$ of image $$\boldsymbol{J}$$ is transformed as[^pixel-index]:
 
 $$J_k \mapsto a J_k + b, \tag{1} \label{transform}$$
@@ -146,7 +146,6 @@ fast, despite our simple model. I might tackle this in a follow-up article.
 
 # Endnotes
 [^pixel-index]: We can use a linear index for the pixels instead of $x,y$ because the position does not matter for our model. The important thing is that each value of $$k$$ corresponds to the same unique pixel position in both images.
-[^template]: We have implicitly designated image $$\boldsymbol{I}$$ as the _template image_. It might not seem obvious, but it _does_ matter which image we map to which. If the images are sufficiently similar, this isn't a problem, and in practice we can always try mapping the other way round to see if the results are better. While it's still a theoretical problem in the two-image case, it becomes much more of a practical problem regarding which image we select as the template image. There are also formulations that don't require a template image, but assume the existence of a _latent image_ and reformulate the problem.
 [^lsqr]: Least squares fitting has a couple of nice properties. First of all, it emerges as the maximum likelihood estimator of Gaussian probability distributions. Second of all, it is very tractable analytically. Both things make it appealing for our use case, though a formal Bayesian description of our image mapping process can get tricky quickly. So we'll allow ourselves to use least squares here because it's a good heuristic.
 [^zhang]: See [here](https://www.researchgate.net/publication/234800535_Automatic_relative_radiometric_normalization_using_iteratively_weighted_least_square_regression) for a PDF copy.
 [^zhang2]: They use a slightly different multiplier for variance and covariance than presented here, but it doesn't matter because that cancels out anyway.
