@@ -366,6 +366,17 @@ Solver or Minpack. The Minpack User Guide
 and practical insight. However, the best performing
 scaling I've found is the one that's implemented in the Ceres Solver[^test-suite]<sup>,</sup>.
 
+Curiously, Ceres combines two types of scaling. To be able to talk about these
+two types, we are going to introduce some (non-standard) vocabulary:
+_Static Scaling_ $$\boldsymbol{D}_s$$ and _Dynamic Scaling_ $$\boldsymbol{D}_d$$.
+Ceres calls the first kind of scaling _Jacobi scaling_, and the second type
+_diagonal scaling_, though I find the names misleading because both matrices
+are diagonal matrices, both matrices act on the Jacobian, and they are calculated
+based on the Jacobian (though slightly differently).
+
+The _Static Scaling_ matrix is calculated _once_ in the first iteration and
+stays the same for the whole runtime of the algorithm.
+ 
 
 # Finding the (Regularized) Gauss-Newton Step
 
