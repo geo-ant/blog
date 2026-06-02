@@ -3,7 +3,7 @@ layout: post
 tags: image-processing least-squares
 #categories: []
 date: 2026-05-18
-last_updated:
+last_updated: 2026-02-26
 #excerpt: ''
 #image:
 #description:
@@ -114,6 +114,10 @@ $$\begin{eqnarray}
 \text{cov}_{\boldsymbol{w}}(\boldsymbol{I},\boldsymbol{J}) &=& \frac{N}{N-1}\frac{\sum_{k=1}^{N} w_k (I_k-\text{mean}_{\boldsymbol{w}}(\boldsymbol{I}))\cdot(J_k- \text{mean}_{\boldsymbol{w}}(\boldsymbol{J}))}{\sum_{k=1}^N w_k}  \tag{7b} \label{cov-w}\\
 \text{var}_{\boldsymbol{w}}(\boldsymbol{J}) &=& \text{cov}_{\boldsymbol{w}}(\boldsymbol{J},\boldsymbol{J}) \tag{7c} \label{var-w}
 \end{eqnarray}$$
+
+If those formulas look familiar, it's because they probably are. What we did is
+just bog-standard [linear least squares](https://mathworld.wolfram.com/LeastSquaresFitting.html)
+fitting of the intensity values.
 
 # Prior Art and Further Reading
 
