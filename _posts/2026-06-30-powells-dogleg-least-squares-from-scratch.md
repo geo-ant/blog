@@ -71,7 +71,7 @@ quadratic function taken from the 2<sup>nd</sup> order Taylor expansion
 of $$f(\boldsymbol{x}_k+ \boldsymbol{p})$$ around $$\boldsymbol{x}_k$$:
 
 $$\begin{eqnarray}
-m_k(\boldsymbol{p}) &:=& f_k + \boldsymbol{g}_k^T \boldsymbol{p} + \frac{1}{2} \boldsymbol{p}^T \boldsymbol{B} \boldsymbol{p} \label{mk-def} \\
+m_k(\boldsymbol{p}) &:=& f_k + \boldsymbol{g}_k^T \boldsymbol{p} + \frac{1}{2} \boldsymbol{p}^T \boldsymbol{B} \boldsymbol{p} \tag{2a} \label{mk-def} \\
 &=& f(\boldsymbol{x}+\boldsymbol{p}) + \mathcal{O}(\lVert \boldsymbol{p} \rVert^2) \\
 \boldsymbol{g}_k &:=& \nabla f(\boldsymbol{x}_k) \in \mathbb{R}^n, \tag{2b} \label{g-def}
 \end{eqnarray}$$
@@ -125,7 +125,7 @@ trust region radius as is. All of this is summarized in the following algorithm.
 
 <div class="pseudocode" markdown="1">
 **Algorithm 1** (Trust Region)
-- Given
+- **Given**:
   - initial guess $$x_0$$
   - intial trust region radius $$\Delta_0 > 0$$
   - step acceptance threshold $$\rho_\min \in [0,\frac{1}{4}]$$
@@ -214,11 +214,11 @@ Note also that this section already specializes Dogleg to least squares problems
 
 The Gauss-Newton step $$\boldsymbol{p}_{gn}$$ is given as the solution to 
 
-$$\boldsymbol{p}_{gn}(\boldsymbol{x}) = \arg \min_{p} \lVert \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} + f(\boldsymbol{x}) \rVert^2, \tag{9} \label{p-gn}$$
+$$\boldsymbol{p}_{gn}(\boldsymbol{x}) = \arg \min_{p} \lVert \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} + \boldsymbol{r}(\boldsymbol{x}) \rVert^2, \tag{9} \label{p-gn}$$
 
 which is just the least squares solution to the following system of equations
 
-$$\boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} \simeq -f(\boldsymbol{x}). \tag{10}$$
+$$\boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} \simeq -\boldsymbol{r}(\boldsymbol{x}). \tag{10}$$
 
 Note the minus sign on the right hand side. It's possible to solve this system
 using the [normal equations](https://en.wikipedia.org/wiki/Linear_least_squares),
@@ -266,6 +266,7 @@ Gauss-Newton step. So the algorithm for choosing the Dogleg step is:
 
 <div class="pseudocode" markdown="1">
 **Algorithm 2** (Classic Dogleg Step)
+- **Given**: Jacobian $$\boldsymbol{J}$$, gradient $$\boldsymbol{g}$$, residuals $$\boldsymbol{r}$$
 - Calculate $$\boldsymbol{p}_{sd}$$ as in eq. $$\eqref{p-sd}$$
 - `if` $$\lVert \boldsymbol{p}_{sd} \rVert \leq \Delta$$
   - return $$\boldsymbol{p}_{dl} = \Delta \; \boldsymbol{p}_{sd} / \lVert \boldsymbol{p}_{sd}\rVert$$
@@ -313,20 +314,20 @@ that we still have to take care of.
 Parameter scaling is used to address the fact that an objective function can
 be very sensitive to changes in certain parameters, while it's less sensitive
 to others. In this case, we say that the objective function is _poorly scaled_,
-which can manifest as the minimizer laying in a narrow valley. In this case,
+which can manifest as the minimizer being in a narrow valley. In this case,
 elliptical trust regions are a much better fit than the spherical trust regions
-we had considered so far. The test suite of my Dogleg implementation taught
+we've considered so far. The test suite of my Dogleg implementation taught
 me that compensating for parameter scaling is one of the most important things
-to go from a decent implementation to a great one.
+to implement for going from a decent implementation to a great one.
 
 Elliptical trust regions are defined by
 
 $$\begin{eqnarray}
 \lVert \boldsymbol{D} \boldsymbol{p} \rVert &\leq& \Delta, \tag{15a} \label{elliptical-tr} \\
-\boldsymbol{D} &:=& \text{diag}(d_1,\dots,d_n) \in \mathbb{R}^{n \times n} \tag{15b} \label{d-def}
+\boldsymbol{D} &:=& \text{diag}(d_1,\dots,d_n) \in \mathbb{R}^{n \times n},\; d_j > 0 \tag{15b} \label{d-def}
 \end{eqnarray}$$
 
-where $$\boldsymbol{D}$$ is a diagonal matrix. Now the optimization problem
+where $$\boldsymbol{D}$$ is an invertible diagonal matrix. Now the optimization problem
 in eq. $$\eqref{pk-def}$$ becomes
 
 $$\boldsymbol{p}_k = \arg \min_{\boldsymbol{p}} m_k(\boldsymbol{p}) \text{ , s.t. } \lVert \boldsymbol{D p} \rVert \leq \Delta \tag{16} \label{pk-elliptical},$$
@@ -334,7 +335,7 @@ $$\boldsymbol{p}_k = \arg \min_{\boldsymbol{p}} m_k(\boldsymbol{p}) \text{ , s.t
 where the only change to the problem before is the elliptical shape of the trust
 region. There are ways to express the solution to this problem using the elliptical
 bounds, but a much simpler alternative is to perform a coordinate transform
-such that are now working in a _scaled_ coordinate system for the steps.
+such that we are now working in a _scaled_ coordinate system for the steps.
 
 $$\boldsymbol{\widetilde{p}} = \boldsymbol{D p}. \tag{17} \label{scaled-p}$$
 
@@ -345,15 +346,21 @@ $$\begin{eqnarray}
 \boldsymbol{\widetilde{p}}_k &=& \arg \min_{\boldsymbol{p}} \widetilde{m}_k(\boldsymbol{\widetilde{p}}) \text{ , s.t. } \lVert \boldsymbol{\widetilde{p}} \rVert \leq \Delta \tag{18a} \label{mk-scaled}, \\
 \widetilde{m}_k(\boldsymbol{\widetilde{p}}) &:=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}) \rVert^2 + \boldsymbol{\widetilde{g}}(\boldsymbol{x})^T \boldsymbol{\widetilde{p}} + \frac{1}{2} (\boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}})^T \boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}} \tag{18b} \label{mk-scaled-1} \\
  &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}) + \boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}} \rVert^2 \tag{18c} \label{mk-scaled2} \\
-\boldsymbol{\widetilde{g}}(\boldsymbol{x}) &:=& \boldsymbol{\widetilde{J}}(\boldsymbol{x})^T \boldsymbol{r}(\boldsymbol{x}) = \boldsymbol{D}^{-1} \boldsymbol{g}(\boldsymbol{x})  \tag{18d} \label{g-scaled} \\
-\boldsymbol{\widetilde{J}}(\boldsymbol{x}) &:=& \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{D}^{-1}  \tag{18e} \label{j-scaled},
+\boldsymbol{\widetilde{J}}(\boldsymbol{x}) &:=& \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{D}^{-1}  \tag{18d} \label{j-scaled} \\
+\boldsymbol{\widetilde{g}}(\boldsymbol{x}) &:=& \boldsymbol{D}^{-1} \boldsymbol{g}(\boldsymbol{x}) = \boldsymbol{\widetilde{J}}(\boldsymbol{x})^T \boldsymbol{r}(\boldsymbol{x})   \tag{18e} \label{g-scaled},
 \end{eqnarray}$$
 
 where we call $$\boldsymbol{\widetilde{g}}$$ the _scaled_ gradient and
-$$\boldsymbol{\widetilde{J}}$$ the _scaled_ Jacobian. 
+$$\boldsymbol{\widetilde{J}}$$ the _scaled_ Jacobian. The neat thing is that,
+at each iteration, we can just calculate the _scaled_ dogled step using the
+same math as above as long as we consistently use the scaled Jacobian and
+gradient for the calculations. Only to calculate the next evaluation point
+$$\boldsymbol{x}_{k+1} = \boldsymbol{x}_k + \boldsymbol{p}_k$$, do we have
+to translate the step into unscaled coordinates by using
+$$\boldsymbol{p}_k = \boldsymbol{D}^{-1} \widetilde{\boldsymbol{p}}_k$$.
 
 
-## Implementing Parameter Scaling
+## Parameter Scaling in Practice
 
 Now, let's look at how to actually implement practically useful parameter
 scaling. Madsen _et al._ don't mention scaling at all, while N&W simply state:
@@ -363,20 +370,93 @@ from iteration to iteration" (N&W section 4.5). For more practically useful
 information, we have to turn to gold-standard implementations, like Ceres
 Solver or Minpack. The Minpack User Guide
 [section 2.5](https://www.osti.gov/biblio/6997568) gives some good theoretical
-and practical insight. However, the best performing
-scaling I've found is the one that's implemented in the Ceres Solver[^test-suite]<sup>,</sup>.
+and practical insight. However, the best performing scaling I've
+found is implemented in the Ceres Solver[^test-suite].
+
+### Static and Dynamic Scaling
 
 Curiously, Ceres combines two types of scaling. To be able to talk about these
 two types, we are going to introduce some (non-standard) vocabulary:
 _Static Scaling_ $$\boldsymbol{D}_s$$ and _Dynamic Scaling_ $$\boldsymbol{D}_d$$.
-Ceres calls the first kind of scaling _Jacobi scaling_, and the second type
-_diagonal scaling_, though I find the names misleading because both matrices
-are diagonal matrices, both matrices act on the Jacobian, and they are calculated
-based on the Jacobian (though slightly differently).
+Ceres calls those _Jacobi scaling_, and _diagonal scaling_, respectively.
+I find the names misleading because both matrices are diagonal matrices, both
+matrices act on the Jacobian (among other things), and they are calculated based
+on the Jacobian (though slightly differently).
 
-The _Static Scaling_ matrix is calculated _once_ in the first iteration and
-stays the same for the whole runtime of the algorithm.
- 
+The matrix $$\boldsymbol{D}_s$$is calculated _once_ in the first iteration and
+stays the same for the whole runtime of the algorithm. It's intent
+is to _"improve the conditioning of the Jacobian"_[^ceres-static-scaling]:
+
+$$\begin{eqnarray}
+  \boldsymbol{D}_s &=& \text{diag}(d_{s,1},\,\dots\,,d_{s,n}) \in \mathbb{R}^n \tag{19a} \label{Ds} \\ 
+  d_{s,i} &=& |\boldsymbol{j}_i|+1 \tag{19b}, \\
+\end{eqnarray}$$
+
+where $$\boldsymbol{j}_i$$ is the $$i$$-th _column_ of the Jacobian. For this
+matrix, since it's only calculated once in the first iteration, this is the
+Jacobian at initialization. Using this scaling indeed makes the
+algorithm perform better in my test suite, but I'll be honest: this was a bit
+of a surprise to me, once I understood what was going on.
+
+The dynamic scaling matrix $$\boldsymbol{D}_d^{(k)}$$ is updated everytime the Jacobian
+changes, i.e. _everytime a step is taken_. The dynamic scaling implemented by Ceres
+is very similar to the scaling described in the Minpack User guide. It's primary
+intent is to give us an adaptive elliptical trust region. I've included the $$(k)$$
+superstep to make the explicit dependence on the step obvious. It's calculated
+as [^ceres-dynamic-scaling]:
+
+$$\begin{eqnarray}
+  \boldsymbol{D}_d^{(k)} &=& \text{diag}(d_{d,1}^{(k)},\,\dots\,,d_{d,n}^{(k)}) \in \mathbb{R}^n \tag{20a} \label{Dd} \\ 
+  d_{d,i}^{(k)} &=& \max(\min(d_{max}, |\boldsymbol{j}_i^{(k)}|),d_{min}), \tag{20b} \\
+\end{eqnarray}$$
+
+where $$\boldsymbol{j}_j^{(k)}$$ agian denotes the $$i$$-th column of the Jacobian,
+this time evaluated at the current step with index $$k$$. The diagonal elements
+are just the column-norms of the Jacobian clamped to a the range $$[d_{min}, d_{max}]$$,
+where the default values for the endpoints of the range in Ceres are:
+
+$$\begin{eqnarray}
+d_{min} &=& 10^{-3} \\
+d_{max} &=& 10^{-16} \\
+\end{eqnarray}$$
+
+
+We can combine those scaling matrices into one _step dependent_ diagonal scaling
+matrix $$\boldsymbol{D}_k$$, where $$k$$ is the index of the current step.
+
+$$\boldsymbol{D}_k = \boldsymbol{D}_s \boldsymbol{D}_d^{(k)} \tag{21} \label{Dk}$$
+
+### Implementing Parameter Scaling
+
+Don't worry if this has all been a bit confusing so far, we're going to tie it
+together now. At each iteration, we calculate the scaling matrix $$\boldsymbol{D}_k$$
+as given in $$\eqref{Dk}$$. We can then use this matrix to calculate
+the scaled Jacobian $$\widetilde{\boldsymbol{J}}$$ from the Jacobian $$\boldsymbol{J}$$,
+using $$\eqref{j-scaled}$$ and from that the scaled gradient using $$\eqref{g-scaled}$$.
+
+We're calculating the dogleg step in scaled space by using the same algorithm
+as described above. The two ingredients to the dogleg step are the $$\widetilde{\boldsymbol{p}}_{gn}$$
+and $$\widetilde{\boldsymbol{p}}_{sd}$$, which are the Gauss-Newton and the
+steepest descent step, respectively, both in scaled space. From that, we
+calculate the final dogleg step in scaled space $$\widetilde{\boldsymbol{p}_{dl}}$$
+using Algorithm 2. We can still use Algorithm 1 to perform the trust region step,
+but we have to be sure to _unscale_ the dogleg step using
+$$\boldsymbol{p}_{dl} = \boldsymbol{D}^{-1} \widetilde{\boldsymbol{p}}_{dl}$$
+before using it to get the next step
+$$\boldsymbol{x}_{k+1} = \boldsymbol{x}_k + \boldsymbol{p}_k$$.
+
+To obtain $$\widetilde{\boldsymbol{p}}_{sd}$$, we just use modify $$\eqref{p-sd}$$
+with the scaled gradient and Jacobian: 
+
+$$ \widetilde{\boldsymbol{p}}_{sd}(\boldsymbol{x}) = -\frac{\lVert \widetilde{\boldsymbol{g}}(\boldsymbol{x})\rVert^2}{\lVert \widetilde{\boldsymbol{J}}(\boldsymbol{x})\widetilde{\boldsymbol{g}}(\boldsymbol{x})\rVert^2} \widetilde{\boldsymbol{g}}(\boldsymbol{x}), \tag{11} \label{p-sd-scaled}$$
+
+In the next section, I'll explain how calculate the Gauss-Newton step, since
+I wanted to introduce regularization to it as well. Note that we'll never
+actually need to form the scaled Jacobian to calculate $$\eqref{p-sd-scaled}$$,
+because we can just rewrite the matrix vector product in the denominator as
+$$\widetilde{\boldsymbol{J}}\widetilde{\boldsymbol{g}} = \boldsymbol{J}(\boldsymbol{D}^{-1} \widetilde{\boldsymbol{g}})$$,
+which saves a couple of FLOPS, but probably won't matter much in the grand scheme
+of things.
 
 # Finding the (Regularized) Gauss-Newton Step
 
@@ -387,6 +467,7 @@ of the Gauss-Newton step. Instead of using eq. $$\eqref{p-gn}$$ for the Gauss-Ne
 step, we'll use a _regularized_ Gauss-Newton step:
 
 $$\boldsymbol{p}_{gn}(\boldsymbol{x}) = \arg \min_{p} \lVert \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} + f(\boldsymbol{x}) \rVert^2 + \mu \lVert p \rVert^2. \tag{TODO TODO} \label{reg-p-gn}$$
+
 In here, $$\mu$$ 
 
 
@@ -406,4 +487,6 @@ TODO TODO TODO
 [^ellipsoid-tr]: Other shapes are available. One very common case is a spherical trust region, which is just a special case of the ellipsoid. Another common case would be a box-shaped region in hyperspace.
 [^quadratic-model]: You guessed, it: it doesn't _have_ to be quadratic. See e.g. pp 25, 26 in N&W 2<sup>nd</sup> ed. for a demonstration how a linear model leads to a steepest descent algorithm.
 [^lemma-4-2]: See N&W pp. 74, in particular Lemma 4.2 for this. For this lemma to hold, we need the Jacobian $$\boldsymbol{J}$$ to have full rank. We'll later see that we can also use Dogleg in practice for all Jacobians, if we use a _regularized_ Gauss-Newton step, rather than the vanilla step defined in $$\eqref{p-gn}$$.
-[^test-suite]: Were "best" is evaluated against the suite of test problems that I use. This is the famous MGH test suite described by More, Garbow, and Hilstrom in ["Testing Unconstrained Optimization Software"](https://doi.org/10.1145/355934.355936).
+[^test-suite]: Were "best" is evaluated against the suite of test problems that I use. This is the famous MGH test suite described by More, Garbow, and Hilstrom in ["Testing Unconstrained Optimization Software"](https://doithat step additionally..org/10.1145/355934.355936).
+[^ceres-static-scaling]: See [`trust_region_minimizer.cc:265`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/trust_region_minimizer.cc#L265) and following lines in the Ceres Solver source code. From the comments in the Ceres source code we can piece together that the scaling is meant to act roughly as $$\text{diag}(\boldsymbol{H})^{-1}$$, where $$\boldsymbol{H} \approx \boldsymbol{J}^T \boldsymbol{J}$$ is the Hessian of $$f$$. The addition of $$1$$ is there to counteract division by small numbers. It's important to note that Ceres actually defines the scaling matrix as the inverse of the matrix that I gave, but they apply the matrix itself (not its inverse) to the Jacobian from the right hand side. To make their matrix consistent with my notation (where always the inverse of a scaling matrix is applied to the Jacobian from the right), I have to invert the definition. That means the scaling is exactly the same both in this document and in Ceres, I've just chosen notational consistency.
+[^ceres-dynamic-scaling]: See [`dogleg_strategy.cc:117`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L117) and following, as well as [`trust_region_strategy.h:71`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/trust_region_strategy.h#L71). But note the `sqrt` operation in the actual diagonal matrix, which means the actual enforced clamping range is given by the `sqrt` of the values.
