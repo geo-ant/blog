@@ -214,14 +214,18 @@ Note also that this section already specializes Dogleg to least squares problems
 
 The Gauss-Newton step $$\boldsymbol{p}_{gn}$$ is given as the solution to 
 
-$$\boldsymbol{p}_{gn}(\boldsymbol{x}) = \arg \min_{p} \lVert \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} + \boldsymbol{r}(\boldsymbol{x}) \rVert^2, \tag{9} \label{p-gn}$$
+$$\begin{eqnarray}
+\boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p}_{gn} = - \boldsymbol{J}^T(\boldsymbol{x}) \boldsymbol{r}(\boldsymbol{x}) \label{normal-eqs} \tag{9a} \\
+\Leftrightarrow \boldsymbol{p}_{gn}(\boldsymbol{x}) = \arg \min_{p} \lVert \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} + \boldsymbol{r}(\boldsymbol{x}) \rVert^2, \tag{9b} \label{p-gn}
+\end{eqnarray}$$
 
 which is just the least squares solution to the following system of equations
 
-$$\boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} \simeq -\boldsymbol{r}(\boldsymbol{x}). \tag{10}$$
+$$\boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p}_{gn} \simeq -\boldsymbol{r}(\boldsymbol{x}). \tag{10}$$
 
 Note the minus sign on the right hand side. It's possible to solve this system
-using the [normal equations](https://en.wikipedia.org/wiki/Linear_least_squares),
+by directly inverting the
+[normal equations](https://en.wikipedia.org/wiki/Linear_least_squares) $$\eqref{normal-eqs},
 but that becomes numerically unstable quickly. Using matrix decompositions is
 the way to go here and we'll return to this later. For now, let's look at the
 steepest descent step, which is given as: 
@@ -448,29 +452,89 @@ $$\boldsymbol{x}_{k+1} = \boldsymbol{x}_k + \boldsymbol{p}_k$$.
 To obtain $$\widetilde{\boldsymbol{p}}_{sd}$$, we just use modify $$\eqref{p-sd}$$
 with the scaled gradient and Jacobian: 
 
-$$ \widetilde{\boldsymbol{p}}_{sd}(\boldsymbol{x}) = -\frac{\lVert \widetilde{\boldsymbol{g}}(\boldsymbol{x})\rVert^2}{\lVert \widetilde{\boldsymbol{J}}(\boldsymbol{x})\widetilde{\boldsymbol{g}}(\boldsymbol{x})\rVert^2} \widetilde{\boldsymbol{g}}(\boldsymbol{x}), \tag{11} \label{p-sd-scaled}$$
+$$ \widetilde{\boldsymbol{p}}_{sd}(\boldsymbol{x}) = -\frac{\lVert \widetilde{\boldsymbol{g}}(\boldsymbol{x})\rVert^2}{\lVert \widetilde{\boldsymbol{J}}(\boldsymbol{x})\widetilde{\boldsymbol{g}}(\boldsymbol{x})\rVert^2} \widetilde{\boldsymbol{g}}(\boldsymbol{x}), \tag{22} \label{p-sd-scaled}$$
 
 In the next section, I'll explain how calculate the Gauss-Newton step, since
-I wanted to introduce regularization to it as well. Note that we'll never
+I wanted to introduce regularization to it as well. Note, that we'll never
 actually need to form the scaled Jacobian to calculate $$\eqref{p-sd-scaled}$$,
 because we can just rewrite the matrix vector product in the denominator as
 $$\widetilde{\boldsymbol{J}}\widetilde{\boldsymbol{g}} = \boldsymbol{J}(\boldsymbol{D}^{-1} \widetilde{\boldsymbol{g}})$$,
-which saves a couple of FLOPS, but probably won't matter much in the grand scheme
-of things.
+which saves a couple of FLOPS, but probably won't matter that much in the
+grand scheme of things.
 
-# Finding the (Regularized) Gauss-Newton Step
+# Finding the Regularized Gauss-Newton Step
 
-!!! TODO REGULARIZATION AND SCALING
+Instead of using $$\eqref{normal-eqs}$$ to calculate the Gauss-Newton step using
+suitable matrix decompositions, we'll modify the equations to calculate the
+[regularized Gauss-Newton step](https://en.wikipedia.org/wiki/Gauss%E2%80%93Newton_algorithm#Improved_versions)
+for increased stability. None of the sources I know for the Dogleg Algorithm
+mentions this, but Ceres does it to measurably improve the stability of the
+algorithm[^ceres-regularization]. 
 
-I've alluded to the fact that we'll make a minor modification to the calculation
-of the Gauss-Newton step. Instead of using eq. $$\eqref{p-gn}$$ for the Gauss-Newton
-step, we'll use a _regularized_ Gauss-Newton step:
+The regularization is performed in _scaled space_ and the regularized normal
+equations are:
 
-$$\boldsymbol{p}_{gn}(\boldsymbol{x}) = \arg \min_{p} \lVert \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} + f(\boldsymbol{x}) \rVert^2 + \mu \lVert p \rVert^2. \tag{TODO TODO} \label{reg-p-gn}$$
+$$
+(\widetilde{\boldsymbol{J}}^T \widetilde{\boldsymbol{J}} + \mu \boldsymbol{I}) \widetilde{\boldsymbol{p}}_{gn} = - \widetilde{\boldsymbol{J}}^T \boldsymbol{r} \label{normal-eqs-scaled-regularized} \tag{23}, \\
+$$
 
-In here, $$\mu$$ 
+where I've omitted the explicit dependency on $$\boldsymbol{x}$$ for notational
+convenience. Here $$\mu \in \mathbb{R}$$ is a scalar with $$\mu > 0$$ and
+$$\boldsymbol{I} \in \mathbb{R}^{n \times n}$$ the identity matrix.
+Those act as regularization on the approximated Hessian and improve
+its conditioning. By substituting
+$$\widetilde{\boldsymbol{J}} = \boldsymbol{J}\boldsymbol{D}^{-1}$$ and then
+$$\boldsymbol{p}_{gn} = \boldsymbol{D}^{-1}\widetilde{\boldsymbol{p}}_{gn}$$ and
+rewriting a little, we can see that $$\eqref{normal-eqs-scaled-regularized}$$
+is equivalent to solving the following unscaled system:
 
+$$
+(\boldsymbol{J}^T \boldsymbol{J} + \mu \boldsymbol{D}^2) \boldsymbol{p}_{gn} = - \boldsymbol{J}^T \boldsymbol{r} \label{normal-eqs-unscaled-regularized} \tag{24}, \\
+$$
 
+which is also equivalent to the following (augmented) least squares problem:
+
+$$
+\boldsymbol{p}_{gn} =
+\arg\min_{\boldsymbol{p}}
+\left\lVert
+\left(\begin{matrix}
+\boldsymbol{J} \\
+\sqrt{\mu}\boldsymbol{D}
+\end{matrix}\right)
+\boldsymbol{p} -
+\left(\begin{matrix}
+\boldsymbol{-r} \\
+\boldsymbol{0}
+\end{matrix}\right)
+\right\rVert^2
+\label{ceres-augmented-system-regularized}
+\tag{25}
+$$
+
+which is just another way of saying to solve the system
+
+$$
+\left(\begin{matrix}
+\boldsymbol{J} \\
+\sqrt{\mu}\boldsymbol{D}
+\end{matrix}\right)
+\boldsymbol{p} \simeq
+\left(\begin{matrix}
+\boldsymbol{-r} \\
+\boldsymbol{0}
+\end{matrix}\right)
+\tag{26}
+\label{augmented-least-squares-sense}
+$$
+
+in a least squares sense. Ceres uses (for example)
+[QR decomposition](https://en.wikipedia.org/wiki/QR_decomposition) to solve this
+augmented system in a least squares sense[^ceres-regularized-gn]. It's also
+possible to use [singular value decomposition](https://en.wikipedia.org/wiki/Singular_value_decomposition)(SVD)
+to solve the system. That one even allows us to reuse the SVD of $$\boldsymbol{J}$$
+for different $$\mu$$, but is typically not worth its high computational cost
+compared to other solvers.
 
 # TODO SCALING!!!!
 # TODO REGULARIZED GN STEP
@@ -490,3 +554,5 @@ TODO TODO TODO
 [^test-suite]: Were "best" is evaluated against the suite of test problems that I use. This is the famous MGH test suite described by More, Garbow, and Hilstrom in ["Testing Unconstrained Optimization Software"](https://doithat step additionally..org/10.1145/355934.355936).
 [^ceres-static-scaling]: See [`trust_region_minimizer.cc:265`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/trust_region_minimizer.cc#L265) and following lines in the Ceres Solver source code. From the comments in the Ceres source code we can piece together that the scaling is meant to act roughly as $$\text{diag}(\boldsymbol{H})^{-1}$$, where $$\boldsymbol{H} \approx \boldsymbol{J}^T \boldsymbol{J}$$ is the Hessian of $$f$$. The addition of $$1$$ is there to counteract division by small numbers. It's important to note that Ceres actually defines the scaling matrix as the inverse of the matrix that I gave, but they apply the matrix itself (not its inverse) to the Jacobian from the right hand side. To make their matrix consistent with my notation (where always the inverse of a scaling matrix is applied to the Jacobian from the right), I have to invert the definition. That means the scaling is exactly the same both in this document and in Ceres, I've just chosen notational consistency.
 [^ceres-dynamic-scaling]: See [`dogleg_strategy.cc:117`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L117) and following, as well as [`trust_region_strategy.h:71`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/trust_region_strategy.h#L71). But note the `sqrt` operation in the actual diagonal matrix, which means the actual enforced clamping range is given by the `sqrt` of the values.
+[^ceres-regularization]: See [`dogleg_strategy.cc:517`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L517). Again, I can confirm that this measure makes the algorithm perform better on my test suite.
+[^ceres-regularized-gn]: The last two formulations actually show us that this is exactly how ceres solves this system. First the matrix $$\sqrt{mu} \boldsymbol{D}$$ is formed in [`dogleg_strategy.cc:561`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L561) and passed to the solver options of the least squares solver. Then e.g. in the [`dense_qr_solver.cc:48`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dense_qr_solver.cc#L48) we can see that the diagonal is used as described to construct the augmented system before solving this with QR decomposition.
