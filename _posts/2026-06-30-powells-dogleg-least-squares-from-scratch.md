@@ -563,11 +563,96 @@ the optimization is terminated with failure. The value of $$\mu$$ persists
 between iterations, but it is decreased by a factor of $$5$$ every time a
 step is accepted[^ceres-mu-dec].
 
-This scheme is not overly complicated, but it does add some complexity but as I
-said before it _is_ worth it. Luckily, if we're using a solver that _can't fail_,
+This scheme adds a little bit of complexity, but as I said before it _is_
+worth it. Luckily, if we're using a solver that _can't fail_,
 then $$\mu$$ always stays at $$\mu_{min}$$. Examples of linear solvers that can't
-fail are e.g. SVD or column-pivoted QR, the latter of which _is_ an option in
+fail are e.g. SVD[^svd-regularized] or column-pivoted QR, the latter of which _is_ an option in
 Ceres.
+
+# Stopping Criteria
+
+Before putting this all together, there's more thing I completely glossed
+over in Algorithm 1 and that is "while stopping criterion `not` reached". So
+let's talk about stopping criteria, specifically convergence criteria that
+tell us whether we think a solution is good enough or whether we're possibly
+stuck. N&W doesn't define stopping criteria, but Madsen _et al._, the Minpack
+User Guide section 2.3, and (obviously) the Ceres source code. I'll list the criteria
+in different sections and we'll see there's a decent amount of overlap as well.
+
+## Minpack Convergence Criteria
+
+Minpack describes three convergence criteria to try and estimate how far
+our current iterate is away from an optimal solution.
+
+* The **XTOL Criterion** estimates how close we are to a true solution and is
+  stated as
+
+  $$\Delta \leq x_{tol} \cdot \lVert \boldsymbol{Dx} \rVert, \tag{27} \label{minpack-xtol}$$
+
+  where $$x_{tol} \in \mathbb{R}$$ and $$x_{tol} > 0$$. Formally, this criterion
+  _tries_ to guarantee a bound on the distance of the current parameter estimate
+  $$\boldsymbol{x}_k$$ from the true, unknown optimum $$\boldsymbol{x}^\star$$
+  such that $$\lVert \boldsymbol{D}(\boldsymbol{x}_k-\boldsymbol{x}^\star) \rVert \leq x_{tol} \lVert \boldsymbol{Dx}^\star \rVert$$.
+
+* The **FTOL Criterion** tries to bound 
+  $$\lVert f(\boldsymbol{x})\rVert \leq (1+f_{tol}) \cdot \lVert f(\boldsymbol{x}^\star) \rVert$$.
+  Again $$f_{tol} \in \mathbb{R}$$ and $$f_{tol} > 0$$ is a user-supplied tolerance.
+  Since the true optimum is unknown, the test is defined in terms of the
+  normalized _actual reduction_ and the normalized _predicted reduction_ defined
+  as
+
+  $$\begin{eqnarray}
+  \text{ACTRED} &:=& \frac{f(\boldsymbol{x}_{k})- f(\boldsymbol{x}_{k+1})}{f(\boldsymbol{x}_{k})} \\[0.5em]
+  \text{PREDRED} &:=& \frac{ m_k(\boldsymbol{0})- m_k(\boldsymbol{p}_{k})}{ f(\boldsymbol{x}_{k})}. \\
+  \end{eqnarray}$$
+
+  The criterion is considered fulfilled if the following three conditions are met:
+
+  $$\begin{eqnarray}
+  \text{PREDRED} &\leq& f_{tol} \tag{28a} \\\
+  |\text{ACTRED}| &\leq& f_{tol} \tag{28b} \\
+  \text{ACTRED}  &\leq& 2\cdot\text{PREDRED} \tag{28c}
+  \end{eqnarray}$$
+
+  Since this criterion sets attempts to set a relative bound on the residuals
+  compared to their optimum, this won't be hit if $$f(\boldsymbol{x}^\star)=0$$,
+  unless our residuals also vanish. It's therefore useful to supplement this
+  criterion with an absolute check $$f(\boldsymbol{x}_k) < \epsilon_f$$, where
+  $$\epsilon_f$$ is a small tolerance, possibly in the order of machine precision.
+
+* The **GTOL Criterion** tries to estimate if we're at a minimum by checking
+  whether the gradient at the current iterate vanishes. Instead of just
+  comparing the maximum absolute value of the gradient against a threshold,
+  this criterion checks:
+
+  $$ \max_i\left\{ \frac{| \boldsymbol{j}_i^T \; \boldsymbol{r}(\boldsymbol{x}_k)|}{\lVert \boldsymbol{j}_j\rVert \cdot \lVert \boldsymbol{r}(\boldsymbol{x}_k)\rVert}\right\} \leq g_{tol}, \tag{29} \label{minpack-gtol}, $$
+
+  where $$\boldsymbol{j}_i$$ is the $$i$$-th column of the Jacobian evaluated
+  at the current parameters $$\boldsymbol{x}_k$$. Formulating the gradient
+  criterion like this makes the criterion more robust to scaling in $$f$$, but it
+  might not always confer a practical advantage. Again $$g_{tol} > 0$$ is a user
+  supplied real number.
+
+By default, the Minpack implementation sets $$g_{tol} = 0$$ and the user guide
+gives some guidance on the values of $$x_{tol}$$ and $$f_{tol}$$:
+
+> In general, $$x_{tol}$$ and $$f_{tol}$$ should be smaller than $$10^{-5}$$;
+> recommended values for these tolerances are on the order of the square root
+> of the machine precision.
+
+The Minpack implementation actually checks each criterion _twice_. First, it
+performs the checks with the user supplied tolerances. If any of the convergence
+criteria is hit, then the optimizer terminates successfully. Second, it performs
+the checks _again_ but uses machine epsilon instead of the user supplied tolerances.
+If any of those checks hit, then the optimization terminates with failure because
+it's reasonable to assume that no further progress can be made.
+
+The implementation also has another hard stopping criterion that
+!!!!!!!!!!!!!!!!!!
+https://github.com/fortran-lang/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1488
+!!!!!!!!!!!!!!
+!!!!!!! MAX FEV
+
 
 # Appendix A: Finding $$\tau_{dl}$$
 
@@ -588,3 +673,4 @@ TODO TODO TODO
 [^ceres-mu-range]: See [`doglec_strategy.cc:544`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L544) and [`doglec_strategy.cc:632`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L632).
 [^ceres-mu-inc]: See [`dogleg_strategy.cc:63`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L63) and [`dogleg_strategy:533`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L533).
 [^ceres-mu-dec]: See [`doglec_strategy.cc:632`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L632).
+[^svd-regularized]: If you're interested in how to solve the regularized normal equations (in scaled space) with SVD, you can have a look at my code [here](https://github.com/geo-ant/dogleg/blob/ceb440443ad294a78bf3e3edc848bd6ac7f4bca7/dogleg-matx/src/nalgebra_impl.rs#L268).
