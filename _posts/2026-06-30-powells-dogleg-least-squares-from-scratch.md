@@ -25,7 +25,7 @@ crate and I thought I'd document everything you need to implement your own
 dogleg solver from scratch. You probably don't want to do that. But if you
 did, then here's everything you need to know about it.
 
-# Foreword and References
+# 1 Foreword and References
 
 I'll try to do my best to actually go into details around the algorithm and
 implementation details, rather than leaving it at the high-level stuff.
@@ -47,7 +47,7 @@ and the [Modern Minpack source code](https://github.com/fortran-lang/minpack).
 I'll be pretty sloppy with my citations because most of them would just be N&W
 or Madsen _et al_. 
 
-# Trust Region Algorithms
+# 2 Trust Region Algorithms
 
 Let's start from the basics: we'd like to minimize a scalar-valued
 _objective function_ $$f:\mathbb{R}^n \rightarrow \mathbb{R}$$ with respect
@@ -158,7 +158,7 @@ and Madsen for details (but not that many).
 Typically, and in this article, The trust region itself is a multidimensional
 ellipsoid. 
 
-# Least Squares Minimization
+# 3 Least Squares Minimization
 
 For least squares minimization we are concerned with minizing, you guessed
 it, a sum of squares:
@@ -204,7 +204,7 @@ Fascinating, but let's get on with it. Now we have taken to big steps on the
 way to solving least squares problem with the Dogleg algorithm, but we still need
 to know the first thing about the Dogleg algorithm. So let's look into that next.
 
-# Dogleg Basics
+# 4 Dogleg Basics
 
 The basic idea of the dogleg algorithm is to approximate a solution to $$\eqref{pk-def}$$
 by combining two steps: the _Gauss-Newton step_ and the _steepest descent step_.
@@ -313,7 +313,7 @@ from Algorithm 2 and plug this into Algorithm 1 as the step that approximately
 solves $$\eqref{pk-def}$$. However, there are a couple of pesky little details
 that we still have to take care of. 
 
-# Parameter Scaling
+# 5 Parameter Scaling
 
 Parameter scaling is used to address the fact that an objective function can
 be very sensitive to changes in certain parameters, while it's less sensitive
@@ -364,7 +364,7 @@ to translate the step into unscaled coordinates by using
 $$\boldsymbol{p}_k = \boldsymbol{D}^{-1} \widetilde{\boldsymbol{p}}_k$$.
 
 
-## Parameter Scaling in Practice
+## 5.1 Practical Parameter Scaling
 
 Now, let's look at how to actually implement practically useful parameter
 scaling. Madsen _et al._ don't mention scaling at all, while N&W simply state:
@@ -377,7 +377,7 @@ Solver or Minpack. The Minpack User Guide
 and practical insight. However, the best performing scaling I've
 found is implemented in the Ceres Solver[^test-suite].
 
-### Static and Dynamic Scaling
+### 5.1.1 Static and Dynamic Scaling
 
 Curiously, Ceres combines two types of scaling. To be able to talk about these
 two types, we are going to introduce some (non-standard) vocabulary:
@@ -430,7 +430,7 @@ matrix $$\boldsymbol{D}_k$$, where $$k$$ is the index of the current step.
 
 $$\boldsymbol{D}_k = \boldsymbol{D}_s \boldsymbol{D}_d^{(k)} \tag{21} \label{Dk}$$
 
-### Implementing Parameter Scaling
+### 5.1.2 Implementing Parameter Scaling
 
 Don't worry if this has all been a bit confusing so far, we're going to tie it
 together now. At each iteration, we calculate the scaling matrix $$\boldsymbol{D}_k$$
@@ -462,7 +462,7 @@ $$\widetilde{\boldsymbol{J}}\widetilde{\boldsymbol{g}} = \boldsymbol{J}(\boldsym
 which saves a couple of FLOPS, but probably won't matter that much in the
 grand scheme of things.
 
-# Finding the Regularized Gauss-Newton Step
+# 6 Finding the Regularized Gauss-Newton Step
 
 Instead of using $$\eqref{normal-eqs}$$ to calculate the Gauss-Newton step using
 suitable matrix decompositions, we'll modify the equations to calculate the
@@ -549,7 +549,7 @@ it's of course fine to use $$\eqref{normal-eqs-scaled-regularized}$$, but the
 advantage of using the other formulations is that we (like in the previous section)
 can use those without having to ever form the scaled Jacobian explicitly.
 
-## Updating the Regularization Parameter $$\mu$$
+## 6.1 Updating the Regularization Parameter $$\mu$$
 
 To see how to chose the regularization paramter, we'll dig into the Ceres
 source code again. There are two imporant values $$\mu_{min} = 10^{-8}$$
@@ -569,7 +569,7 @@ then $$\mu$$ always stays at $$\mu_{min}$$. Examples of linear solvers that can'
 fail are e.g. SVD[^svd-regularized] or column-pivoted QR, the latter of which _is_ an option in
 Ceres.
 
-# Stopping Criteria
+# 7 Stopping Criteria
 
 Before putting this all together, there's more thing I completely glossed
 over in Algorithm 1 and that is "while stopping criterion `not` reached". So
@@ -579,12 +579,14 @@ stuck. N&W doesn't define stopping criteria, but Madsen _et al._, the Minpack
 User Guide section 2.3, and (obviously) the Ceres source code. I'll list the criteria
 in different sections and we'll see there's a decent amount of overlap as well.
 
-## Minpack Convergence Criteria
+## 7.1 Minpack Stopping Criteria
 
-Minpack describes three convergence criteria to try and estimate how far
-our current iterate is away from an optimal solution.
+I'll label the stopping criteria from Minpack with **MPK-1**, **MPK-2**,... to
+distinguish them from the criteria of other sources. Firstly, Minpack describes three
+convergence criteria to try and estimate how far our current iterate is
+away from an optimal solution.
 
-* The **XTOL Criterion** estimates how close we are to a true solution and is
+* **MPK-1**: The _Xtol Criterion_ estimates how close we are to a true solution and is
   stated as
 
   $$\Delta \leq x_{tol} \cdot \lVert \boldsymbol{Dx} \rVert, \tag{27} \label{minpack-xtol}$$
@@ -594,7 +596,7 @@ our current iterate is away from an optimal solution.
   $$\boldsymbol{x}_k$$ from the true, unknown optimum $$\boldsymbol{x}^\star$$
   such that $$\lVert \boldsymbol{D}(\boldsymbol{x}_k-\boldsymbol{x}^\star) \rVert \leq x_{tol} \lVert \boldsymbol{Dx}^\star \rVert$$.
 
-* The **FTOL Criterion** tries to bound 
+* **MPK-2**: The _Ftol Criterion_ tries to bound 
   $$\lVert f(\boldsymbol{x})\rVert \leq (1+f_{tol}) \cdot \lVert f(\boldsymbol{x}^\star) \rVert$$.
   Again $$f_{tol} \in \mathbb{R}$$ and $$f_{tol} > 0$$ is a user-supplied tolerance.
   Since the true optimum is unknown, the test is defined in terms of the
@@ -620,7 +622,7 @@ our current iterate is away from an optimal solution.
   criterion with an absolute check $$f(\boldsymbol{x}_k) < \epsilon_f$$, where
   $$\epsilon_f$$ is a small tolerance, possibly in the order of machine precision.
 
-* The **GTOL Criterion** tries to estimate if we're at a minimum by checking
+* **MPK-3**: The _Gtol Criterion_ tries to estimate if we're at a minimum by checking
   whether the gradient at the current iterate vanishes. Instead of just
   comparing the maximum absolute value of the gradient against a threshold,
   this criterion checks:
@@ -640,19 +642,112 @@ gives some guidance on the values of $$x_{tol}$$ and $$f_{tol}$$:
 > recommended values for these tolerances are on the order of the square root
 > of the machine precision.
 
-The Minpack implementation actually checks each criterion _twice_. First, it
-performs the checks with the user supplied tolerances. If any of the convergence
+The Minpack implementation actually checks each of the three criteria above _twice_.
+First, it performs the checks with the user supplied tolerances. If any of the convergence
 criteria is hit, then the optimizer terminates successfully. Second, it performs
 the checks _again_ but uses machine epsilon instead of the user supplied tolerances.
 If any of those checks hit, then the optimization terminates with failure because
 it's reasonable to assume that no further progress can be made.
 
-The implementation also has another hard stopping criterion that
-!!!!!!!!!!!!!!!!!!
-https://github.com/fortran-lang/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1488
-!!!!!!!!!!!!!!
-!!!!!!! MAX FEV
+The Minpack implementation actually checks one more hard stopping criterion,
+and that's this one[^minpack-feval]:
 
+* **MPK-4**: The _Max Eval_ criterion makes the algorithm terminate when the number of
+  times the function $$f$$ was evaluated exceeds a certain limit $$N_{feval}$$.
+  At other places in the libraries similar parameters have default values
+  of $$N_{feval} = 100\cdot(n+1)$$ or $$200\cdot (n+1)$$, where $$n$$ is the
+  number of elements in $$\boldsymbol{x}$$, i.e. the number of variables.
+
+The number of function evaluations is highly correlated to the number of
+iterations, but it increases every time that a step is _evaluated_ rather than
+every time a step is actually _accepted_. Since function evaluations may be costly,
+this is a more stringent bound on the limit of computations to perform than
+the number of iterations, where each iteration possibly tests many steps.
+
+## 7.2 Madsen _et al_. Stopping Criteria
+
+To label the stopping criteria in the Madsen, Nielsen, and Tingleff paper I'll
+use the prefix **MNT**. The following four stopping criteria are defined:
+
+* **MNT-1**: The _Max Gradient Element_ criterion terminates the optimization
+  with success under the condition
+
+  $$\lVert \boldsymbol{g} \rVert_{\infty} \leq \epsilon_g,$$
+
+  where $$\boldsymbol{g}$$ is the gradient at the current iterate $$\boldsymbol{x}_k$$
+  and $$\epsilon_g > 0$$ is a real number.
+
+* **MNT-2**: The _Step Norm Criterion_ terminates the optimization with success
+
+  when
+
+  $$\lVert \boldsymbol{p}_{dl} \rVert \leq \epsilon_p \cdot (\lVert \boldsymbol{x_k})
+  \rVert + \epsilon_p),$$
+
+  where $$\boldsymbol{p}_{dl}$$ is the current _unscaled_ Dogleg step and
+  $$\epsilon_p > 0$$ is a real number.
+
+* **MNT-3**: The _Max Residual Criterion_ terminates with success if
+
+  $$\lVert \boldsymbol{r} \rVert_{\infty} \leq \epsilon_r,$$
+
+  where $$\boldsymbol{r}$$ is the residual vector, evaluated at the current
+  iterate $$\boldsymbol{x}_k$$ and $$\epsilon_r > 0$$ a real number.
+
+* **MNT-4** The _Max Iteration Count Criterion_ terminates with failure if
+  the iteration count surpasses a defined limit $$N_{iter}$$:
+
+  $$k > N_{iter}$$
+
+We can already see that there's a lot of conceptual overlap in the stopping
+criteria between Minpack and Madsen _et al._. But there's also a decent
+amount of subtle (and not so subtle) differences. Although the Minpack criteria look
+more sophisticated, my experience is that they don't always perform better in practice.
+
+## 7.3 Ceres' Stopping Criteria
+
+Ceres introduces some new stopping criteria, but also takes a _almost_ all
+from Madsen _et al_. like so:
+
+* **MNT-1** with default _gradient tolerance_ of $$\epsilon_g = 10^{-10}$$
+* **MNT-3** with default _parameter tolerance_ of $$\epsilon_p = 10^{-8}$$ 
+* **MNT-4** with a default iteration limit of $$N_{iter} = 50$$
+
+Additionally, Ceres defines a number of custom stopping criteria, which I'll
+prefix with **CRS**
+
+* **CRS-1**: The _Function Tolerance Criterion_[^ceres-function-tol] is used
+  instead of **MNT-2** and terminates successfully if
+
+  $$|\text{ACTRED}| \leq \epsilon_a,$$
+
+  where $$\text{ACTRED}$$ is defined as in **MPK-2** and $$\epsilon_a = 10^{-6}$$
+  by default.
+
+* **CRS-2**: The _Min Trust Region Radius_[^ceres-min-delta] criterion terminates with success
+  if the trust region radius $$\Delta$$ is below a certain threshold:
+
+  $$\Delta \leq \Delta_{min},$$
+
+  where by default $$\Delta_{min} = 10^{-32}$$.
+
+* **CRS-3**: The _Max Solver Time_[^ceres-max-time] criterion terminates with
+  failure if the total time that the solver took exceeds a limit that
+  defaults to tens of years.
+
+All the criterions above (including the ones used from Madsen _et al_.) make
+the Ceres solver indicate `CONVERGENCE` on success and `NO_CONVERGENCE` on
+failure. However, Ceres also has a distinct hard `FAILURE` mode, which is
+different from `NO_CONVERGENCE`. The following criteria terminate the algorithm
+in a hard failure mode:
+
+* **CRS-4**: Hard failure is triggered if function or Jacobian evaluation fails
+  or if the linear solver cannot find a regularized Gauss-Newton step despite
+  having hit the maximum regularization parameter $$\mu$$.
+
+* **CRS-5**: Hard failure is triggered if too many consecutive steps were
+  rejected[^ceres-consecutive-steps]. By default, the limit is 5 consecutive
+  invalid steps.
 
 # Appendix A: Finding $$\tau_{dl}$$
 
@@ -674,3 +769,8 @@ TODO TODO TODO
 [^ceres-mu-inc]: See [`dogleg_strategy.cc:63`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L63) and [`dogleg_strategy:533`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L533).
 [^ceres-mu-dec]: See [`doglec_strategy.cc:632`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L632).
 [^svd-regularized]: If you're interested in how to solve the regularized normal equations (in scaled space) with SVD, you can have a look at my code [here](https://github.com/geo-ant/dogleg/blob/ceb440443ad294a78bf3e3edc848bd6ac7f4bca7/dogleg-matx/src/nalgebra_impl.rs#L268).
+[^minpack-feval]: The Minpack implementation I'm referring to is actually of the _Levenberg-Marquardt_ algorithm but those criteria are also applicable to Dogleg, see [`minpack.f90:1488`](https://github.com/fortran-lang/minpack/blob/c0b5aea9fcd2b83865af921a7a7e881904f8d3c2/src/minpack.f90#L1488).
+[^ceres-function-tol]: See [`trust_region_minimizer.cc:751`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/trust_region_minimizer.cc#L751).
+[^ceres-min-delta]: See [`trust_region_minimizer.cc:707`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/trust_region_minimizer.cc#L707).
+[^ceres-max-time]: See [`trust_region_minimizer.cc:646`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/trust_region_minimizer.cc#L646).
+[^ceres-consecutive-steps]: See [`trust_region_minimizer.cc:467`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/trust_region_minimizer.cc#L467).
