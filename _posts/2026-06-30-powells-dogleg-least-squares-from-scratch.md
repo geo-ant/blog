@@ -732,8 +732,7 @@ prefix with **CRS**
   where by default $$\Delta_{min} = 10^{-32}$$.
 
 * **CRS-3**: The _Max Solver Time_[^ceres-max-time] criterion terminates with
-  failure if the total time that the solver took exceeds a limit that
-  defaults to tens of years.
+  failure if the total time that the solver took exceeds a given limit[^ceres-time-limit].
 
 All the criterions above (including the ones used from Madsen _et al_.) make
 the Ceres solver indicate `CONVERGENCE` on success and `NO_CONVERGENCE` on
@@ -749,11 +748,37 @@ in a hard failure mode:
   rejected[^ceres-consecutive-steps]. By default, the limit is 5 consecutive
   invalid steps.
 
+## 7.4 Which Stopping Criteria To Use?
+
+For my [`dogleg`](https://crates.io/crates/dogleg) crate I picked a combination
+of the Minpack and the Ceres criteria, which will probably evolve a little
+over time[^dogleg-stopping]. If you had to pick only one set, my recommendation
+would be to just go with the Ceres criteria.
+
+# Putting It Together
+
+I was considering re-stating Algorithm 1 and Algorithm 2 by adding all the gory
+details we discussed. But honestly, not that much changes. We only have to
+make the following additions to Algorithm 1:
+
+* Use the real set of stopping conditions that we decided on in section
+  7.
+* Calculate the diagonal weighting matrix $$\boldsymbol{D}_k$$ for each step
+  as given by $$\eqref{Dk}$$. 
+* Calculate the scaled and regularized step as described in sections 5 and 6.
+  Make sure to unscale the step right before evaluating $$\boldsymbol{x}_{k+1} = \boldsymbol{x}_k +\boldsymbol{p}_k$$.
+
+For Algorithm 2 we don't have to make any adjustments other than making sure
+that we calculate the steepest descent step and the regularized Gauss-Newton
+step in scaled space. Again, the step must only be unscaled once Algorithm 2
+completes.
+
+And that's it. That's all you need to put together your own implementation
+of a high quality least squares minimization algorithm using the Dogleg Algorithm.
+If you're interested in a Rust implementation, please check out my
+open-source [`dogleg`](https://crates.io/crates/dogleg) crate.
+
 # Appendix A: Finding $$\tau_{dl}$$
-
-TODO TODO TODO
-
-# Appendix B: Singular Value Decomposition for Finding $$\boldsymbol{p}_{gn}$$
 
 [^local-min]: Convergence guarantees of solver methods are their own beast that I won't touch at all in this article. Everyone that has ever worked with optimization algorithms knows that finding global optima is often a pipe dream and even finding a local optimum can be highly sensitive to starting conditions, implementation details, condition numbers, birthdates, star signs, etc etc...
 [^ellipsoid-tr]: Other shapes are available. One very common case is a spherical trust region, which is just a special case of the ellipsoid. Another common case would be a box-shaped region in hyperspace.
@@ -774,3 +799,5 @@ TODO TODO TODO
 [^ceres-min-delta]: See [`trust_region_minimizer.cc:707`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/trust_region_minimizer.cc#L707).
 [^ceres-max-time]: See [`trust_region_minimizer.cc:646`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/trust_region_minimizer.cc#L646).
 [^ceres-consecutive-steps]: See [`trust_region_minimizer.cc:467`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/trust_region_minimizer.cc#L467).
+[^dogleg-stopping]: See the `Dogleg::minimize_generic` function in [`dogleg.rs`](https://github.com/geo-ant/dogleg/blob/main/dogleg/src/dogleg.rs).
+[^ceres-time-limit]: As of the time of writing, that time limit defaults to a time period of more than 30 years, which is basically unlimited for all intents and purposes...
