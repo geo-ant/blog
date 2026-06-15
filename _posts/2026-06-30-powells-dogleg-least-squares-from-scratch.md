@@ -32,7 +32,7 @@ implementation details, rather than leaving it at the high-level stuff.
 However, since this will be a long article, I'll need to focus on Dogleg
 specifically and I can only touch on adjacent topics. Additionally, I will
 focus on the topic of _unconstrained least squares minimization_. Dogleg itself is a general
-purpose minimization minimization algorithm and not restricted to least squares.
+purpose minimization algorithm and not restricted to least squares.
 However, when applied to this important subproblem, we can exploit the structure
 of the problem in such a way that we can gain some dramatic increases in robustness.
 
@@ -76,7 +76,7 @@ m_k(\boldsymbol{p}) &:=& f_k + \boldsymbol{g}_k^T \boldsymbol{p} + \frac{1}{2} \
 \boldsymbol{g}_k &:=& \nabla f(\boldsymbol{x}_k) \in \mathbb{R}^n, \tag{2b} \label{g-def}
 \end{eqnarray}$$
 
-where $$\boldsymbol{g}_k$$ is the gradient of $$f$$ and $$\boldsymbol{B} \in \mathbb{R}^{n x n}$$
+where $$\boldsymbol{g}_k$$ is the gradient of $$f$$ and $$\boldsymbol{B} \in \mathbb{R}^{n \times n}$$
 is a symmetric matrix that's either the [Hessian](https://en.wikipedia.org/wiki/Hessian_matrix)
 of $$f$$ or an approximation of it. We'll come back to this again later and make
 this more concrete for the least squares case, but let's continue with
@@ -85,7 +85,7 @@ $$k$$ of the algorithm we try to find a _candidate step_ $$\boldsymbol{p}_k \in 
 our current model $$m_k$$ _inside_ the trust region. Formally:
 
 $$
-\boldsymbol{p}_k = \arg \min_{\boldsymbol{p}} m_k(\boldsymbol{x}_k + \boldsymbol{p}) \text{ , s.t. } \lVert \boldsymbol{p} \rVert \leq \Delta \tag{3} \label{pk-def} 
+\boldsymbol{p}_k = \arg \min_{\boldsymbol{p}} m_k(\boldsymbol{p}) \text{ , s.t. } \lVert \boldsymbol{p} \rVert \leq \Delta \tag{3} \label{pk-def} 
 $$
 
 where the _trust region radius_ $$\Delta \in \mathbb{R}$$ and $$\lVert . \rVert$$ is the
@@ -99,7 +99,7 @@ I promise I'll get back to that, but let's proceed without scaling for now.
 I've called $$\boldsymbol{p}_k$$ a candidate step, because it's not automatically
 accepted. In the following, we'll introduce a value $$\rho_k \in \mathbb{R}$$
 to serve both as an acceptance criterion for the step and as a decision
-criterion when to enlarge or shrink the trust region. Its defined as the
+criterion when to enlarge or shrink the trust region. It's defined as the
 ratio of the _actual reduction_ over the _predicted reduction_:
 
 $$\rho_k = \frac{f(\boldsymbol{x}_k) - f(\boldsymbol{x}_k+\boldsymbol{p}_k)}{m_k(\boldsymbol{0})-m_k(\boldsymbol{p}_k)} \tag {4} \label{rho-k}.$$
@@ -134,12 +134,12 @@ trust region radius as is. All of this is summarized in the following algorithm.
   - Calculate $$\rho_k$$ using $$\eqref{rho-k}$$.
   - `if` $$\rho_k > \frac{3}{4}$$ then 
     - let $$\Delta_{k+1} = \max(\Delta_k,3 \cdot \lVert \boldsymbol{p}_k \rVert)$$
-  - `else if` $$\rho < \frac{1}{4}$$
+  - `else if` $$\rho_k < \frac{1}{4}$$
     - let $$\Delta_{k+1} = \Delta_k/2$$
   - `else`
     - let $$\Delta_{k+1} = \Delta_k$$
   - `end if`
-  - `if` $$\rho > \rho_\min$$
+  - `if` $$\rho_k > \rho_\min$$
     - let $$\boldsymbol{x}_{k+1} = \boldsymbol{x}_k + \boldsymbol{p}_k$$
   - `else`
     - let $$\boldsymbol{x}_{k+1} = \boldsymbol{x}_k$$
@@ -163,7 +163,7 @@ ellipsoid.
 For least squares minimization we are concerned with minizing, you guessed
 it, a sum of squares:
 
-$$f(\boldsymbol{x}) = \frac{1}{2}\sum_{i=1}^{m} r_i(\boldsymbol{x})^2 = \lVert \boldsymbol{r}(\boldsymbol{x})\rVert^2 \tag{5} \label{f-lsqr},$$
+$$f(\boldsymbol{x}) = \frac{1}{2}\sum_{i=1}^{m} r_i(\boldsymbol{x})^2 = \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x})\rVert^2 \tag{5} \label{f-lsqr},$$
 
 where $$\boldsymbol{r}(\boldsymbol{x}) = (r_1(\boldsymbol{x}),\dots, r_m(\boldsymbol{x})) \in \mathbb{R}^m$$ is called the _residual vector_
 or the vector of residuals. It turns out (cf. N&W p. 245-247), that we can write
@@ -182,13 +182,12 @@ and now we can write the gradient and Hessian of $$f$$ as
 
 $$\begin{eqnarray}
 \nabla f(\boldsymbol{x}) &=:& \boldsymbol{g}(\boldsymbol{x}) = \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{r} \tag{7a} \label{grad-f} \\
-\nabla^2 f(\boldsymbol{x}) &=& \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) + \sum_{i=1}^{m} r_i(\boldsymbol{x})^T \nabla^2 r_i(\boldsymbol{x}) \approx \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) \tag{7b} \label{hessian-f}.
+\nabla^2 f(\boldsymbol{x}) &=& \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) + \sum_{i=1}^{m} r_i(\boldsymbol{x}) \nabla^2 r_i(\boldsymbol{x}) \approx \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) \tag{7b} \label{hessian-f}.
 \end{eqnarray}$$
 
 The approximation $$\boldsymbol{B} \approx \boldsymbol{J}^T \boldsymbol{J}$$ is
 typically used for the Hessian of $$f$$ and we'll plug the results above into
 eq. $$\eqref{mk-def}$$:
-
 
 $$\begin{eqnarray}
 m_k(\boldsymbol{p}) &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}) \rVert^2 + \boldsymbol{r}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x})\boldsymbol{p} + \frac{1}{2} (\boldsymbol{J}(\boldsymbol{x})\boldsymbol{p})^T \boldsymbol{J}(\boldsymbol{x})\boldsymbol{p} \tag{8a} \label{mk-lsqr1} \\
@@ -200,7 +199,7 @@ since $$m_k(\boldsymbol{p})$$ is meant to approximate
 $$f(\boldsymbol{x}+\boldsymbol{p}) = \frac{1}{2}\lVert \boldsymbol{r}(\boldsymbol{x}+\boldsymbol{p})\rVert^2$$,
 we can see that what we did so far actually implies a linear approximation of the
 residuals $$\boldsymbol{r}(\boldsymbol{x}+\boldsymbol{p}) \approx \boldsymbol{r}(\boldsymbol{x}) + \boldsymbol{J}(\boldsymbol{x})\boldsymbol{p}$$.
-Fascinating, but let's get on with it. Now we have taken to big steps on the
+Fascinating, but let's get on with it. Now we have taken two big steps on the
 way to solving least squares problem with the Dogleg algorithm, but we still need
 to know the first thing about the Dogleg algorithm. So let's look into that next.
 
@@ -238,7 +237,7 @@ is parametrized using a $$\tau \in [0,2]$$ like so:
 
 $$\boldsymbol{p}(\tau) = \left\{
 \begin{array}{ll} \tau \, \boldsymbol{p}_{sd}, & \tau \in [0,1] \\
-\boldsymbol{p}_{sd} + (1-\tau) (\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}), & \tau \in (1,2] . \\
+\boldsymbol{p}_{sd} + (\tau-1) (\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}), & \tau \in (1,2] . \\
 \end{array}
 \right. \tag{12} \label{dogleg-path}$$
 
@@ -259,10 +258,10 @@ in golf. This figure is heavily inspired by N&W figure 4.4, p. 74.
  </figcaption>
 </figure>
 
-It can be shown that $$\lVert m_k(\boldsymbol{p}(\tau)) \rVert$$ will decrease
+It can be shown that $$m_k(\boldsymbol{p}(\tau))$$ will decrease
 along the dogleg path and that the path will have at most _one_ intersection
 with the trust region boundary[^lemma-4-2]. To take the biggest possible step that's
-still inside the trust region, we can chose the _dogleg step_ $$\boldsymbol{p}_{dl}$$
+still inside the trust region, we can choose the _dogleg step_ $$\boldsymbol{p}_{dl}$$
 as the point on the dogleg path where it intersects the trust region boundary.
 Otherwise the dogleg step goes to the end of the path, which is just the
 Gauss-Newton step. So the algorithm for choosing the Dogleg step is:
@@ -272,7 +271,7 @@ Gauss-Newton step. So the algorithm for choosing the Dogleg step is:
 **Algorithm 2** (Classic Dogleg Step)
 - **Given**: Jacobian $$\boldsymbol{J}$$, gradient $$\boldsymbol{g}$$, residuals $$\boldsymbol{r}$$
 - Calculate $$\boldsymbol{p}_{sd}$$ as in eq. $$\eqref{p-sd}$$
-- `if` $$\lVert \boldsymbol{p}_{sd} \rVert \leq \Delta$$
+- `if` $$\lVert \boldsymbol{p}_{sd} \rVert \geq \Delta$$
   - return $$\boldsymbol{p}_{dl} = \Delta \; \boldsymbol{p}_{sd} / \lVert \boldsymbol{p}_{sd}\rVert$$
 - `end if`
 - Calculate $$\boldsymbol{p}_{gn}$$ as in eq. $$\eqref{p-gn}$$
@@ -296,7 +295,7 @@ realize that we are now in the $$\tau \in [1,2)$$ path segment. That means
 the condition $$\lVert \boldsymbol{p}(\tau_{dl}) \rVert = \Delta$$ is now
 equivalent to the quadratic equation
 
-$$\lVert \boldsymbol{p}_{sd} + (1-\tau_{dl}) (\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}) \rVert = \Delta^2. \tag {13}$$
+$$\lVert \boldsymbol{p}_{sd} + (\tau_{dl}-1) (\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}) \rVert^2 = \Delta^2. \tag{13}$$
 
 It can be shown that the solution to this equation can always be written as follows
 (see Appendix A):
@@ -356,7 +355,7 @@ $$\begin{eqnarray}
 
 where we call $$\boldsymbol{\widetilde{g}}$$ the _scaled_ gradient and
 $$\boldsymbol{\widetilde{J}}$$ the _scaled_ Jacobian. The neat thing is that,
-at each iteration, we can just calculate the _scaled_ dogled step using the
+at each iteration, we can just calculate the _scaled_ dogleg step using the
 same math as above as long as we consistently use the scaled Jacobian and
 gradient for the calculations. Only to calculate the next evaluation point
 $$\boldsymbol{x}_{k+1} = \boldsymbol{x}_k + \boldsymbol{p}_k$$, do we have
@@ -388,7 +387,7 @@ matrices act on the Jacobian (among other things), and they are calculated based
 on the Jacobian (though slightly differently).
 
 The matrix $$\boldsymbol{D}_s$$is calculated _once_ in the first iteration and
-stays the same for the whole runtime of the algorithm. It's intent
+stays the same for the whole runtime of the algorithm. Its intent
 is to _"improve the conditioning of the Jacobian"_[^ceres-static-scaling]:
 
 $$\begin{eqnarray}
@@ -414,14 +413,14 @@ $$\begin{eqnarray}
   d_{d,i}^{(k)} &=& \max(\min(d_{max}, |\boldsymbol{j}_i^{(k)}|),d_{min}), \tag{20b} \\
 \end{eqnarray}$$
 
-where $$\boldsymbol{j}_j^{(k)}$$ agian denotes the $$i$$-th column of the Jacobian,
+where $$\boldsymbol{j}_i^{(k)}$$ again denotes the $$i$$-th column of the Jacobian,
 this time evaluated at the current step with index $$k$$. The diagonal elements
 are just the column-norms of the Jacobian clamped to a the range $$[d_{min}, d_{max}]$$,
 where the default values for the endpoints of the range in Ceres are:
 
 $$\begin{eqnarray}
 d_{min} &=& 10^{-3} \\
-d_{max} &=& 10^{-16} \\
+d_{max} &=& 10^{16} \\
 \end{eqnarray}$$
 
 
@@ -571,7 +570,7 @@ Ceres.
 
 # 7 Stopping Criteria
 
-Before putting this all together, there's more thing I completely glossed
+Before putting this all together, there's one more thing I completely glossed
 over in Algorithm 1 and that is "while stopping criterion `not` reached". So
 let's talk about stopping criteria, specifically convergence criteria that
 tell us whether we think a solution is good enough or whether we're possibly
@@ -627,7 +626,7 @@ away from an optimal solution.
   comparing the maximum absolute value of the gradient against a threshold,
   this criterion checks:
 
-  $$ \max_i\left\{ \frac{| \boldsymbol{j}_i^T \; \boldsymbol{r}(\boldsymbol{x}_k)|}{\lVert \boldsymbol{j}_j\rVert \cdot \lVert \boldsymbol{r}(\boldsymbol{x}_k)\rVert}\right\} \leq g_{tol}, \tag{29} \label{minpack-gtol}, $$
+  $$ \max_i\left\{ \frac{| \boldsymbol{j}_i^T \; \boldsymbol{r}(\boldsymbol{x}_k)|}{\lVert \boldsymbol{j}_i\rVert \cdot \lVert \boldsymbol{r}(\boldsymbol{x}_k)\rVert}\right\} \leq g_{tol}, \tag{29} \label{minpack-gtol}, $$
 
   where $$\boldsymbol{j}_i$$ is the $$i$$-th column of the Jacobian evaluated
   at the current parameters $$\boldsymbol{x}_k$$. Formulating the gradient
@@ -706,18 +705,18 @@ more sophisticated, my experience is that they don't always perform better in pr
 
 ## 7.3 Ceres' Stopping Criteria
 
-Ceres introduces some new stopping criteria, but also takes a _almost_ all
+Ceres introduces some new stopping criteria, but also takes _almost_ all the ones
 from Madsen _et al_. like so:
 
 * **MNT-1** with default _gradient tolerance_ of $$\epsilon_g = 10^{-10}$$
-* **MNT-3** with default _parameter tolerance_ of $$\epsilon_p = 10^{-8}$$ 
+* **MNT-2** with default _parameter tolerance_ of $$\epsilon_p = 10^{-8}$$ 
 * **MNT-4** with a default iteration limit of $$N_{iter} = 50$$
 
 Additionally, Ceres defines a number of custom stopping criteria, which I'll
 prefix with **CRS**
 
 * **CRS-1**: The _Function Tolerance Criterion_[^ceres-function-tol] is used
-  instead of **MNT-2** and terminates successfully if
+  instead of **MNT-3** and terminates successfully if
 
   $$|\text{ACTRED}| \leq \epsilon_a,$$
 
@@ -755,7 +754,7 @@ of the Minpack and the Ceres criteria, which will probably evolve a little
 over time[^dogleg-stopping]. If you had to pick only one set, my recommendation
 would be to just go with the Ceres criteria.
 
-# Putting It Together
+# 8 Putting It Together
 
 I was considering re-stating Algorithm 1 and Algorithm 2 by adding all the gory
 details we discussed. But honestly, not that much changes. We only have to
@@ -784,7 +783,7 @@ open-source [`dogleg`](https://crates.io/crates/dogleg) crate.
 [^ellipsoid-tr]: Other shapes are available. One very common case is a spherical trust region, which is just a special case of the ellipsoid. Another common case would be a box-shaped region in hyperspace.
 [^quadratic-model]: You guessed, it: it doesn't _have_ to be quadratic. See e.g. pp 25, 26 in N&W 2<sup>nd</sup> ed. for a demonstration how a linear model leads to a steepest descent algorithm.
 [^lemma-4-2]: See N&W pp. 74, in particular Lemma 4.2 for this. For this lemma to hold, we need the Jacobian $$\boldsymbol{J}$$ to have full rank. We'll later see that we can also use Dogleg in practice for all Jacobians, if we use a _regularized_ Gauss-Newton step, rather than the vanilla step defined in $$\eqref{p-gn}$$.
-[^test-suite]: Were "best" is evaluated against the suite of test problems that I use. This is the famous MGH test suite described by More, Garbow, and Hilstrom in ["Testing Unconstrained Optimization Software"](https://doithat step additionally..org/10.1145/355934.355936).
+[^test-suite]: Where "best" is evaluated against the suite of test problems that I use. This is the famous MGH test suite described by More, Garbow, and Hilstrom in ["Testing Unconstrained Optimization Software"](https://doi.org/10.1145/355934.355936).
 [^ceres-static-scaling]: See [`trust_region_minimizer.cc:265`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/trust_region_minimizer.cc#L265) and following lines in the Ceres Solver source code. From the comments in the Ceres source code we can piece together that the scaling is meant to act roughly as $$\text{diag}(\boldsymbol{H})^{-1}$$, where $$\boldsymbol{H} \approx \boldsymbol{J}^T \boldsymbol{J}$$ is the Hessian of $$f$$. The addition of $$1$$ is there to counteract division by small numbers. It's important to note that Ceres actually defines the scaling matrix as the inverse of the matrix that I gave, but they apply the matrix itself (not its inverse) to the Jacobian from the right hand side. To make their matrix consistent with my notation (where always the inverse of a scaling matrix is applied to the Jacobian from the right), I have to invert the definition. That means the scaling is exactly the same both in this document and in Ceres, I've just chosen notational consistency.
 [^ceres-dynamic-scaling]: See [`dogleg_strategy.cc:117`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L117) and following, as well as [`trust_region_strategy.h:71`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/trust_region_strategy.h#L71). But note the `sqrt` operation in the actual diagonal matrix, which means the actual enforced clamping range is given by the `sqrt` of the values.
 [^ceres-regularization]: See [`dogleg_strategy.cc:517`](https://github.com/ceres-solver/ceres-solver/blob/0ba987acaf9e8674070f116ed624edf017d2b630/internal/ceres/dogleg_strategy.cc#L517). Again, I can confirm that this measure makes the algorithm perform better on my test suite.
