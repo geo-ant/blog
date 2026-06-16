@@ -1,0 +1,127 @@
+// ---------------------------------------------------------------------------
+// Footnote reference links (the superscript number in body text)
+// ---------------------------------------------------------------------------
+
+sup .footnote {
+  cursor: pointer;
+  text-decoration: none;
+  color: $blue;
+
+  &:hover,
+  &:focus {
+    text-decoration: underline;
+  }
+
+  // Expand the tap target on touch screens without affecting layout.
+  // The negative margin cancels out the added padding so surrounding text
+  // doesn't shift.
+  @include mobile {
+    padding: 0.6em 0.35em;
+    margin: -0.6em -0.35em;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Hide the bottom footnotes list when JS has taken over rendering
+// ---------------------------------------------------------------------------
+
+body.js-footnotes .footnotes {
+  display: none;
+}
+
+// ---------------------------------------------------------------------------
+// Inline footnote popover box
+// ---------------------------------------------------------------------------
+
+.footnote-popover {
+  display: block;
+  position: relative;
+  box-sizing: border-box;
+
+  // Light-mode tint (default)
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--foreground-color);
+
+  border-left: 3px solid $blue;
+  border-radius: 4px;
+  padding: 0.75em 2.5em 0.75em 1.25em; // right padding keeps text clear of ✕ button
+  margin: 0.75em 0;
+  font-size: 0.875em;
+  line-height: 1.5;
+
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+
+  // Dark-mode tint
+  @media (prefers-color-scheme: dark) {
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  }
+
+  // ── Close button ──────────────────────────────────────────────────────────
+  .footnote-popover-close {
+    position: absolute;
+    top: 0.4em;
+    right: 0.6em;
+
+    // 44px minimum touch target (Apple HIG / WCAG 2.5.5)
+    padding: 0.4em 0.5em;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    line-height: 1;
+    color: var(--muted-color);
+    transition: color 0.15s;
+
+    &:hover,
+    &:focus {
+      color: var(--foreground-color);
+      outline: none;
+    }
+  }
+
+  // ── Links inside the popover ──────────────────────────────────────────────
+  a {
+    color: $blue;
+    text-decoration: underline;
+
+    &:hover {
+      color: $darkRed;
+    }
+  }
+
+  // ── Code inside the popover ───────────────────────────────────────────────
+  code {
+    background: var(--code-background);
+    font-family: $Monospace;
+    font-size: 0.9em;
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+  }
+
+  pre {
+    background: var(--code-background);
+    padding: 0.75em 1em;
+    border-radius: 4px;
+    overflow-x: auto;
+
+    code {
+      background: none;
+      padding: 0;
+      font-size: inherit;
+    }
+  }
+
+  // ── Typography cleanup ────────────────────────────────────────────────────
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  p:first-child {
+    margin-top: 0;
+  }
+}
