@@ -2,7 +2,7 @@
 layout: post
 tags: math numerics least-squares
 #categories: []
-date: 2026-06-30
+date: 2026-06-26
 last_updated:
 #excerpt: ''
 #image:
@@ -12,7 +12,7 @@ title: "Powell's Dogleg for Least Squares Minimization from Scratch"
 #
 #
 # Make sure this image is correct !!!
-og_image: 
+og_image: dogleg-from-scratch.png
 #
 #
 # make sure comments are enabled
