@@ -21,10 +21,9 @@ math: true
 ---
 
 I've recently released the Rust [`dogleg`](https://docs.rs/dogleg/latest/dogleg/)
-crate and I thought I'd document everything you need to implement your own
-dogleg solver from scratch. You probably don't want to do that. But if you
-did, then here's everything you need to know about it.
-
+crate and I thought I'd document everything that's needed to implement a least-squares
+Dogleg optimizer from scratch. You probably don't want to do that, but _if you
+did_, then here's everything you need to know.
 # 1 Foreword and References
 
 I'll try to do my best to actually go into details around the algorithm and
@@ -183,7 +182,9 @@ and now we can write the gradient and Hessian of $$f$$ as
 
 $$\begin{eqnarray}
 \nabla f(\boldsymbol{x}) &=:& \boldsymbol{g}(\boldsymbol{x}) = \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{r} \tag{7a} \label{grad-f} \\
-\nabla^2 f(\boldsymbol{x}) &=& \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) + \sum_{i=1}^{m} r_i(\boldsymbol{x}) \nabla^2 r_i(\boldsymbol{x}) \approx \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) \tag{7b} \label{hessian-f}.
+\nabla^2 f(\boldsymbol{x}) &=& \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) \\
+&+& \sum_{i=1}^{m} r_i(\boldsymbol{x}) \nabla^2 r_i(\boldsymbol{x}) \\
+&\approx& \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) \tag{7b} \label{hessian-f}.
 \end{eqnarray}$$
 
 The approximation $$\boldsymbol{B} \approx \boldsymbol{J}^T \boldsymbol{J}$$ is
@@ -191,7 +192,8 @@ typically used for the Hessian of $$f$$ and we'll plug the results above into
 eq. $$\eqref{mk-def}$$:
 
 $$\begin{eqnarray}
-m_k(\boldsymbol{p}) &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}_k) \rVert^2 + \boldsymbol{r}(\boldsymbol{x}_k)^T \boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p} + \frac{1}{2} (\boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p})^T \boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p} \tag{8a} \label{mk-lsqr1} \\
+m_k(\boldsymbol{p}) &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}_k) \rVert^2 + \boldsymbol{r}(\boldsymbol{x}_k)^T \boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p} \\
+&+& \frac{1}{2} (\boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p})^T \boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p} \tag{8a} \label{mk-lsqr1} \\
  &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}_k) + \boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p} \rVert^2 \tag{8b} \label{mk-lsqr2}.
 \end{eqnarray}$$
 
@@ -328,7 +330,8 @@ Elliptical trust regions are defined by
 
 $$\begin{eqnarray}
 \lVert \boldsymbol{D} \boldsymbol{p} \rVert &\leq& \Delta, \tag{15a} \label{elliptical-tr} \\
-\boldsymbol{D} &:=& \text{diag}(d_1,\dots,d_n) \in \mathbb{R}^{n \times n},\; d_j > 0 \tag{15b} \label{d-def}
+\boldsymbol{D} &:=& \text{diag}(d_1,\dots,d_n) \in \mathbb{R}^{n \times n},\; \tag{15b} \label{d-def} \\
+d_j &>& 0 
 \end{eqnarray}$$
 
 where $$\boldsymbol{D}$$ is an invertible diagonal matrix. Now the optimization problem
@@ -348,7 +351,8 @@ minimization problem with spherical bounds in the scaled step coordinates:
 
 $$\begin{eqnarray}
 \boldsymbol{\widetilde{p}}_k &=& \arg \min_{\boldsymbol{\widetilde{p}}} \widetilde{m}_k(\boldsymbol{\widetilde{p}}) \text{ , s.t. } \lVert \boldsymbol{\widetilde{p}} \rVert \leq \Delta \tag{18a} \label{mk-scaled}, \\
-\widetilde{m}_k(\boldsymbol{\widetilde{p}}) &:=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}) \rVert^2 + \boldsymbol{\widetilde{g}}(\boldsymbol{x})^T \boldsymbol{\widetilde{p}} + \frac{1}{2} (\boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}})^T \boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}} \tag{18b} \label{mk-scaled-1} \\
+\widetilde{m}_k(\boldsymbol{\widetilde{p}}) &:=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}) \rVert^2 + \boldsymbol{\widetilde{g}}(\boldsymbol{x})^T \boldsymbol{\widetilde{p}} \\
+ &+& \frac{1}{2} (\boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}})^T \boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}} \tag{18b} \label{mk-scaled-1} \\
  &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}) + \boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}} \rVert^2 \tag{18c} \label{mk-scaled2} \\
 \boldsymbol{\widetilde{J}}(\boldsymbol{x}) &:=& \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{D}^{-1}  \tag{18d} \label{j-scaled} \\
 \boldsymbol{\widetilde{g}}(\boldsymbol{x}) &:=& \boldsymbol{D}^{-1} \boldsymbol{g}(\boldsymbol{x}) = \boldsymbol{\widetilde{J}}(\boldsymbol{x})^T \boldsymbol{r}(\boldsymbol{x})   \tag{18e} \label{g-scaled},
