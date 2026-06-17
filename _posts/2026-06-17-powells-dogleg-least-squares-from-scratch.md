@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: math numerics least-squares
-date: 2026-06-30
+date: 2026-06-17
 last_updated:
 title: "Powell's Dogleg for Least Squares Minimization from Scratch"
 # Make sure image is correct!
