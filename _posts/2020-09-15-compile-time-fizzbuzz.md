@@ -178,7 +178,6 @@ That's it. A FizzBuzz implementation at compile time with expandable rules and a
 
 You can find the code in my [GitHub repository](https://github.com/geo-ant/CompileTimeKatas).
 
-# Endnotes
 [^optional]: If I had wanted to be more in line with Functional Programming idioms (or Rust) I could have made the return type an `std::optional`. I decided against it, because any string type has a reasonably good representation for a `null` or `None` value. It's just the empty string `""`.
 [^rules_alternatives]: An alternative idiom is to implement a constexpr call operator with the same functionality. The result would then be invoked by default constructing a value of that type and using it's call operator, e.g. `buzz_rule_t<5>()()`.
 [^diff_types]: Yes, `StrLit<0>` and `StrLit<N>` are different types! Do not be fooled that they are based on the same class template.

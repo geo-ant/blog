@@ -87,6 +87,5 @@ Note that this is a template class and not a class with a templated call operato
 
 And this is how we can translate the ternary operator with two branches. However, the expression only gets useful once the `ElseIf` case is also allowed. We will look into that in the next article, where we will also discuss some improvements.
 
-# Endnotes
 [^rust_void]: It can also return `()`, which is the Rust equivalent of a `void` value.
 [^cpp_uninitialized]: I have deliberately left out another option: We could try and declare a pointer to the variable without initializing it (or we could default initialize variable itself) and then (re)assign to it afterwards in an `if` statement. This, for many reasons, is a very bad solution and I will discount it completely here.

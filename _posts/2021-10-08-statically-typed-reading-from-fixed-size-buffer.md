@@ -114,7 +114,6 @@ So this is it. A safer way of reinterpreting elements from a buffer that provide
 
 Feel free to check out the code in [this github repo](https://github.com/geo-ant/MetaProgrammingShenanigans/).
 
-# Endnotes
 
 [^cpptmp]: From C++11 onwards, the increasing power of `constexpr`, `consteval`, and other language facilities made imperative metaprogramming easier in C++. Still, metaprogramming in C++ is not imperative. If you are interested in imperative C++ metaprogramming (and so much more), check out Sean Baxters [Circle](https://www.circle-lang.org/) language.
 [^packing]: For further reference see e.g. [this post on packing structures](https://www.joshcaratelli.com/blog/struct-packing), this discussion on [struct memory layout](http://www.cplusplus.com/forum/general/19661/), or this one [on Stackoverflow](https://stackoverflow.com/questions/7793820/struct-members-memory-layout).

@@ -309,7 +309,6 @@ BIT 15, 49–57 (1975). [DOI link](https://doi.org/10.1007/BF01932995)
 and Nonlinear Least Squares Problems Whose Variables Separate".
 SIAM J. Numer. Anal. **1973, 10, 413–432**. [DOI link](https://doi.org/10.1137/0710036)
 
-# Endnotes
 
 [^fitting]: VarPro isn't strictly for function fitting only, since it's a way of rewriting _separable_ nonlinear least squares minimization problems. It's just widely employed for model fitting, which is also what I am using it for.
 [^kaufmann-qr]: Note that Kaufman uses slightly different --but equivalent-- convention for the QR decomposition than this article and (Bae23). This must be taken into account when comparing the equations across publications. Specifically, Kaufman gives the decomposition as $$Q\Phi P = R$$, whereas (Bae23) and I use the more common $$\Phi P = QR$$ convention. That's not a big deal. It just means, that for Kaufman $$Q$$ means $$Q^T$$ in this article and vice versa.

@@ -351,7 +351,6 @@ Statistical Science, 16(2) 101-133 May 2001. [link](https://doi.org/10.1214/ss/1
 Statistics, 8(1) 817-840 2014. [link](https://doi.org/10.1214/14-EJS909)
 
 
-## Endnotes
 
 [^sample-overest]: This might or might not be a problem in practice. If we are dealing with _in silico_ simulations, then increasing the number of samples might be reasonably cheap. If we have to e.g. recruit patients for a study, this can become a problem.
 [^conservative]: Again, do keep in mind that Brown _et al._ characterize the bounds as "wastefully conservative".

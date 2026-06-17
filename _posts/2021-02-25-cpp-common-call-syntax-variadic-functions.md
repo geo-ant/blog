@@ -196,7 +196,6 @@ So we can call our evaluate function with an `int` template argument although ou
 # Conclusion
 What a ride this has been. Kudos to whoever made it this far. We have seen that we can produce a very similar interface for calling and passing functions with different argument lengths in C++ and Rust. And while the under the hood implementation for C++17 and below does get somewhat hairy, we *were* able to do it. And at the end of the day, if the API is simple then it does not really matter that the underlying implementation is hard and complex.
 
-# Endnotes
 [^losing_genericity]: At least not if I want some amount of generality (and templates) left in my code.
 [^traits_concepts]: C++20 concepts are only superficially equivalent to Rust traits in the sense that they allow us to restrict generic functions to certain classes of types. However, Rust traits are much more powerful in assisting with type inference.
 [^invocable_return]: Note that the `std::invocable` concept does not restrict the return type. There's other ways of doing that in C++, but we'll not bother with this for now.

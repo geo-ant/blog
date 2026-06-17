@@ -166,6 +166,5 @@ You can [try for yourself](https://play.rust-lang.org/?version=stable&mode=debug
 # Conclusion
 Providing extra generic parameters is a neat way of implementing a trait with the same interface for different types. I encourage you to take a look [at the actix-web source code](https://github.com/actix/actix-web/blob/web-v3.3.2/src/handler.rs) to see how to do it for a use case which is even more generic. Furthermore, they provide a neat macro to lessen the burden of manually implementing the traits for each argument count.
 
-# Endnotes
 [^actix_macro]: However, they use a macro to reduce the amount of required monkeywork.
 [^from_trait]: For example `From<f64>` and `From<(f64,f64)>` are different traits.

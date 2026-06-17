@@ -735,7 +735,6 @@ here. I just hadn't seen it anywhere else, maybe it's out there and I did not
 look hard enough. I'm very happy to engage in the comments at the end of this
 article.
 
-# Endnotes
 [^runtime-builders]: There's also the excellent and venerable [`derive_builder`](https://crates.io/crates/derive_builder) (ver `0.20.1`), which does all validations (including forgotten fields) at run time. The problems with generics addressed in this article also apply to this crate.
 [^bon-core]: The `bon` crate allows to create builders not only for structs but also e.g. for functions. However, this functionality internally transforms the function into a structure with a `.call()` method. The function arguments are made into fields of the generated structure. Then, a builder for this new struct is generated and thus it has the same limitations as the builders that are applied directly to structures.
 [^builder-capabilities]: Examples including: optional fields, `Into`-conversions, default parameters and much more, depending on the crate. [Here](https://elastio.github.io/bon/guide/alternatives) is a great overview by the `bon` maintainers.

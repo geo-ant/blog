@@ -571,7 +571,6 @@ of their paper, which is consistent with the expression I gave.
 As mentioned in the update to this article, I don't believe these ideas are as useful as I once thought.
 But who knows, maybe I'll try and explore them at some point and see how they turn out numerically.
 
-# Endnotes
 
 [^golub_pereyra2002]: See [here](https://pdfs.semanticscholar.org/3f20/1634276f9c1c79e421355b4915b69b4aae24.pdf) for a review paper on Variable Projection by Golub and Pereyra in 2002. In there you can also find references to their original work as well as the contributions by Linda Kaufman. There is also [a follow-up by Pereyra](http://vpereyra.com/wp-content/uploads/2019/08/Surveypaper2019.pdf) covering the time from 2002 until 2019.
 [^errors_notation]: Errors are mine of course. I will also use their notation to make it easy to go back and forth from this article and their publication. This is why I am sparing you the references to their publication in the next sections. Just assume everything is taken from O'Leary and Rust unless stated otherwise.

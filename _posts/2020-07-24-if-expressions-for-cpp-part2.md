@@ -94,7 +94,6 @@ I have chosen move semantics over making the class members themselves references
 # Code and Conclusion
 This was my shot at mimicking Rust-style `if` expressions in C++. These expressions are way more powerful in Rust because expressions are a more natural part of the language than in C++. This is why I only targeted the niche case of conditional initialization. I wonder how useful my implementation is at the end of the day, but the journey was fun for sure. The code is available as part of my [func++ repository](https://github.com/geo-ant/funcpp) on Github.
 
-# Endnotes
 
 [^move_and_const]: Note that the member functions of the expression helper classes cannot be `const` when we want to move out of the expression objects. This oversight caused me more headache than it should have.
 [^char_ternary]: If we tried to write `std::string str = (is_french)?"Bon Jour":"Hello";` we would also get a compiler error, albeit for a slightly different reason.

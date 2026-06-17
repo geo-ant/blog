@@ -82,7 +82,6 @@ Compare this behavior with the C++ mutex: We are locking the mutex before access
 The different paradigms, i.e. protecting pieces of code versus protecting data, are rooted in the differences concerning lifetime and thread-safety guarantees inside the languages. I wonder if it is possible to create an equivalent of the `Arc<Mutex<T>>` structure in C++ which can be used to protect data and can safely be passed to different threads. I'll play with the implementation and write up what I learned in a future post [^boost_sync].
 
 
-# Endnotes
 [^thread_safe_arc]: [Arc](https://doc.rust-lang.org/std/sync/struct.Arc.html) stands for Atomically Reference Counted [Pointer]. It is only the reference counting part that is thread-safe. `Arc` does not provide mutually exclusive access to different threads. To this end we have to stick the `Mutex` insite the `Arc`.
 [^cpp17_features]: Namely class template argument deducation ([CTAD](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction)) and `std::scoped_lock` instead of `std::lock_guard`.
 [^rust_thread]: There is even more neat things that Rust does for us at compile time. For example, it would not allow us to use a different smart-pointer type `Rc<T>` that cannot be safely accessed by multiple threads.

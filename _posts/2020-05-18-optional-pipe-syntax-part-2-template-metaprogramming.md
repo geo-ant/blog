@@ -99,7 +99,6 @@ The rest of the implementation can be left unchanged, regardless of whether the 
 
 There is one last thing left to do. We removed this implementation for callables returning `void` from the overload set using SFINAE. Now we have to provide a suitable overload instead. In the [next article](/blog/2020/optional-pipe-syntax-part-3/) we will do just that.
 
-# Endnotes
 
 [^sfinae]: I want to handle functions returning `void` with a different overload of the operator. That is why I want to use SFINAE to remove this implementation of the pipe operator from the overload set. [Here](https://www.bfilipek.com/2016/02/notes-on-c-sfinae.html) is a very thorough introduction to SFINAE in Modern C++. I will also explain the magic behind this later in the article.
 [^metafunc_return]:In general, metafunctions in C++ can operate either on types or on compile time constant values (or both). The result of a metafunction, be it type or compile time constant, is always computed at compile time.

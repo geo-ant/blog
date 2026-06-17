@@ -185,6 +185,5 @@ which we can use to select _values_ (but not types) at compile time. Both
 implementations are available as part of my [func++ repository](https://github.com/geo-ant/funcpp) 
 repository on GitHub.
 
-# Endnotes
 [^first_try]: For my first try I used `constexpr` functions on the `If` type which can be made to return (instances of) different types using `if constexpr`. There's many problems with this approach, but the biggest problem is that we have to extract the return _type_ using `decltype`, which does not make for a pretty syntax
 [^nested_conditionals]: I know we can nest `std::conditional` to get an _else if_ logic but that only exacerbates the problems with readability.

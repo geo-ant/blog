@@ -498,7 +498,6 @@ This fact is not explicitly guaranteed or documented but I was pretty mind
 blown [when I learned this](https://users.rust-lang.org/t/current-meta-converting-vec-u-vec-t-where/86603).
 This is truly a zero cost abstraction if I ever saw one.
 
-# Endnotes
 
 [^mutref]: As a matter of fact, even if `r2` had merely been an immutable reference, this code would have been rejected by the compiler.
 [^safeapi]: It will turn out that there is, in fact, a high-level API to achieve this. It'll even turn out that the API itself is pretty obvious but the fact that it does the transformation in place is not.

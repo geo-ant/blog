@@ -390,7 +390,6 @@ I'll collect some other solutions that people send me here:
 * [Another nightly solution](https://www.reddit.com/r/rust/comments/168zdh6/comment/jz44fgs/?utm_source=share&utm_medium=web2x&context=3)
 that works entirely inside a `where` clause. (thanks [u/matthieum](https://www.reddit.com/user/matthieum/), thanks [u/Dragon-Hatcher](https://www.reddit.com/user/Dragon-Hatcher/))
 
-# Endnotes
 [^where-clause]: If it strikes you as odd that we have to repeat the exact same condition in the where clause that we used in the body, you are not alone. In principle the compiler should know that `TruthType` is implemented for all incarnations of `Condition<C>`. It also does not help if we write `where Condition<true>: TruthType, Condition<false>:TruthType`. I suspect those are limitations in the current trait solver.
 [^chalk]: There are efforts to implement [a new trait solver](https://blog.rust-lang.org/inside-rust/2023/07/17/trait-system-refactor-initiative.html) with the aim of improving the current situation. Thanks to reddit user `u/Sharlinator` for pointing it out [here](https://www.reddit.com/r/rust/comments/168zdh6/comment/jyz37s3/?utm_source=share&utm_medium=web2x&context=3) that this was not Chalk, as I had stated in a previous version of this endnote.
 [^cpp]: I _know_ C++ has massive problems and I will choose Rust over it any time but the (non macro based) metaprogramming and conditional compilation is currently stronger in C++. Though for normal (non-meta) usecases Traits beat Concepts any day of the week.

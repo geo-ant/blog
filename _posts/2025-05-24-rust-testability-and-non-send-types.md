@@ -259,7 +259,6 @@ I believe the benefits of this approach completely justify the additional comple
 even if this starts looking a bit like a factory pattern. It's no
 [`AbstractFactoryBean<T>`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/beans/factory/config/AbstractFactoryBean.html), though.
 
-# Endnotes
 [^trivial-example]: Since this example is so trivial, there are other ways to go about testing it. But I want to focus on the bare essentials of the problem and I ask you to bear with me, dear reader.
 [^mutex-sync]: Matters would be different if we were interested in implementing `Send` _and_ `Sync` on a type `T` that _only_ implements `Send`. In this case, reachig for `Mutex<T>` is a solution.
 [^pointers]: This commonly happens, e.g. if our type contains a raw pointer field. 

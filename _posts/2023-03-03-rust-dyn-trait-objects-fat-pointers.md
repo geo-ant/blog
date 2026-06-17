@@ -417,7 +417,6 @@ say that this deep dive cleared all (or even any) of that up, but I don't think 
 If anything this probably left you more confused... all I can hope for is that
 some fun was had while reading this. I sure had fun writing it.
 
-# Endnotes
 [^oo_lang]: I mean that C++ is a _more_ object-oriented (OO) language than Rust, not that C++ is a purely an OO language. Further, I don't want to imply that Rust is an OO language _at all_.
 [^vtable-cpp]: Also called virtual _method_ tables, but they also go by [many other names](https://en.wikipedia.org/wiki/Virtual_method_table). Pronounced "veeh-table". Vtables are commonly used in C++ compilers for dispatching to the method of a derived class via a pointer to its base class. The `virtual` keyword plays an important role in dynamic dispatch via inheritance in C++, hence the V in vtable. Our animal example in C++ would be calling the `Cat::sound` member function via a pointer to super class `Pet`, where the `Cat` class derives from `Pet`, which has a `virtual` member function `sound()`.  I'll leave it at that for now and I urge anyone interested in the C++ aspects to check out the aforementioned video on the Creel YouTube channel. 
 [^object-safety]: Not every trait in Rust can be made into a trait object. The key concept here is [object safety](https://doc.rust-lang.org/reference/items/traits.html#object-safety). In this article, we are only concerned with object safe traits.

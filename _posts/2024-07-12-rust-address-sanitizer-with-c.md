@@ -282,7 +282,6 @@ where ASan lets the program run much faster than miri.
 * [Google's documentation](https://github.com/google/sanitizers/wiki/AddressSanitizer) for Address Sanitizer.
 * [Stabilization PR](https://github.com/rust-lang/rust/pull/123617) for AddressSanitizer and LeakSanitizer in rustc.
 
-# Endnotes
 
 [^static]: The correct term is _static_ or _internal_ linkage. In effect, the function cannot be called from outside the library (or even outside of this particular C File... _compilation unit_... damn you voice in my head!).
 [^ub]: But we cannot rely on that. Accessing an invalid pointer is _undefined behavior_, which can mean any number of things.

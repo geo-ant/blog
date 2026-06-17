@@ -123,7 +123,6 @@ As $$K$$ and $$N$$ get large, we can see that all estimates tend toward the same
 # Quantifying Our Confidence
 Now we know how to estimate the mean from a collection of Poisson distributed random variables. All we need is the sum of the variables and the number of trials. However, we have not looked into credible intervals. Since we always end up with a Gamma distribution, there should be information out there. Maybe [here](https://www.tandfonline.com/doi/full/10.1080/03610926.2019.1619768) is a good place to start. Another time...
 
-# Endnotes
 [^jefprio]: This is different from the prior that results when applying Jeffreys' Rule. See [here](https://www.statisticshowto.com/jeffreys-prior/) for an explanation of the confusing nomenclature 
 
 
