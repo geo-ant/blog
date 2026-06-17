@@ -15,6 +15,7 @@ I've recently released the Rust [`dogleg`](https://docs.rs/dogleg/latest/dogleg/
 crate and I thought I'd document everything that's needed to implement a least-squares
 Dogleg optimizer from scratch. You probably don't want to do that, but _if you
 did_, then here's everything you need to know.
+
 # 1 Foreword and References
 
 I'll aim to go into details around the algorithm and implementation, rather than
