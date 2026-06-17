@@ -7,9 +7,9 @@
    viewBox="0 0 158.75 83.34375"
    version="1.1"
    id="svg8"
-   inkscape:version="1.2.2 (1:1.2.2+202212051552+b0a8486541)"
+   inkscape:version="1.4.4 (1:1.4.4+202605061436+dcaf3e7d9e)"
    sodipodi:docname="math.svg"
-   inkscape:export-filename="../../../../../Pictures/vapro-introduction.png"
+   inkscape:export-filename="../dogleg-from-scratch.png"
    inkscape:export-xdpi="192"
    inkscape:export-ydpi="192"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -29,8 +29,8 @@
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
-     inkscape:cx="163.64471"
-     inkscape:cy="204.55589"
+     inkscape:cx="336.3808"
+     inkscape:cy="204.30335"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -38,18 +38,24 @@
      inkscape:snap-bbox="true"
      inkscape:bbox-paths="true"
      inkscape:window-width="2560"
-     inkscape:window-height="1362"
-     inkscape:window-x="1920"
-     inkscape:window-y="41"
+     inkscape:window-height="1313"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:pagecheckerboard="true"
      inkscape:bbox-nodes="true"
      inkscape:snap-bbox-edge-midpoints="true"
      inkscape:showpageshadow="0"
-     inkscape:deskcolor="#d1d1d1">
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:export-bgcolor="#ffffffff">
     <inkscape:grid
        type="xygrid"
-       id="grid838" />
+       id="grid838"
+       originx="0"
+       originy="0"
+       spacingy="1"
+       spacingx="1"
+       units="px" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -78,34 +84,34 @@
          id="tspan826"
          x="55.871964"
          y="251.44806"
-         style="font-size:14.8167px;stroke-width:0.264583">Variable</tspan><tspan
+         style="font-size:14.8167px;stroke-width:0.264583">Powell's</tspan><tspan
          sodipodi:role="line"
          x="55.871964"
-         y="269.9689"
+         y="269.96893"
          style="font-size:14.8167px;stroke-width:0.264583"
-         id="tspan830">Projection</tspan></text>
+         id="tspan830">Dogleg</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:'Dela Gothic One';-inkscape-font-specification:'Dela Gothic One';letter-spacing:0px;word-spacing:0px;fill:#4671ac;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="56.670929"
-       y="230.73491"
+       x="54.785522"
+       y="233.49818"
        id="text836"><tspan
          sodipodi:role="line"
          id="tspan834"
-         x="56.670929"
-         y="230.73491"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;font-family:'EB Garamond';-inkscape-font-specification:'EB Garamond';fill:#4671ac;fill-opacity:1;stroke-width:0.264583">Intro to the</tspan></text>
+         x="54.785522"
+         y="233.49818"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;font-family:'EB Garamond';-inkscape-font-specification:'EB Garamond';fill:#4671ac;fill-opacity:1;stroke-width:0.264583">Intro to </tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:'Dela Gothic One';-inkscape-font-specification:'Dela Gothic One';letter-spacing:0px;word-spacing:0px;fill:#4671ac;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="104.05182"
-       y="283.46744"
+       x="94.368286"
+       y="286.62619"
        id="text836-3"><tspan
          sodipodi:role="line"
          id="tspan834-6"
-         x="104.05182"
-         y="283.46744"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;font-family:'EB Garamond';-inkscape-font-specification:'EB Garamond';fill:#4671ac;fill-opacity:1;stroke-width:0.264583">Algorithm</tspan></text>
+         x="94.368286"
+         y="286.62619"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;font-family:'EB Garamond';-inkscape-font-specification:'EB Garamond';fill:#4671ac;fill-opacity:1;stroke-width:0.264583">from Scratch</tspan></text>
     <g
        id="g819"
        transform="matrix(0.32629633,0,0,0.32629633,-57.835348,116.09622)">

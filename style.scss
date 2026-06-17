@@ -137,6 +137,22 @@ ul ul, ol ul {
   list-style-type: circle;
 }
 
+.pseudocode ul, .pseudocode ol {
+  list-style-type: none;
+  padding-left: 1.5em;
+}
+
+.pseudocode li {
+  margin: 0.2em 0;
+}
+
+.pseudocode .caption {
+  color: $gray;
+  font-size: 0.85em;
+  padding: 2px;
+  text-align: left;
+}
+
 em, i {
   font-family: $Emphasis;
   font-size: 1.1em;
