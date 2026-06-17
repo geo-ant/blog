@@ -7,7 +7,7 @@ title: "Powell's Dogleg for Least Squares Minimization from Scratch"
 # Make sure image is correct!
 og_image: dogleg-from-scratch.png
 # Make sure comments are enabled!
-comments_id: 
+comments_id: 98
 math: true
 ---
 
