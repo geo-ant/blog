@@ -1,7 +1,7 @@
 ---
 layout: post
 tags: math numerics least-squares
-date: 2026-06-30
+date: 2026-06-17
 last_updated:
 title: "Powell's Dogleg for Least Squares Minimization from Scratch"
 # Make sure image is correct!
@@ -15,6 +15,7 @@ I've recently released the Rust [`dogleg`](https://docs.rs/dogleg/latest/dogleg/
 crate and I thought I'd document everything that's needed to implement a least-squares
 Dogleg optimizer from scratch. You probably don't want to do that, but _if you
 did_, then here's everything you need to know.
+
 # 1 Foreword and References
 
 I'll aim to go into details around the algorithm and implementation, rather than
@@ -830,7 +831,6 @@ From that, the statement $$\eqref{tau-dl}$$ follows. Note that for numerical rea
 might still be necessary to tackle the case $$c\approx 0$$, which can manifest
 when $$|c| < \epsilon$$, where $$\epsilon$$ might be in the order of machine precision.
 
-# Endnotes
 
 [^local-min]: Convergence guarantees of solver methods are their own beast that I won't touch at all in this article. Everyone that has ever worked with optimization algorithms knows that finding global optima is often a pipe dream and even finding a local optimum can be highly sensitive to starting conditions, implementation details, condition numbers, birthdates, star signs, etc etc...
 [^ellipsoid-tr]: Other shapes are available. One very common case is a spherical trust region, which is just a special case of the ellipsoid. Another common case would be a box-shaped region in hyperspace.

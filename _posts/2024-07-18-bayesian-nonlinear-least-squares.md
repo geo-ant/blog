@@ -898,7 +898,6 @@ P(\boldsymbol{p},\sigma) &\propto& \sqrt{\text{det}\boldsymbol{I}(\boldsymbol{p}
 
 where we have dropped all factors that do not depend on $$\boldsymbol{p}$$ or $$\sigma$$.
 
-# Endnotes
 [^a-posteriori]: Maximizing the likelihood is the equivalent to maximizing the posterior probability, given uniform priors.
 [^uniform-prior]: Some problems arise when thinking in depth about the meaning of uniform priors. Those don't have a lot of practical importance, but are interesting nonetheless. They are discussed e.g. in Sivia's brilliant [Data Analysis - A Bayesian Tutorial](https://global.oup.com/academic/product/data-analysis-9780198568322https://global.oup.com/academic/product/data-analysis-9780198568322).
 [^log-likelihood]: Maximizing the posterior is the same as minimizing the negative logarithm of the posterior $$L(p)=-\log\,P(p\vert y)$$, which leads us again to the least squares minimization expression at the start of the article.

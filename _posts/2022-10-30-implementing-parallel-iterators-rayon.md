@@ -428,7 +428,6 @@ you an idea of how to go about it. Now is probably a good time to look at all th
 prior art that I mentioned at the beginning of this article, if you haven't
 already.
 
-# Endnotes
 
 [^double_ended]: As a matter of fact, those iterators implement [`ExactSizeIterator`](https://doc.rust-lang.org/std/iter/trait.ExactSizeIterator.html#) as well as [`DoubleEndedIterator`](https://doc.rust-lang.org/std/iter/trait.DoubleEndedIterator.html#), which will be important later.
 [^send]: Note that `i32` is `Send`, which is also important later.

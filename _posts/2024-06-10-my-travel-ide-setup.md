@@ -230,7 +230,6 @@ So that was it. None of this is rocket-science, but I'm still very happy with
 my setup. Let me know what you think. Help, criticism, and any other feedback is 
 welcome. Just leave a comment below.
 
-# Endnotes
 
 [^dont-want-to]: Let's just pretend that I _don't want_ to pay for business class, not that I _can't_...
 [^lsps-neovim]: For example, if you use the mason plugin, downloading an LSP is super easy, barely an inconvenience.

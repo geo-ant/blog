@@ -231,7 +231,6 @@ This is it. We have seen what the DFT actually computes and how it is related to
 
 [Nuttall1981] Nuttall, A. 1981. *Some windows with very good sidelobe behavior*. IEEE Transactions on Acoustics, Speech, and Signal Processing. [doi: 10.1109/TASSP.1981.1163506](https://ieeexplore.ieee.org/document/1163506).
 
-# Endnotes
 [^dsp_answer]: This answer to [my question](https://dsp.stackexchange.com/questions/72231/how-is-the-dtft-of-a-periodic-sampled-signal-linked-to-the-dft) on [dsp.stackexchange](https://dsp.stackexchange.com/) really helped me overcome a mental block I had.
 [^sum_subranges]: Specifically $$\sum_{k=-\infty}^{\infty} a[k]= \sum_{k=-\infty}^{\infty} \sum_{l=0}^{L-1} a[l-kL]$$ for any suitable infinite series. Think of this like splitting a `for` loop over one running index into two for loops over two indices total. Just like accessing a 2D array.
 [^sum_convergence]: Convergence of infinite series is [its own beast](https://math.stackexchange.com/questions/357224/absolutely-convergent-series-and-conditionally-convergent-series-rearrangement). I won't bother with the details and assume the conditions are fulfilled for what I am doing.

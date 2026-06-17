@@ -230,7 +230,6 @@ you'll be forced to make decisions that lay the groundwork for subsequent
 increments. To my mind, that's a better mental model of a good incremental
 development process, and one that's both well-known and worth repeating.
 
-## Endnotes
 
 [^henry-ford-quote]: While it _is true_ that the quote is often attributed to Ford, there's [no evidence](https://www.snopes.com/news/2025/02/23/horses-quote-henry-ford/) of him actually saying it. But _"never let the truth get in the way of a good story"_ --Mark Twain, or was it...?
 [^big-bang]: I'll extend an olive branch here and say that there truly are people who try to design the perfect product in their ivory tower, and yes, those people will most likely never release _anything_, let alone anything that anyone actually wants.

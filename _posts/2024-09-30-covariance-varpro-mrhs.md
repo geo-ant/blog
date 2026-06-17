@@ -410,7 +410,6 @@ numerically efficient (and probably more stable) way of calculating the
 covariance matrix using eq. $$\eqref{cov-jrw}$$. There might be even further
 simplifications that we can exploit, but I'll leave it at that for now[^pseudoinverse].
 
-# Endnotes
 [^inverse]: One can see in the expressions below, that this inverse exists if $$\boldsymbol{W \Phi}(\boldsymbol{\alpha}^\dagger)$$ has linear independent columns. That means the base functions (at the best fit parameters) must be linearly independent, which should be the case for a correcly chosen set of basefunctions for VarPro.
 [^existence]: Note that $$(\boldsymbol{A}^T\boldsymbol{A})^{-1}$$ existing is necessary but not sufficient for the existence of $$(\boldsymbol{J}_{r_w}^T\boldsymbol{J}_{r_w})^{-1}$$. We assume the latter also exists, because we need it to calculate the covariance matrix.
 [^pseudoinverse]: Note, for example that some expressions involve $$((\boldsymbol{W \Phi})^T \boldsymbol{W \Phi})^{-1}(\boldsymbol{W \Phi})^T$$, which is the pseudoinverse of $$\boldsymbol{W \Phi}$$. We can use SVD or QR decompositions to obtain the solutions rather than calculating the peudoinverse itself.

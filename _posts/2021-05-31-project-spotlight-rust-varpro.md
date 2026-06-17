@@ -84,7 +84,6 @@ This concludes my spotlight on the varpro crate. I am pretty happy with how the 
 
 
 
-# Endnotes
 [^nalgebra]: I used the [nalgebra](https://www.nalgebra.org/) package to take care of linear algebra.
 [^notation]: In my article on varpro, I used the notation $$f(\boldsymbol{\alpha},t)$$, but to be consistent with how I implemented it in the library (for reasons that will become apparent later), I'll pull $$t$$ in the front and use  $$f(t,\boldsymbol{\alpha})$$ notation here. This changes nothing semantically.
 [^types]: Here `Vector` is an appropriate column vector type from nalgebra and `Scalar` is an appropriate scalar type. E.g. `type Vector = nalgebra::DVector<f64>` and `type Scalar = f64`.

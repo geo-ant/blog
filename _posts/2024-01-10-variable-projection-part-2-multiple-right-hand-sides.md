@@ -335,7 +335,6 @@ Jacobian (Warren2013).
 
 **(Baerligea2023)** Bärligea, A. *et al.* (2023) "A Generalized Variable Projection Algorithm for Least Squares Problems in Atmospheric Remote Sensing," *Mathematics* **2023, 11, 2839** ([link](https://doi.org/10.3390/math11132839))
 
-# Endnotes
 
 [^baerligea-extension]: They extend the method for datasets where the members of a dataset may have different numbers of elements. This is out of scope for this here article because we have to sacrifice computational savings for this extension. However, it's definitely worth checking out their paper. 
 [^naive-approach]: If you're interested, check out the section titled _naive approach_ in the Bärligea paper.

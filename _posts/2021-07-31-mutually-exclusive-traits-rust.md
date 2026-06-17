@@ -204,7 +204,6 @@ logger.handle(InfoMessage("fyi".to_string()));
 # Conclusion
 Getting mutually exclusive traits and blanket implementations working in Rust was a fun journey. We have to combine the fact that generic traits of different types are different traits *as well as* the fact that associated types can be used as mutually exclusive restrictions in trait bounds. Neither alone will suffice at the time of writing.
 
-# Endnotes
 [^silly]: Again, this is a silly example. But it is self-contained and we'll eventually get to sweet, sweet generic programming. So disregard for now that we could just add another field to our logging message and decide what to do at runtime.
 
 [^log_task_display]: For an actual use case we would require `Display` rather than `Debug` as a supertrait of a log message. For this example, using `Debug` is easier because we can derive it without additional dependencies.

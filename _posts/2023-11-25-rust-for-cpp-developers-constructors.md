@@ -521,7 +521,6 @@ explicitness. Explicit copies, clones, conversions and even being explicit in
 what is implemented, even if the compiler could trivially do so. When I go 
 back to C++ now, I often find myself adhering to these more Rusty idioms.
 
-# Endnotes
 [^initialization-cpp]: It would not be C++ if there weren't potentially many ways of initialization that interact in complex ways with each other. There's even [a book](https://leanpub.com/cppinitbook) dedicated solely to this very topic.
 [^concept-triv]: It's not a _concept_ in the C++20 meaning of the word. 
 [^auto-traits]: There are a handful of marker traits that the compiler will implicitly implement for you if appropriate. Those are called [Auto Traits](https://doc.rust-lang.org/beta/reference/special-types-and-traits.html#auto-traits) and are very carefully chosen. The most common auto traits that programmers interact with are the `Send` and `Sync` traits that are important for describing thread safety via the type system.

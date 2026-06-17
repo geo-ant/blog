@@ -385,7 +385,6 @@ to see that a language which is often hailed as a safe successor to C++ does ind
 help to prevent many of the bugs common in C++. And yet we saw that Rust is not without
 its flaws.
 
-# Endnotes
 
 [^arrays]: This is true for other array like containers in the STL as well as C-style arrays.
 [^panic]: A panic is an early, but orderly termination of the program with stack unwinding.

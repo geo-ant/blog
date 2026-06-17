@@ -71,7 +71,6 @@ there's an argument in here for being less fancy, maybe there's an argument for 
 that decision to you, dear reader, as I leave the question: how do we actually achieve what I was trying out to do in an elegant manner?
 
 
-# Endnotes
 
 
 [^always]: Full disclosure, it's not _always_ recursion.

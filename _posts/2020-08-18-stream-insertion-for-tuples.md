@@ -70,7 +70,6 @@ std::ostream & operator<<(std::ostream& os, const std::tuple<Ts...> & tuple) {
 ```
 Note that we pass the helper function a (default constructed) value of helper type `std::index_sequence_for<Ts...>{}`. This is the idiom I mentioned above. We pass the value to let the compiler deduce the underlying type, which is what we are actually interested in. Now the operator does what we want it to do.
 
-# Endnotes
 
 [^cppref_prettyprint]: The [cppreference](https://en.cppreference.com/w/cpp/utility/integer_sequence) has pretty much the same implementation as an example use case for `std::integer_sequence`
 

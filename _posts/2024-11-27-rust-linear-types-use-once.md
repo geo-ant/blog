@@ -195,7 +195,6 @@ crate. In that crate, a non-existing external function is linked in the `Drop`
 implementation, which moves the error to link time. That will make it work for
 this case but it also makes the error even uglier[^linker].
 
-# Endnotes
 [^title]: Unless you are quoting the title of this article which explicitly says linear types... I feel stupid now.
 [^linker]: Plus it introduces the can of worms of how to know that a symbol name is never going to be actually linked. There are ways around that, but I don't feel they'll be pretty.
 [^panic]: If you want to find out why, it's explained in the comment thread.

@@ -148,7 +148,6 @@ Those considerations quickly lead us into the territory of joint optimizations
 and _latent images_, where the math and algorithms get really interesting really
 fast, despite our simple model. I might tackle this in a follow-up article.
 
-# Endnotes
 [^pixel-index]: We can use a linear index for the pixels instead of $x,y$ because the position does not matter for our model. The important thing is that each value of $$k$$ corresponds to the same unique pixel position in both images.
 [^lsqr]: Least squares fitting has a couple of nice properties. First of all, it emerges as the maximum likelihood estimator of Gaussian probability distributions. Second of all, it is very tractable analytically. Both things make it appealing for our use case, though a formal Bayesian description of our image mapping process can get tricky quickly. So we'll allow ourselves to use least squares here because it's a good heuristic.
 [^zhang]: See [here](https://www.researchgate.net/publication/234800535_Automatic_relative_radiometric_normalization_using_iteratively_weighted_least_square_regression) for a PDF copy.
