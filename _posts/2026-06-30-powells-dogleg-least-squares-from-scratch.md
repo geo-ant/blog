@@ -822,8 +822,11 @@ $$
 
 Since we know from the inequalities above that $$b/c \geq 0$$, the _only way_
 in which the solution can satisfy $$x>0$$ is when the sign before the square
-root is positive. Therefore, the positive solution is the unique valid root. From that
-the statement $$\eqref{tau-dl}$$ follows. Note that for numerical reasons it
+root is positive. Therefore, the positive solution must be the unique valid root.
+It's also quite easy to prove that $$x \in (0,1)$$, but that's left as an exercise
+to the reader.
+
+From that, the statement $$\eqref{tau-dl}$$ follows. Note that for numerical reasons it
 might still be necessary to tackle the case $$c\approx 0$$, which can manifest
 when $$|c| < \epsilon$$, where $$\epsilon$$ might be in the order of machine precision.
 
