@@ -1,21 +1,12 @@
 ---
 layout: post
 tags: math numerics least-squares
-#categories: []
-date: 2026-06-26
+date: 2026-06-30
 last_updated:
-#excerpt: ''
-#image:
-#description:
-#permalink:
 title: "Powell's Dogleg for Least Squares Minimization from Scratch"
-#
-#
-# Make sure this image is correct !!!
+# Make sure image is correct!
 og_image: dogleg-from-scratch.png
-#
-#
-# make sure comments are enabled
+# Make sure comments are enabled!
 comments_id: 
 math: true
 ---
@@ -26,8 +17,8 @@ Dogleg optimizer from scratch. You probably don't want to do that, but _if you
 did_, then here's everything you need to know.
 # 1 Foreword and References
 
-I'll try to do my best to actually go into details around the algorithm and
-implementation details, rather than leaving it at the high-level stuff.
+I'll aim to go into details around the algorithm and implementation, rather than
+leaving it at a high-level overview.
 However, since this will be a long article, I'll need to focus on Dogleg
 specifically and I can only touch on adjacent topics. Additionally, I will
 focus on the topic of _unconstrained least squares minimization_. Dogleg itself is a general
@@ -420,8 +411,8 @@ $$\begin{eqnarray}
   d_{d,i}^{(k)} &=& \max(\min(d_{max}, \lVert\boldsymbol{j}_i^{(k)}\rVert),d_{min}), \tag{20.2} \\
 \end{eqnarray}$$
 
-where $$\boldsymbol{j}_i^{(k)}$$ again denotes the $$i$$-th column of the Jacobian,
-this time evaluated at the current step with index $$k$$. The diagonal elements
+where $$\boldsymbol{j}_i^{(k)}$$ again denotes the $$i$$-th column of the Jacobian
+evaluated at the current step with index $$k$$. The diagonal elements
 are just the column-norms of the Jacobian clamped to the range $$[d_{min}, d_{max}]$$,
 where the default values for the endpoints of the range in Ceres are:
 
@@ -445,12 +436,12 @@ as given in $$\eqref{Dk}$$. We can then use this matrix to calculate
 the scaled Jacobian $$\widetilde{\boldsymbol{J}}$$ from the Jacobian $$\boldsymbol{J}$$,
 using $$\eqref{j-scaled}$$ and from that the scaled gradient using $$\eqref{g-scaled}$$.
 
-We're calculating the dogleg step in scaled space by using the same algorithm
+We calculate the dogleg step in scaled space by using the same algorithm
 as described above. The two ingredients to the dogleg step are the $$\widetilde{\boldsymbol{p}}_{gn}$$
 and $$\widetilde{\boldsymbol{p}}_{sd}$$, which are the Gauss-Newton and the
 steepest descent step, respectively, both in scaled space. From that, we
 calculate the final dogleg step in scaled space $$\widetilde{\boldsymbol{p}}_{dl}$$
-using Algorithm 2. We can still use Algorithm 1 to perform the trust region step,
+using Algorithm 2. We can then use Algorithm 1 to perform the trust region step,
 but we have to be sure to _unscale_ the dogleg step using
 $$\boldsymbol{p}_{dl} = \boldsymbol{D}^{-1} \widetilde{\boldsymbol{p}}_{dl}$$
 before using it to get the next step
@@ -462,7 +453,7 @@ with the scaled gradient and Jacobian:
 $$ \widetilde{\boldsymbol{p}}_{sd}(\boldsymbol{x}) = -\frac{\lVert \widetilde{\boldsymbol{g}}(\boldsymbol{x})\rVert^2}{\lVert \widetilde{\boldsymbol{J}}(\boldsymbol{x})\widetilde{\boldsymbol{g}}(\boldsymbol{x})\rVert^2} \widetilde{\boldsymbol{g}}(\boldsymbol{x}), \tag{22} \label{p-sd-scaled}$$
 
 In the next section, I'll explain how to calculate the Gauss-Newton step, since
-I wanted to introduce regularization to it as well. Note, that we'll never
+I wanted to introduce regularization to it as well. Note that we'll never
 actually need to form the scaled Jacobian to calculate $$\eqref{p-sd-scaled}$$,
 because we can just rewrite the matrix vector product in the denominator as
 $$\widetilde{\boldsymbol{J}}\widetilde{\boldsymbol{g}} = \boldsymbol{J}(\boldsymbol{D}^{-1} \widetilde{\boldsymbol{g}})$$,
@@ -812,8 +803,8 @@ inequality $$c>0$$, we have to look at Algorithm 2 again. Obviously $$c \geq 0$$
 it's a norm squared. So the one thing we need to prove for $$c>0$$ is
 $$\boldsymbol{p}_{gn} \neq \boldsymbol{p}_{sd}$$. Let's assume
 $$\boldsymbol{p}_{gn} = \boldsymbol{p}_{sd} = \boldsymbol{p}$$. In that case
-either the first condition $$\boldsymbol{p} \geq \Delta$$ of Algorithm or its
-second condition $$\boldsymbol{p} \leq \Delta$$ kicks in. Thus, at the time
+either the first condition $$\lVert\boldsymbol{p}\rVert \geq \Delta$$ of Algorithm 2 or its
+second condition $$\lVert\boldsymbol{p}\rVert \leq \Delta$$ kicks in. Thus, at the time
 where we're trying to solve the quadratic equation, we know that $$c >0$$.
 Writing the equation using the definitions above gives us
 
@@ -831,8 +822,8 @@ $$
 
 Since we know from the inequalities above that $$b/c \geq 0$$, the _only way_
 in which the solution can satisfy $$x>0$$ is when the sign before the square
-root is positive. That makes the positive solution the only one. From that
-the statement $$\eqref{tau-dl}$$ follows. Note, that for numerical reasons it
+root is positive. Therefore, the positive solution is the unique valid root. From that
+the statement $$\eqref{tau-dl}$$ follows. Note that for numerical reasons it
 might still be necessary to tackle the case $$c\approx 0$$, which can manifest
 when $$|c| < \epsilon$$, where $$\epsilon$$ might be in the order of machine precision.
 
