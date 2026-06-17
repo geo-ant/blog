@@ -181,10 +181,10 @@ $$\boldsymbol{J}(\boldsymbol{x})=
 and now we can write the gradient and Hessian of $$f$$ as
 
 $$\begin{eqnarray}
-\nabla f(\boldsymbol{x}) &=:& \boldsymbol{g}(\boldsymbol{x}) = \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{r} \tag{7a} \label{grad-f} \\
+\nabla f(\boldsymbol{x}) &=:& \boldsymbol{g}(\boldsymbol{x}) = \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{r} \tag{7.1} \label{grad-f} \\
 \nabla^2 f(\boldsymbol{x}) &=& \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) \\
 &+& \sum_{i=1}^{m} r_i(\boldsymbol{x}) \nabla^2 r_i(\boldsymbol{x}) \\
-&\approx& \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) \tag{7b} \label{hessian-f}.
+&\approx& \boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) \tag{7.2} \label{hessian-f}.
 \end{eqnarray}$$
 
 The approximation $$\boldsymbol{B} \approx \boldsymbol{J}^T \boldsymbol{J}$$ is
@@ -193,8 +193,8 @@ eq. $$\eqref{mk-def}$$:
 
 $$\begin{eqnarray}
 m_k(\boldsymbol{p}) &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}_k) \rVert^2 + \boldsymbol{r}(\boldsymbol{x}_k)^T \boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p} \\
-&+& \frac{1}{2} (\boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p})^T \boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p} \tag{8a} \label{mk-lsqr1} \\
- &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}_k) + \boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p} \rVert^2 \tag{8b} \label{mk-lsqr2}.
+&+& \frac{1}{2} (\boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p})^T \boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p} \tag{8.1} \label{mk-lsqr1} \\
+ &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}_k) + \boldsymbol{J}(\boldsymbol{x}_k)\boldsymbol{p} \rVert^2 \tag{8.2} \label{mk-lsqr2}.
 \end{eqnarray}$$
 
 Both formulations are useful. Just as an aside, the second line reveals an interesting insight:
@@ -217,8 +217,8 @@ Note also that this section already specializes Dogleg to least squares problems
 The Gauss-Newton step $$\boldsymbol{p}_{gn}$$ is given as the solution to 
 
 $$\begin{eqnarray}
-\boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p}_{gn} = - \boldsymbol{J}^T(\boldsymbol{x}) \boldsymbol{r}(\boldsymbol{x}) \label{normal-eqs} \tag{9a} \\
-\Leftrightarrow \boldsymbol{p}_{gn}(\boldsymbol{x}) = \arg \min_{\boldsymbol{p}} \lVert \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} + \boldsymbol{r}(\boldsymbol{x}) \rVert^2, \tag{9b} \label{p-gn}
+\boldsymbol{J}(\boldsymbol{x})^T \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p}_{gn} = - \boldsymbol{J}^T(\boldsymbol{x}) \boldsymbol{r}(\boldsymbol{x}) \label{normal-eqs} \tag{9.1} \\
+\Leftrightarrow \boldsymbol{p}_{gn}(\boldsymbol{x}) = \arg \min_{\boldsymbol{p}} \lVert \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{p} + \boldsymbol{r}(\boldsymbol{x}) \rVert^2, \tag{9.2} \label{p-gn}
 \end{eqnarray}$$
 
 which is just the least squares solution to the following system of equations
@@ -294,19 +294,21 @@ in practice.
 </div>
 
 To obtain the magical $$\tau_{dl}$$ in the third `if` branch, we have to
-realize that we are now in the $$\tau \in [1,2)$$ path segment. That means
-the condition $$\lVert \boldsymbol{p}(\tau_{dl}) \rVert = \Delta$$ is
-equivalent to the quadratic equation
+realize that we are now in the $$\tau \in (1,2)$$ path segment, because
+the case $$\tau \leq 1$$ is covered by the first branch and the case
+$$\tau = 2$$ is covered in the second branch. The condition
+$$\lVert \boldsymbol{p}(\tau_{dl}) \rVert = \Delta$$ is equivalent to the quadratic
+equation
 
-$$\lVert \boldsymbol{p}_{sd} + (\tau_{dl}-1) (\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}) \rVert^2 = \Delta^2. \tag{13}$$
+$$\lVert \boldsymbol{p}_{sd} + (\tau_{dl}-1) (\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}) \rVert^2 = \Delta^2. \label{tau-eqn} \tag{13}$$
 
 It can be shown that the solution to this equation can always be written as follows
 (see Appendix A):
 
 $$
 \begin{eqnarray}
-\tau_{dl} &=& 1 - \xi + \sqrt{\frac{\Delta^2-\lVert \boldsymbol{p}_{sd}\rVert^2}{\lVert \boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}\rVert^2} + \xi^2} \tag{14a} \label{tau-dl} \\
-\xi &:=& \frac{\boldsymbol{p}_{sd}^T (\boldsymbol{p}_{gn} - \boldsymbol{p}_{sd})}{\lVert \boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}\rVert^2} \tag{14b}.
+\tau_{dl} &=& 1 - \xi + \sqrt{\frac{\Delta^2-\lVert \boldsymbol{p}_{sd}\rVert^2}{\lVert \boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}\rVert^2} + \xi^2} \tag{14.1} \label{tau-dl} \\
+\xi &:=& \frac{\boldsymbol{p}_{sd}^T (\boldsymbol{p}_{gn} - \boldsymbol{p}_{sd})}{\lVert \boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}\rVert^2} \tag{14.2}.
 \end{eqnarray}
 $$
 
@@ -329,8 +331,8 @@ to implement for going from a decent implementation to a great one.
 Elliptical trust regions are defined by
 
 $$\begin{eqnarray}
-\lVert \boldsymbol{D} \boldsymbol{p} \rVert &\leq& \Delta, \tag{15a} \label{elliptical-tr} \\
-\boldsymbol{D} &:=& \text{diag}(d_1,\dots,d_n) \in \mathbb{R}^{n \times n},\; \tag{15b} \label{d-def} \\
+\lVert \boldsymbol{D} \boldsymbol{p} \rVert &\leq& \Delta, \tag{15.1} \label{elliptical-tr} \\
+\boldsymbol{D} &:=& \text{diag}(d_1,\dots,d_n) \in \mathbb{R}^{n \times n},\; \tag{15.2} \label{d-def} \\
 d_j &>& 0 
 \end{eqnarray}$$
 
@@ -350,12 +352,12 @@ By substituting this into $$\eqref{pk-elliptical}$$, we obtain a
 minimization problem with spherical bounds in the scaled step coordinates:
 
 $$\begin{eqnarray}
-\boldsymbol{\widetilde{p}}_k &=& \arg \min_{\boldsymbol{\widetilde{p}}} \widetilde{m}_k(\boldsymbol{\widetilde{p}}) \text{ , s.t. } \lVert \boldsymbol{\widetilde{p}} \rVert \leq \Delta \tag{18a} \label{mk-scaled}, \\
+\boldsymbol{\widetilde{p}}_k &=& \arg \min_{\boldsymbol{\widetilde{p}}} \widetilde{m}_k(\boldsymbol{\widetilde{p}}) \text{ , s.t. } \lVert \boldsymbol{\widetilde{p}} \rVert \leq \Delta \tag{18.1} \label{mk-scaled}, \\
 \widetilde{m}_k(\boldsymbol{\widetilde{p}}) &:=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}) \rVert^2 + \boldsymbol{\widetilde{g}}(\boldsymbol{x})^T \boldsymbol{\widetilde{p}} \\
- &+& \frac{1}{2} (\boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}})^T \boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}} \tag{18b} \label{mk-scaled-1} \\
- &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}) + \boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}} \rVert^2 \tag{18c} \label{mk-scaled2} \\
-\boldsymbol{\widetilde{J}}(\boldsymbol{x}) &:=& \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{D}^{-1}  \tag{18d} \label{j-scaled} \\
-\boldsymbol{\widetilde{g}}(\boldsymbol{x}) &:=& \boldsymbol{D}^{-1} \boldsymbol{g}(\boldsymbol{x}) = \boldsymbol{\widetilde{J}}(\boldsymbol{x})^T \boldsymbol{r}(\boldsymbol{x})   \tag{18e} \label{g-scaled},
+ &+& \frac{1}{2} (\boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}})^T \boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}} \tag{18.2} \label{mk-scaled-1} \\
+ &=& \frac{1}{2} \lVert \boldsymbol{r}(\boldsymbol{x}) + \boldsymbol{\widetilde{J}}(\boldsymbol{x})\boldsymbol{\widetilde{p}} \rVert^2 \tag{18.3} \label{mk-scaled2} \\
+\boldsymbol{\widetilde{J}}(\boldsymbol{x}) &:=& \boldsymbol{J}(\boldsymbol{x}) \boldsymbol{D}^{-1}  \tag{18.4} \label{j-scaled} \\
+\boldsymbol{\widetilde{g}}(\boldsymbol{x}) &:=& \boldsymbol{D}^{-1} \boldsymbol{g}(\boldsymbol{x}) = \boldsymbol{\widetilde{J}}(\boldsymbol{x})^T \boldsymbol{r}(\boldsymbol{x})   \tag{18.5} \label{g-scaled},
 \end{eqnarray}$$
 
 where we call $$\boldsymbol{\widetilde{g}}$$ the _scaled_ gradient and
@@ -396,8 +398,8 @@ stays the same for the whole runtime of the algorithm. Its intent
 is to _"improve the conditioning of the Jacobian"_[^ceres-static-scaling]:
 
 $$\begin{eqnarray}
-  \boldsymbol{D}_s &=& \text{diag}(d_{s,1},\,\dots\,,d_{s,n}) \in \mathbb{R}^{n \times n} \tag{19a} \label{Ds} \\ 
-  d_{s,i} &=& \lVert\boldsymbol{j}_i\rVert+1 \tag{19b}, \\
+  \boldsymbol{D}_s &=& \text{diag}(d_{s,1},\,\dots\,,d_{s,n}) \in \mathbb{R}^{n \times n} \tag{19.1} \label{Ds} \\ 
+  d_{s,i} &=& \lVert\boldsymbol{j}_i\rVert+1 \tag{19.2}, \\
 \end{eqnarray}$$
 
 where $$\boldsymbol{j}_i$$ is the $$i$$-th _column_ of the Jacobian. For this
@@ -414,8 +416,8 @@ superscript index to make the explicit dependence on the step obvious. It's calc
 as [^ceres-dynamic-scaling]:
 
 $$\begin{eqnarray}
-  \boldsymbol{D}_d^{(k)} &=& \text{diag}(d_{d,1}^{(k)},\,\dots\,,d_{d,n}^{(k)}) \in \mathbb{R}^{n \times n} \tag{20a} \label{Dd} \\ 
-  d_{d,i}^{(k)} &=& \max(\min(d_{max}, \lVert\boldsymbol{j}_i^{(k)}\rVert),d_{min}), \tag{20b} \\
+  \boldsymbol{D}_d^{(k)} &=& \text{diag}(d_{d,1}^{(k)},\,\dots\,,d_{d,n}^{(k)}) \in \mathbb{R}^{n \times n} \tag{20.1} \label{Dd} \\ 
+  d_{d,i}^{(k)} &=& \max(\min(d_{max}, \lVert\boldsymbol{j}_i^{(k)}\rVert),d_{min}), \tag{20.2} \\
 \end{eqnarray}$$
 
 where $$\boldsymbol{j}_i^{(k)}$$ again denotes the $$i$$-th column of the Jacobian,
@@ -616,9 +618,9 @@ away from an optimal solution.
   The criterion is considered fulfilled if the following three conditions are met:
 
   $$\begin{eqnarray}
-  \text{PREDRED} &\leq& f_{tol} \tag{28a} \\\
-  |\text{ACTRED}| &\leq& f_{tol} \tag{28b} \\
-  \text{ACTRED}  &\leq& 2\cdot\text{PREDRED} \tag{28c}
+  \text{PREDRED} &\leq& f_{tol} \tag{28.1} \\\
+  |\text{ACTRED}| &\leq& f_{tol} \tag{28.2} \\
+  \text{ACTRED}  &\leq& 2\cdot\text{PREDRED} \tag{28.3}
   \end{eqnarray}$$
 
   Since this criterion attempts to set a relative bound on the residuals
@@ -784,6 +786,57 @@ If you're interested in a Rust implementation, please check out my
 open-source [`dogleg`](https://crates.io/crates/dogleg) crate.
 
 # Appendix A: Finding $$\tau_{dl}$$
+
+Since it's not really spelled out in the other referenced material, I'll show how to
+obtain the solution to $$\eqref{tau-eqn}$$:
+
+$$\begin{eqnarray}
+\Delta^2 &=& \lVert \boldsymbol{p}_{sd} + (\tau-1) (\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}) \rVert^2 \tag{A1} \\
+\Leftrightarrow \Delta^2 &=& \lVert \boldsymbol{p}_{sd}\rVert^2 + 2(\tau-1) \boldsymbol{p}_{sd}^T(\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}) \\[0.2em]
+ &\,& + (\tau-1)^2 \lVert(\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}) \rVert^2,
+\end{eqnarray}$$
+
+where we know that the solution $$\tau$$ must be in the range $$(1,2)$$. Let's
+introduce the following definitions
+
+$$\begin{eqnarray}
+x &:=& \tau -1 \in (0,1) \tag{A2.1} \\
+a &:=& \lVert \boldsymbol{p}_{sd}\rVert^2 \geq 0 \tag {A2.2} \\
+b &:=& \boldsymbol{p}_{sd}^T(\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}) \geq 0 \tag{A2.3} \\
+c &:=& \lVert(\boldsymbol{p}_{gn}-\boldsymbol{p}_{sd}) \rVert^2 > 0, \tag{A2.4} \\
+\end{eqnarray}$$
+
+where the inequalities follow trivially, except for $$b\geq 0$$ and $$c>0$$.
+The inequality $$b \geq 0$$ follows from Lemma 4.2 on p.75 of N&W. For the strict
+inequality $$c>0$$, we have to look at Algorithm 2 again. Obviously $$c \geq 0$$ because
+it's a norm squared. So the one thing we need to prove for $$c>0$$ is
+$$\boldsymbol{p}_{gn} \neq \boldsymbol{p}_{sd}$$. Let's assume
+$$\boldsymbol{p}_{gn} = \boldsymbol{p}_{sd} = \boldsymbol{p}$$. In that case
+either the first condition $$\boldsymbol{p} \geq \Delta$$ of Algorithm or its
+second condition $$\boldsymbol{p} \leq \Delta$$ kicks in. Thus, at the time
+where we're trying to solve the quadratic equation, we know that $$c >0$$.
+Writing the equation using the definitions above gives us
+
+$$
+\Delta^2 = a + 2 b x + c x^2 \tag{A3}
+$$
+
+and since we know $$c\neq 0$$, we can
+[write the solution](https://www.wolframalpha.com/input?i=solve%28D%5E2+%3D+a+%2B+2*b*x%2Bc*x%5E2%2Cx%29)
+as
+
+$$
+x = -\frac{b}{c} \pm \sqrt{\frac{c\Delta^2+b^2-ac}{c^2}}. \tag{A4}
+$$
+
+Since we know from the inequalities above that $$b/c \geq 0$$, the _only way_
+in which the solution can satisfy $$x>0$$ is when the sign before the square
+root is positive. That makes the positive solution the only one. From that
+the statement $$\eqref{tau-dl}$$ follows. Note, that for numerical reasons it
+might still be necessary to tackle the case $$c\approx 0$$, which can manifest
+when $$|c| < \epsilon$$, where $$\epsilon$$ might be in the order of machine precision.
+
+# Endnotes
 
 [^local-min]: Convergence guarantees of solver methods are their own beast that I won't touch at all in this article. Everyone that has ever worked with optimization algorithms knows that finding global optima is often a pipe dream and even finding a local optimum can be highly sensitive to starting conditions, implementation details, condition numbers, birthdates, star signs, etc etc...
 [^ellipsoid-tr]: Other shapes are available. One very common case is a spherical trust region, which is just a special case of the ellipsoid. Another common case would be a box-shaped region in hyperspace.
