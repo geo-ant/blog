@@ -3,7 +3,7 @@ layout: post
 tags: rust unstable traits const
 #categories: []
 date: 2023-09-01
-last_updated: 2023-09-07
+last_updated: 2026-10-07
 title: 'Curiously Cumbersome Rust: Type-level Programming'
 #excerpt: ''
 #description:
@@ -243,6 +243,12 @@ and that the compiler issues a dedicated warning when it is used.
 
 # Rethinking and Making it Work on Stable
 
+**UPDATE (Rust >= 1.79.0)** Since [inline const expressions](https://blog.rust-lang.org/2024/06/13/Rust-1.79.0/?utm_source=chatgpt.com#inline-const-expressions)
+were stabilized in Rust 1.79.0, the complicated song and dance outlined
+below isn't necessary anymore. We can now simply stick the assertion inside a
+const block in the function: `const{assert!(size_of::<T>()==size_of::<U>()}`
+and that's it.
+
 There is another way to go about the whole problem, which does not involve
 traits. [For a while](https://github.com/rust-lang/rust/pull/89508) stable Rust
 has offered the possibility of panicking in `const` evaluated contexts. A
@@ -268,7 +274,8 @@ fn do_something<T,U>(t: T, u: U) {
     const ASSERTION : () = assert!(core::mem::size_of::<T>()
                             ==core::mem::size_of::<U>(),
                            "T and U must have the same size");
-    // do something
+    
+    // ...
 }
 ```
 
