@@ -271,10 +271,12 @@ by a compile time assertion like so:
 
 ```rust
 fn do_something<T,U>(t: T, u: U) {
+    // Only necessary before Rust 1.79.0
+    // For more recent versions just stick the assertion
+    // in a const {...} block and be done with this
     const ASSERTION : () = assert!(core::mem::size_of::<T>()
                             ==core::mem::size_of::<U>(),
                            "T and U must have the same size");
-    
     // ...
 }
 ```
